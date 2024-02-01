@@ -1,0 +1,12 @@
+.idea
+.run
+.vscode
+cmake-build-.*
+
+conan-staging/.*\.cmake
+conan-staging/.*\.sh
+
+\.gitignore
+.*\.tar\.gz$
+^\.github
+^docs

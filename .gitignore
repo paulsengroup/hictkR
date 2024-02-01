@@ -1,0 +1,17 @@
+# Copyright (C) 2024 Roberto Rossini <roberros@uio.no>
+#
+# SPDX-License-Identifier: MIT
+
+# Ignored directories
+.idea/
+.run/
+.vscode/
+cmake-build*/
+conan-staging/
+
+# Ignored files
+*.bak
+gmon.out
+perf.*
+*.o
+*.so
