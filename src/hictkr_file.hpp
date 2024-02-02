@@ -21,6 +21,9 @@ public:
   [[nodiscard]] bool is_cooler() const noexcept;
   [[nodiscard]] bool is_hic() const noexcept;
 
+  [[nodiscard]] Rcpp::DataFrame chromosomes() const;
+  [[nodiscard]] Rcpp::DataFrame bins() const;
+
   [[nodiscard]] std::string path() const noexcept;
   [[nodiscard]] std::uint64_t nbins() const noexcept;
 

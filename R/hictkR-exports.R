@@ -4,6 +4,9 @@
 
 #' @export HiCFile
 #' @export File
+#' @export fetch
+#' @export chromosomes
+#' @export bins
 
 loadModule(module = "hictkR", TRUE)
 
@@ -19,4 +22,12 @@ fetch <- function(file, range1 = "", range2 = "", normalization = "NONE", count_
     if (type == "dense") {
         return(file$fetch_dense(range1, range2, normalization, count_type, query_type))
     }
+}
+
+chromosomes <- function(file) {
+    return(file$chromosomes);
+}
+
+bins <- function(file) {
+    return(file$bins);
 }

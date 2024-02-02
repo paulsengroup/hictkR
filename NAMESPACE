@@ -7,3 +7,5 @@ export(HiCFile)
 
 export(File)
 export(fetch)
+export(chromosomes)
+export(bins)

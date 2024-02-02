@@ -3,11 +3,17 @@
 // SPDX-License-Identifier: MIT
 
 #include <Rcpp.h>
+#include <cstddef>
 #include <cstdint>
+#include <hictk/bin_table.hpp>
 #include <hictk/file.hpp>
+#include <hictk/genomic_interval.hpp>
+#include <hictk/pixel.hpp>
 #include <hictk/transformers/join_genomic_coords.hpp>
-#include <hictk/version.hpp>
+#include <memory>
 #include <string>
+#include <variant>
+#include <vector>
 
 #include "./hictkr_file.hpp"
 
@@ -18,6 +24,49 @@ HiCFile::HiCFile(std::string uri, std::uint32_t resolution,
 
 bool HiCFile::is_cooler() const noexcept { return _fp.is_cooler(); }
 bool HiCFile::is_hic() const noexcept { return _fp.is_hic(); }
+
+Rcpp::DataFrame HiCFile::chromosomes() const {
+  Rcpp::CharacterVector chrom_names{};
+  Rcpp::IntegerVector chrom_sizes{};
+  for (const auto &chrom : _fp.chromosomes()) {
+    if (chrom.is_all()) {
+      continue;
+    }
+    chrom_names.push_back(std::string{chrom.name()});
+    chrom_sizes.push_back(chrom.size());
+  }
+
+  return Rcpp::DataFrame::create(Rcpp::Named("name") = chrom_names,
+                                 Rcpp::Named("size") = chrom_sizes);
+}
+
+Rcpp::DataFrame HiCFile::bins() const {
+
+  Rcpp::CharacterVector chrom_names{};
+  for (const auto &chrom : _fp.chromosomes()) {
+    if (chrom.is_all()) {
+      continue;
+    }
+    chrom_names.push_back(std::string{chrom.name()});
+  }
+
+  Rcpp::IntegerVector chroms{};
+  Rcpp::IntegerVector starts{};
+  Rcpp::IntegerVector ends{};
+
+  for (const auto &bin : _fp.bins()) {
+    chroms.push_back(bin.chrom().id());
+    starts.push_back(bin.start());
+    ends.push_back(bin.end());
+  }
+
+  chroms.attr("class") = "factor";
+  chroms.attr("levels") = chrom_names;
+
+  return Rcpp::DataFrame::create(Rcpp::Named("chrom") = chroms,
+                                 Rcpp::Named("start") = starts,
+                                 Rcpp::Named("ends") = ends);
+}
 
 std::string HiCFile::path() const noexcept { return {_fp.path()}; }
 std::uint64_t HiCFile::nbins() const noexcept { return _fp.nbins(); }

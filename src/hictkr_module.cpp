@@ -7,6 +7,8 @@ RCPP_MODULE(hictkR) {
       .constructor<std::string, std::uint32_t, std::string, std::string>()
       .property("is_cooler", &HiCFile::is_cooler)
       .property("is_hic", &HiCFile::is_hic)
+      .property("chromosomes", &HiCFile::chromosomes)
+      .property("bins", &HiCFile::bins)
       .property("path", &HiCFile::path, "Path to the opened file.")
       .property("nbins", &HiCFile::nbins, "Number of bins.")
       .method("fetch_df", &HiCFile::fetch_df,
