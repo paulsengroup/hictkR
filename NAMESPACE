@@ -1,3 +1,9 @@
-useDynLib(hictkR, .registration=TRUE)
-exportPattern("^[[:alpha:]]+")
-importFrom(Rcpp, evalCpp)
+useDynLib(hictkR, .registration = TRUE)
+
+import(Rcpp)
+import(methods)
+
+export(HiCFile)
+
+export(File)
+export(fetch)
