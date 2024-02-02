@@ -44,9 +44,6 @@ Rcpp::DataFrame HiCFile::bins() const {
 
   Rcpp::CharacterVector chrom_names{};
   for (const auto &chrom : _fp.chromosomes()) {
-    if (chrom.is_all()) {
-      continue;
-    }
     chrom_names.push_back(std::string{chrom.name()});
   }
 
@@ -55,7 +52,7 @@ Rcpp::DataFrame HiCFile::bins() const {
   Rcpp::IntegerVector ends{};
 
   for (const auto &bin : _fp.bins()) {
-    chroms.push_back(bin.chrom().id());
+    chroms.push_back(bin.chrom().id() + 1);
     starts.push_back(bin.start());
     ends.push_back(bin.end());
   }
@@ -65,7 +62,7 @@ Rcpp::DataFrame HiCFile::bins() const {
 
   return Rcpp::DataFrame::create(Rcpp::Named("chrom") = chroms,
                                  Rcpp::Named("start") = starts,
-                                 Rcpp::Named("ends") = ends);
+                                 Rcpp::Named("end") = ends);
 }
 
 std::string HiCFile::path() const noexcept { return {_fp.path()}; }
@@ -96,9 +93,6 @@ fetch_as_df(const Selector &sel,
 
   Rcpp::CharacterVector chrom_names{};
   for (const auto &chrom : bins_ptr->chromosomes()) {
-    if (chrom.is_all()) {
-      continue;
-    }
     chrom_names.push_back(std::string{chrom.name()});
   }
 
@@ -113,10 +107,10 @@ fetch_as_df(const Selector &sel,
       sel.template begin<N>(), sel.template end<N>(), bins_ptr);
 
   std::for_each(jsel.begin(), jsel.end(), [&](const hictk::Pixel<N> &p) {
-    chrom1.push_back(p.coords.bin1.chrom().id());
+    chrom1.push_back(p.coords.bin1.chrom().id() + 1);
     start1.push_back(p.coords.bin1.start());
     end1.push_back(p.coords.bin1.end());
-    chrom2.push_back(p.coords.bin2.chrom().id());
+    chrom2.push_back(p.coords.bin2.chrom().id() + 1);
     start2.push_back(p.coords.bin2.start());
     end2.push_back(p.coords.bin2.end());
     counts.push_back(p.count);
