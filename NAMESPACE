@@ -1,7 +1,6 @@
 useDynLib(hictkR, .registration = TRUE)
 
 import(Rcpp)
-import(methods)
 
 export(HiCFile)
 

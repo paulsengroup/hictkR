@@ -18,3 +18,6 @@ Imports:
     Rcpp
 SystemRequirements:
     Please make sure conan is installed on your system: https://conan.io/downloads
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
