@@ -1,12 +1,20 @@
-.idea
-.run
-.vscode
-cmake-build-.*
+^\.idea$
+^\.run$
+^\.vscode$
+^cmake-build-.*
+^cmake$
 
-conan-staging/.*\.cmake
-conan-staging/.*\.sh
+^\.github$
+conan-staging$
 
-\.gitignore
+.*.o$
+.*.so$
 .*\.tar\.gz$
-^\.github
-^docs
+
+^\.clang-format$
+^\.editorconfig$
+^\.gitignore$
+^\.pre-commit-config.yaml$
+^\.RData$
+CMakeLists.txt$
+^docs$
