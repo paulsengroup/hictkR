@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
+#include "./hictkr_file.hpp"
+
 #include <Rcpp.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <hictk/bin_table.hpp>
@@ -15,10 +18,8 @@
 #include <variant>
 #include <vector>
 
-#include "./hictkr_file.hpp"
-
-HiCFile::HiCFile(std::string uri, std::uint32_t resolution,
-                 std::string matrix_type, std::string matrix_unit)
+HiCFile::HiCFile(std::string uri, std::uint32_t resolution, std::string matrix_type,
+                 std::string matrix_unit)
     : _fp(uri, resolution, hictk::hic::ParseMatrixTypeStr(matrix_type),
           hictk::hic::ParseUnitStr(matrix_unit)) {}
 
@@ -41,7 +42,6 @@ Rcpp::DataFrame HiCFile::chromosomes() const {
 }
 
 Rcpp::DataFrame HiCFile::bins() const {
-
   Rcpp::CharacterVector chrom_names{};
   for (const auto &chrom : _fp.chromosomes()) {
     chrom_names.push_back(std::string{chrom.name()});
@@ -60,8 +60,7 @@ Rcpp::DataFrame HiCFile::bins() const {
   chroms.attr("class") = "factor";
   chroms.attr("levels") = chrom_names;
 
-  return Rcpp::DataFrame::create(Rcpp::Named("chrom") = chroms,
-                                 Rcpp::Named("start") = starts,
+  return Rcpp::DataFrame::create(Rcpp::Named("chrom") = chroms, Rcpp::Named("start") = starts,
                                  Rcpp::Named("end") = ends);
 }
 
@@ -69,8 +68,7 @@ std::string HiCFile::path() const noexcept { return {_fp.path()}; }
 std::uint64_t HiCFile::nbins() const noexcept { return _fp.nbins(); }
 std::uint64_t HiCFile::nchroms() const noexcept { return _fp.nchroms(); }
 
-[[nodiscard]] static Rcpp::List
-get_cooler_attrs(const hictk::cooler::File &clr) {
+[[nodiscard]] static Rcpp::List get_cooler_attrs(const hictk::cooler::File &clr) {
   Rcpp::List r_attrs{};
   std::vector<std::string> r_attr_names{};
 
@@ -167,10 +165,9 @@ Rcpp::List HiCFile::attributes() const {
 }
 
 template <typename N, typename Selector>
-static Rcpp::DataFrame
-fetch_as_df(const Selector &sel,
-            const std::shared_ptr<const hictk::BinTable> &bins_ptr, bool join) {
-
+static Rcpp::DataFrame fetch_as_df(const Selector &sel,
+                                   const std::shared_ptr<const hictk::BinTable> &bins_ptr,
+                                   bool join) {
   Rcpp::NumericVector counts{};
 
   if (!join) {
@@ -201,8 +198,8 @@ fetch_as_df(const Selector &sel,
   Rcpp::IntegerVector start2{};
   Rcpp::IntegerVector end2{};
 
-  const hictk::transformers::JoinGenomicCoords jsel(
-      sel.template begin<N>(), sel.template end<N>(), bins_ptr);
+  const hictk::transformers::JoinGenomicCoords jsel(sel.template begin<N>(), sel.template end<N>(),
+                                                    bins_ptr);
 
   std::for_each(jsel.begin(), jsel.end(), [&](const hictk::Pixel<N> &p) {
     chrom1.push_back(p.coords.bin1.chrom().id() + 1);
@@ -219,18 +216,14 @@ fetch_as_df(const Selector &sel,
   chrom2.attr("class") = "factor";
   chrom2.attr("levels") = chrom_names;
 
-  return Rcpp::DataFrame::create(
-      Rcpp::Named("chrom1") = chrom1, Rcpp::Named("start1") = start1,
-      Rcpp::Named("end1") = end1, Rcpp::Named("chrom2") = chrom2,
-      Rcpp::Named("start2") = start2, Rcpp::Named("end2") = end2,
-      Rcpp::Named("count") = counts);
+  return Rcpp::DataFrame::create(Rcpp::Named("chrom1") = chrom1, Rcpp::Named("start1") = start1,
+                                 Rcpp::Named("end1") = end1, Rcpp::Named("chrom2") = chrom2,
+                                 Rcpp::Named("start2") = start2, Rcpp::Named("end2") = end2,
+                                 Rcpp::Named("count") = counts);
 }
 
-Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2,
-                                  std::string normalization,
-                                  std::string count_type, bool join,
-                                  std::string query_type) {
-
+Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::string normalization,
+                                  std::string count_type, bool join, std::string query_type) {
   if (normalization != "NONE") {
     count_type = "float";
   }
@@ -248,16 +241,14 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2,
         _fp.get());
   }
 
-  const auto qt = query_type == "UCSC" ? hictk::GenomicInterval::Type::UCSC
-                                       : hictk::GenomicInterval::Type::BED;
+  const auto qt =
+      query_type == "UCSC" ? hictk::GenomicInterval::Type::UCSC : hictk::GenomicInterval::Type::BED;
 
   return std::visit(
       [&](const auto &ff) {
-        auto sel =
-            range2.empty() || range1 == range2
-                ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
-                : ff.fetch(range1, range2,
-                           hictk::balancing::Method{normalization}, qt);
+        auto sel = range2.empty() || range1 == range2
+                       ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
+                       : ff.fetch(range1, range2, hictk::balancing::Method{normalization}, qt);
         if (count_type == "int") {
           return fetch_as_df<std::int32_t>(sel, ff.bins_ptr(), join);
         }
@@ -267,17 +258,13 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2,
 }
 
 template <typename N, typename Selector>
-static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel,
-                                           bool mirror_below_diagonal = true) {
-
+static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel, bool mirror_below_diagonal = true) {
   const auto bin_size = sel.bins().bin_size();
 
   const auto span1 = sel.coord1().bin2.end() - sel.coord1().bin1.start();
   const auto span2 = sel.coord2().bin2.end() - sel.coord2().bin1.start();
-  const auto num_rows =
-      span1 == 0 ? sel.bins().size() : (span1 + bin_size - 1) / bin_size;
-  const auto num_cols =
-      span2 == 0 ? sel.bins().size() : (span2 + bin_size - 1) / bin_size;
+  const auto num_rows = span1 == 0 ? sel.bins().size() : (span1 + bin_size - 1) / bin_size;
+  const auto num_cols = span2 == 0 ? sel.bins().size() : (span2 + bin_size - 1) / bin_size;
 
   const auto row_offset = sel.coord1().bin1.id();
   const auto col_offset = sel.coord2().bin1.id();
@@ -285,31 +272,28 @@ static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel,
   Rcpp::NumericMatrix matrix(num_rows, num_cols);
   std::fill(matrix.begin(), matrix.end(), N{0});
 
-  std::for_each(
-      sel.template begin<N>(), sel.template end<N>(), [&](const auto &tp) {
-        const auto i1 = static_cast<std::int64_t>(tp.bin1_id - row_offset);
-        const auto i2 = static_cast<std::int64_t>(tp.bin2_id - col_offset);
-        matrix.at(i1, i2) = tp.count;
+  std::for_each(sel.template begin<N>(), sel.template end<N>(), [&](const auto &tp) {
+    const auto i1 = static_cast<std::int64_t>(tp.bin1_id - row_offset);
+    const auto i2 = static_cast<std::int64_t>(tp.bin2_id - col_offset);
+    matrix.at(i1, i2) = tp.count;
 
-        if (mirror_below_diagonal) {
-          //  Mirror matrix below diagonal
-          if (i2 - i1 < num_rows && i1 < num_cols && i2 < num_rows) {
-            matrix.at(i2, i1) = tp.count;
-          } else if (i2 - i1 > num_cols && i1 < num_cols && i2 < num_rows) {
-            const auto i3 = static_cast<std::int64_t>(tp.bin2_id - row_offset);
-            const auto i4 = static_cast<std::int64_t>(tp.bin1_id - col_offset);
-            matrix.at(i3, i4) = tp.count;
-          }
-        }
-      });
+    if (mirror_below_diagonal) {
+      //  Mirror matrix below diagonal
+      if (i2 - i1 < num_rows && i1 < num_cols && i2 < num_rows) {
+        matrix.at(i2, i1) = tp.count;
+      } else if (i2 - i1 > num_cols && i1 < num_cols && i2 < num_rows) {
+        const auto i3 = static_cast<std::int64_t>(tp.bin2_id - row_offset);
+        const auto i4 = static_cast<std::int64_t>(tp.bin1_id - col_offset);
+        matrix.at(i3, i4) = tp.count;
+      }
+    }
+  });
   return matrix;
 }
 
 template <typename N>
-static Rcpp::NumericMatrix
-fetch_as_matrix(const hictk::hic::PixelSelectorAll &sel,
-                bool mirror_below_diagonal = true) {
-
+static Rcpp::NumericMatrix fetch_as_matrix(const hictk::hic::PixelSelectorAll &sel,
+                                           bool mirror_below_diagonal = true) {
   const auto bin_size = sel.bins().bin_size();
 
   const auto num_rows = sel.bins().size();
@@ -318,29 +302,27 @@ fetch_as_matrix(const hictk::hic::PixelSelectorAll &sel,
   Rcpp::NumericMatrix matrix(num_rows, num_cols);
   std::fill(matrix.begin(), matrix.end(), N{0});
 
-  std::for_each(
-      sel.template begin<N>(), sel.template end<N>(), [&](const auto &tp) {
-        const auto i1 = static_cast<std::int64_t>(tp.bin1_id);
-        const auto i2 = static_cast<std::int64_t>(tp.bin2_id);
-        matrix.at(i1, i2) = tp.count;
+  std::for_each(sel.template begin<N>(), sel.template end<N>(), [&](const auto &tp) {
+    const auto i1 = static_cast<std::int64_t>(tp.bin1_id);
+    const auto i2 = static_cast<std::int64_t>(tp.bin2_id);
+    matrix.at(i1, i2) = tp.count;
 
-        if (mirror_below_diagonal) {
-          //  Mirror matrix below diagonal
-          if (i2 - i1 < num_rows && i1 < num_cols && i2 < num_rows) {
-            matrix.at(i2, i1) = tp.count;
-          } else if (i2 - i1 > num_cols && i1 < num_cols && i2 < num_rows) {
-            const auto i3 = static_cast<std::int64_t>(tp.bin2_id);
-            const auto i4 = static_cast<std::int64_t>(tp.bin1_id);
-            matrix.at(i3, i4) = tp.count;
-          }
-        }
-      });
+    if (mirror_below_diagonal) {
+      //  Mirror matrix below diagonal
+      if (i2 - i1 < num_rows && i1 < num_cols && i2 < num_rows) {
+        matrix.at(i2, i1) = tp.count;
+      } else if (i2 - i1 > num_cols && i1 < num_cols && i2 < num_rows) {
+        const auto i3 = static_cast<std::int64_t>(tp.bin2_id);
+        const auto i4 = static_cast<std::int64_t>(tp.bin1_id);
+        matrix.at(i3, i4) = tp.count;
+      }
+    }
+  });
   return matrix;
 }
 
 Rcpp::NumericMatrix HiCFile::fetch_dense(std::string range1, std::string range2,
-                                         std::string normalization,
-                                         std::string count_type,
+                                         std::string normalization, std::string count_type,
                                          std::string query_type) {
   if (normalization != "NONE") {
     count_type = "float";
@@ -359,16 +341,14 @@ Rcpp::NumericMatrix HiCFile::fetch_dense(std::string range1, std::string range2,
         _fp.get());
   }
 
-  const auto qt = query_type == "UCSC" ? hictk::GenomicInterval::Type::UCSC
-                                       : hictk::GenomicInterval::Type::BED;
+  const auto qt =
+      query_type == "UCSC" ? hictk::GenomicInterval::Type::UCSC : hictk::GenomicInterval::Type::BED;
 
   return std::visit(
       [&](const auto &ff) {
-        auto sel =
-            range2.empty() || range1 == range2
-                ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
-                : ff.fetch(range1, range2,
-                           hictk::balancing::Method{normalization}, qt);
+        auto sel = range2.empty() || range1 == range2
+                       ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
+                       : ff.fetch(range1, range2, hictk::balancing::Method{normalization}, qt);
         if (count_type == "int") {
           return fetch_as_matrix<std::int32_t>(sel);
         }

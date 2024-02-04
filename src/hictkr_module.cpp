@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "./hictkr_file.hpp"
 #include <Rcpp.h>
 
-RCPP_MODULE(hictkR) {
+#include "./hictkr_file.hpp"
 
+RCPP_MODULE(hictkR) {
   Rcpp::class_<HiCFile>("HiCFile")
       .constructor<std::string, std::uint32_t, std::string, std::string>()
       .property("is_cooler", &HiCFile::is_cooler)
@@ -17,10 +17,7 @@ RCPP_MODULE(hictkR) {
       .property("nbins", &HiCFile::nbins, "Number of bins.")
       .property("nchroms", &HiCFile::nchroms, "Number of chromosomes.")
       .property("attributes", &HiCFile::attributes, "File attributes.")
-      .property("normalizations", &HiCFile::avail_normalizations,
-                "Normalizations available.")
-      .method("fetch_df", &HiCFile::fetch_df,
-              "Fetch interactions as a DataFrame.")
-      .method("fetch_dense", &HiCFile::fetch_dense,
-              "Fetch interactions as a Matrix.");
+      .property("normalizations", &HiCFile::avail_normalizations, "Normalizations available.")
+      .method("fetch_df", &HiCFile::fetch_df, "Fetch interactions as a DataFrame.")
+      .method("fetch_dense", &HiCFile::fetch_dense, "Fetch interactions as a Matrix.");
 }
