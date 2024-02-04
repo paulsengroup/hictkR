@@ -18,55 +18,25 @@
 #include <variant>
 #include <vector>
 
+#include "./common.hpp"
+
 HiCFile::HiCFile(std::string uri, std::uint32_t resolution, std::string matrix_type,
                  std::string matrix_unit)
     : _fp(uri, resolution, hictk::hic::ParseMatrixTypeStr(matrix_type),
           hictk::hic::ParseUnitStr(matrix_unit)) {}
 
+HiCFile::HiCFile(hictk::cooler::File &&clr) : _fp(std::move(clr)) {}
+HiCFile::HiCFile(hictk::hic::File &&hf) : _fp(std::move(hf)) {}
+
 bool HiCFile::is_cooler() const noexcept { return _fp.is_cooler(); }
 bool HiCFile::is_hic() const noexcept { return _fp.is_hic(); }
 
-Rcpp::DataFrame HiCFile::chromosomes() const {
-  std::vector<std::string> chrom_names{};
-  std::vector<std::uint32_t> chrom_sizes{};
-  for (const auto &chrom : _fp.chromosomes()) {
-    if (chrom.is_all()) {
-      continue;
-    }
-    chrom_names.push_back(std::string{chrom.name()});
-    chrom_sizes.push_back(chrom.size());
-  }
+Rcpp::DataFrame HiCFile::chromosomes() const { return get_chromosomes(_fp); }
 
-  return Rcpp::DataFrame::create(Rcpp::Named("name") = chrom_names,
-                                 Rcpp::Named("size") = chrom_sizes);
-}
-
-Rcpp::DataFrame HiCFile::bins() const {
-  Rcpp::CharacterVector chrom_names{};
-  for (const auto &chrom : _fp.chromosomes()) {
-    chrom_names.push_back(std::string{chrom.name()});
-  }
-
-  std::vector<std::uint32_t> chrom_ids{};
-  std::vector<std::uint32_t> starts{};
-  std::vector<std::uint32_t> ends{};
-
-  for (const auto &bin : _fp.bins()) {
-    chrom_ids.push_back(bin.chrom().id() + 1);
-    starts.push_back(bin.start());
-    ends.push_back(bin.end());
-  }
-
-  Rcpp::IntegerVector chroms(chrom_ids.begin(), chrom_ids.end());
-
-  chroms.attr("class") = "factor";
-  chroms.attr("levels") = chrom_names;
-
-  return Rcpp::DataFrame::create(Rcpp::Named("chrom") = chroms, Rcpp::Named("start") = starts,
-                                 Rcpp::Named("end") = ends);
-}
+Rcpp::DataFrame HiCFile::bins() const { return get_bins(_fp); }
 
 std::string HiCFile::path() const noexcept { return {_fp.path()}; }
+std::uint32_t HiCFile::bin_size() const noexcept { return _fp.bin_size(); }
 std::uint64_t HiCFile::nbins() const noexcept { return _fp.nbins(); }
 std::uint64_t HiCFile::nchroms() const noexcept { return _fp.nchroms(); }
 
@@ -228,7 +198,7 @@ static Rcpp::DataFrame fetch_as_df(const Selector &sel,
 }
 
 Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::string normalization,
-                                  std::string count_type, bool join, std::string query_type) {
+                                  std::string count_type, bool join, std::string query_type) const {
   if (normalization != "NONE") {
     count_type = "float";
   }
@@ -330,7 +300,7 @@ static Rcpp::NumericMatrix fetch_as_matrix(const hictk::hic::PixelSelectorAll &s
 
 Rcpp::NumericMatrix HiCFile::fetch_dense(std::string range1, std::string range2,
                                          std::string normalization, std::string count_type,
-                                         std::string query_type) {
+                                         std::string query_type) const {
   if (normalization != "NONE") {
     count_type = "float";
   }

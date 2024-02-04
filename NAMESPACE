@@ -3,9 +3,14 @@ useDynLib(hictkR, .registration = TRUE)
 import(Rcpp)
 importFrom("methods", "new")
 
-export(HiCFile)
-
 export(File)
+export(MultiResolutionFile)
+export(SingleCellFile)
+
+export(is_cooler)
+export(is_multires_file)
+export(is_scool_file)
+export(is_hic_file)
+
 export(fetch)
-export(chromosomes)
-export(bins)
+export(hictkR_open)
