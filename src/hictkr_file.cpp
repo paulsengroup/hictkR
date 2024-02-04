@@ -263,7 +263,7 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::s
 }
 
 template <typename N, typename Selector>
-static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel, bool mirror_below_diagonal = true) {
+static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel) {
   const auto bin_size = sel.bins().bin_size();
 
   const auto span1 = sel.coord1().bin2.end() - sel.coord1().bin1.start();
@@ -274,6 +274,8 @@ static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel, bool mirror_belo
   const auto row_offset = sel.coord1().bin1.id();
   const auto col_offset = sel.coord2().bin1.id();
 
+  const auto mirror_matrix = sel.coord1().bin1.chrom() == sel.coord2().bin1.chrom();
+
   Rcpp::NumericMatrix matrix(num_rows, num_cols);
   std::fill(matrix.begin(), matrix.end(), N{0});
 
@@ -282,7 +284,7 @@ static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel, bool mirror_belo
     const auto i2 = static_cast<std::int64_t>(tp.bin2_id - col_offset);
     matrix.at(i1, i2) = tp.count;
 
-    if (mirror_below_diagonal) {
+    if (mirror_matrix) {
       //  Mirror matrix below diagonal
       if (i2 - i1 < num_rows && i1 < num_cols && i2 < num_rows) {
         matrix.at(i2, i1) = tp.count;
