@@ -42,17 +42,14 @@ fetch <- function(file, range1 = "", range2 = "", normalization = "NONE", count_
 }
 
 hictkR_open <- function(path, resolution = NULL, cell = NULL) {
-    if (class(path) == "RcppMultiResolutionFile") {
-        if (is.null(resolution)) {
-            stop("resolution is required when opening a multi-resolution file.")
-        }
+    if ("path" %in% names(path)) {
+        # Assume path is actually an .mcool or .scool file
         path <- path$path
     }
-    if (class(path) == "RcppSingleCellFile") {
-        if (is.null(cell)) {
-            stop("cell is required when opening a single-cell file.")
-        }
-        path <- path$path
+
+    if ("bin_size" %in% names(path)) {
+        # Assume path is actually an .mcool or .scool file
+        resolution <- path$bin_size
     }
 
     if (is_multires_file(path)) {
