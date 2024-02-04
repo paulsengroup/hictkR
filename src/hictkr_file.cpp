@@ -27,8 +27,8 @@ bool HiCFile::is_cooler() const noexcept { return _fp.is_cooler(); }
 bool HiCFile::is_hic() const noexcept { return _fp.is_hic(); }
 
 Rcpp::DataFrame HiCFile::chromosomes() const {
-  Rcpp::CharacterVector chrom_names{};
-  Rcpp::IntegerVector chrom_sizes{};
+  std::vector<std::string> chrom_names{};
+  std::vector<std::uint32_t> chrom_sizes{};
   for (const auto &chrom : _fp.chromosomes()) {
     if (chrom.is_all()) {
       continue;
@@ -47,15 +47,17 @@ Rcpp::DataFrame HiCFile::bins() const {
     chrom_names.push_back(std::string{chrom.name()});
   }
 
-  Rcpp::IntegerVector chroms{};
-  Rcpp::IntegerVector starts{};
-  Rcpp::IntegerVector ends{};
+  std::vector<std::uint32_t> chrom_ids{};
+  std::vector<std::uint32_t> starts{};
+  std::vector<std::uint32_t> ends{};
 
   for (const auto &bin : _fp.bins()) {
-    chroms.push_back(bin.chrom().id() + 1);
+    chrom_ids.push_back(bin.chrom().id() + 1);
     starts.push_back(bin.start());
     ends.push_back(bin.end());
   }
+
+  Rcpp::IntegerVector chroms(chrom_ids.begin(), chrom_ids.end());
 
   chroms.attr("class") = "factor";
   chroms.attr("levels") = chrom_names;
@@ -168,11 +170,10 @@ template <typename N, typename Selector>
 static Rcpp::DataFrame fetch_as_df(const Selector &sel,
                                    const std::shared_ptr<const hictk::BinTable> &bins_ptr,
                                    bool join) {
-  Rcpp::NumericVector counts{};
-
   if (!join) {
-    Rcpp::IntegerVector bin1_ids{};
-    Rcpp::IntegerVector bin2_ids{};
+    std::vector<uint64_t> bin1_ids{};
+    std::vector<uint64_t> bin2_ids{};
+    std::vector<N> counts{};
 
     std::for_each(sel.template begin<N>(), sel.template end<N>(),
                   [&](const hictk::ThinPixel<N> &p) {
@@ -191,25 +192,29 @@ static Rcpp::DataFrame fetch_as_df(const Selector &sel,
     chrom_names.push_back(std::string{chrom.name()});
   }
 
-  Rcpp::IntegerVector chrom1{};
-  Rcpp::IntegerVector start1{};
-  Rcpp::IntegerVector end1{};
-  Rcpp::IntegerVector chrom2{};
-  Rcpp::IntegerVector start2{};
-  Rcpp::IntegerVector end2{};
+  std::vector<std::uint32_t> chrom1_ids{};
+  std::vector<std::uint32_t> start1{};
+  std::vector<std::uint32_t> end1{};
+  std::vector<std::uint32_t> chrom2_ids{};
+  std::vector<std::uint32_t> start2{};
+  std::vector<std::uint32_t> end2{};
+  std::vector<N> counts{};
 
   const hictk::transformers::JoinGenomicCoords jsel(sel.template begin<N>(), sel.template end<N>(),
                                                     bins_ptr);
 
   std::for_each(jsel.begin(), jsel.end(), [&](const hictk::Pixel<N> &p) {
-    chrom1.push_back(p.coords.bin1.chrom().id() + 1);
+    chrom1_ids.push_back(p.coords.bin1.chrom().id() + 1);
     start1.push_back(p.coords.bin1.start());
     end1.push_back(p.coords.bin1.end());
-    chrom2.push_back(p.coords.bin2.chrom().id() + 1);
+    chrom2_ids.push_back(p.coords.bin2.chrom().id() + 1);
     start2.push_back(p.coords.bin2.start());
     end2.push_back(p.coords.bin2.end());
     counts.push_back(p.count);
   });
+
+  Rcpp::IntegerVector chrom1{chrom1_ids.begin(), chrom1_ids.end()};
+  Rcpp::IntegerVector chrom2{chrom2_ids.begin(), chrom2_ids.end()};
 
   chrom1.attr("class") = "factor";
   chrom1.attr("levels") = chrom_names;
