@@ -67,6 +67,104 @@ Rcpp::DataFrame HiCFile::bins() const {
 
 std::string HiCFile::path() const noexcept { return {_fp.path()}; }
 std::uint64_t HiCFile::nbins() const noexcept { return _fp.nbins(); }
+std::uint64_t HiCFile::nchroms() const noexcept { return _fp.nchroms(); }
+
+[[nodiscard]] static Rcpp::List
+get_cooler_attrs(const hictk::cooler::File &clr) {
+  Rcpp::List r_attrs{};
+  std::vector<std::string> r_attr_names{};
+
+  const auto &attrs = clr.attributes();
+
+  r_attr_names.push_back("bin-size");
+  r_attrs.push_back(attrs.bin_size);
+
+  r_attr_names.push_back("bin-type");
+  if (attrs.bin_type.has_value()) {
+    r_attrs.push_back(*attrs.bin_type);
+  } else {
+    r_attrs.push_back("fixed");
+  }
+
+  r_attr_names.push_back("format");
+  r_attrs.push_back(attrs.format);
+
+  r_attr_names.push_back("format-version");
+  r_attrs.push_back(attrs.format_version);
+
+  if (attrs.storage_mode.has_value()) {
+    r_attr_names.push_back("storage-mode");
+    r_attrs.push_back(*attrs.storage_mode);
+  }
+  if (attrs.creation_date.has_value()) {
+    r_attr_names.push_back("creation-date");
+    r_attrs.push_back(*attrs.creation_date);
+  }
+  if (attrs.generated_by.has_value()) {
+    r_attr_names.push_back("generated-by");
+    r_attrs.push_back(*attrs.generated_by);
+  }
+  if (attrs.assembly.has_value()) {
+    r_attr_names.push_back("assembly");
+    r_attrs.push_back(*attrs.assembly);
+  }
+  if (attrs.metadata.has_value()) {
+    r_attr_names.push_back("metadata");
+    r_attrs.push_back(*attrs.metadata);
+  }
+  if (attrs.format_url.has_value()) {
+    r_attr_names.push_back("format-url");
+    r_attrs.push_back(*attrs.format_url);
+  }
+  if (attrs.nbins.has_value()) {
+    r_attr_names.push_back("nbins");
+    r_attrs.push_back(*attrs.nbins);
+  }
+  if (attrs.nchroms.has_value()) {
+    r_attr_names.push_back("nchroms");
+    r_attrs.push_back(*attrs.nchroms);
+  }
+  if (attrs.nnz.has_value()) {
+    r_attr_names.push_back("nnz");
+    r_attrs.push_back(*attrs.nnz);
+  }
+  if (attrs.sum.has_value()) {
+    r_attr_names.push_back("sum");
+    std::visit([&](const auto &sum) { r_attrs.push_back(sum); }, *attrs.sum);
+  }
+  if (attrs.cis.has_value()) {
+    r_attr_names.push_back("cis");
+    std::visit([&](const auto &cis) { r_attrs.push_back(cis); }, *attrs.cis);
+  }
+
+  r_attrs.attr("names") = r_attr_names;
+
+  return r_attrs;
+}
+
+[[nodiscard]] static Rcpp::List get_hic_attrs(const hictk::hic::File &hf) {
+  // clang-format off
+  return Rcpp::List::create(
+            Rcpp::Named("bin-size") = hf.bin_size(),
+            Rcpp::Named("format") = "HIC",
+            Rcpp::Named("format-version") = hf.version(),
+            Rcpp::Named("assembly") = hf.assembly(),
+            Rcpp::Named("format-url") = "https://github.com/aidenlab/hic-format",
+            Rcpp::Named("nbins") = hf.nbins(),
+            Rcpp::Named("nchroms") = hf.nchroms()
+         );
+  // clang-format on
+}
+
+Rcpp::List HiCFile::attributes() const {
+  Rcpp::List attrs{};
+
+  std::vector<std::string> attr_names;
+  if (is_cooler()) {
+    return get_cooler_attrs(_fp.get<hictk::cooler::File>());
+  }
+  return get_hic_attrs(_fp.get<hictk::hic::File>());
+}
 
 template <typename N, typename Selector>
 static Rcpp::DataFrame
@@ -277,4 +375,12 @@ Rcpp::NumericMatrix HiCFile::fetch_dense(std::string range1, std::string range2,
         return fetch_as_matrix<double>(sel);
       },
       _fp.get());
+}
+
+Rcpp::CharacterVector HiCFile::avail_normalizations() const {
+  Rcpp::CharacterVector norms{};
+  for (const auto &norm : _fp.avail_normalizations()) {
+    norms.push_back(norm.to_string());
+  }
+  return norms;
 }

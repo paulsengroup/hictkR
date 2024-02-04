@@ -1,3 +1,7 @@
+// Copyright (C) 2024 Roberto Rossini <roberros@uio.no>
+//
+// SPDX-License-Identifier: MIT
+
 #include "./hictkr_file.hpp"
 #include <Rcpp.h>
 
@@ -11,6 +15,10 @@ RCPP_MODULE(hictkR) {
       .property("bins", &HiCFile::bins)
       .property("path", &HiCFile::path, "Path to the opened file.")
       .property("nbins", &HiCFile::nbins, "Number of bins.")
+      .property("nchroms", &HiCFile::nchroms, "Number of chromosomes.")
+      .property("attributes", &HiCFile::attributes, "File attributes.")
+      .property("normalizations", &HiCFile::avail_normalizations,
+                "Normalizations available.")
       .method("fetch_df", &HiCFile::fetch_df,
               "Fetch interactions as a DataFrame.")
       .method("fetch_dense", &HiCFile::fetch_dense,

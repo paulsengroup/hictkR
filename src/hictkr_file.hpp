@@ -26,6 +26,8 @@ public:
 
   [[nodiscard]] std::string path() const noexcept;
   [[nodiscard]] std::uint64_t nbins() const noexcept;
+  [[nodiscard]] std::uint64_t nchroms() const noexcept;
+  [[nodiscard]] Rcpp::List attributes() const;
 
   [[nodiscard]] Rcpp::DataFrame fetch_df(std::string range1, std::string range2,
                                          std::string normalization,
@@ -35,4 +37,6 @@ public:
   [[nodiscard]] Rcpp::NumericMatrix
   fetch_dense(std::string range1, std::string range2, std::string normalization,
               std::string count_type, std::string query_type);
+
+  [[nodiscard]] Rcpp::CharacterVector avail_normalizations() const;
 };
