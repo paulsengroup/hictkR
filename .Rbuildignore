@@ -12,6 +12,7 @@ conan-staging$
 .*\.tar\.gz$
 
 ^\.clang-format$
+^\.cmake-format.yaml$
 ^\.editorconfig$
 ^\.gitignore$
 ^\.pre-commit-config.yaml$
