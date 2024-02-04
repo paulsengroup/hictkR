@@ -5,7 +5,7 @@ Version: 0.0.1
 Authors@R:
   c(person("Roberto", "Rossini", email = "roberros@uio.no", role = c("aut", "cre")))
 Maintainer: Roberto Rossini <roberros@uio.no>
-Description: Example description
+Description: This package provides R binding for hictk: a blazing fast toolkit to work with .hic and .cool files
 License: MIT
 URL: https://github.com/paulsengroup/hictkR
 BugReports: https://github.com/paulsengroup/hictkR/issues
@@ -15,7 +15,8 @@ RoxygenNote: 7.0.2
 LinkingTo:
     Rcpp
 Imports:
-    Rcpp
+    Rcpp,
+    methods
 SystemRequirements:
     Please make sure conan is installed on your system: https://conan.io/downloads
 Suggests:
