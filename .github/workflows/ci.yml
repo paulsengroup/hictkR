@@ -57,7 +57,7 @@ jobs:
 
     - name: Generate requirements.txt
       run: |
-        echo 'conan==2.*.*' > requirements.txt
+        echo 'conan>=2' > requirements.txt
 
     - name: Setup Python
       uses: actions/setup-python@v5
