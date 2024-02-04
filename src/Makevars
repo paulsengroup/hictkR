@@ -1,7 +1,6 @@
 dollar = $
 
-# RUN_CONAN_RESULT := $(shell CONAN_HOME="$(dollar)PWD/conan-staging/.conan2" ../run_conan.sh)
-RUN_CONAN_RESULT := $(shell ../run_conan.sh)
+RUN_CONAN_RESULT := $(shell CONAN_HOME="$(dollar)PWD/conan-staging/.conan2" ../run_conan.sh)
 include conan-staging/conandeps.mk
 
 PKG_CPPFLAGS := $(shell Rscript -e 'Rcpp:::CxxFlags()' 2> /dev/null)
