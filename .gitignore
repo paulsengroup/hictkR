@@ -10,7 +10,9 @@ cmake-build*/
 conan-staging/
 
 # Ignored files
+.RData
 *.bak
+*.tar.*
 gmon.out
 perf.*
 *.o
