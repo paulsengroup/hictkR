@@ -20,7 +20,6 @@ endif()
 project(
   hictkR
   LANGUAGES C CXX
-  VERSION 0.0.8
   HOMEPAGE_URL https://github.com/paulsengroup/hictkR
   DESCRIPTION "R bindings for hictk")
 
