@@ -13,7 +13,7 @@ on:
       - "src/**"
       - "test/**"
       - "conanfile.txt"
-      - "setup_conan.py"
+      - "run_conan.py"
       - "DESCRIPTION"
       - "NAMESPACE"
     tags:
@@ -26,7 +26,7 @@ on:
       - "src/**"
       - "test/**"
       - "conanfile.txt"
-      - "setup_conan.py"
+      - "run_conan.py"
       - "DESCRIPTION"
       - "NAMESPACE"
 
