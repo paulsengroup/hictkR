@@ -1,9 +1,10 @@
-dollar = $
+PWD := $(pwd)
+CONAN_HOME := "$(PWD)/conan-staging/.conan2"
+CONANDEPS_MK := $(shell "$(CONAN_HOME)" ../run_conan.py)
+include $(CONANDEPS_MK)
 
-RUN_CONAN_RESULT := $(shell CONAN_HOME="$(dollar)PWD/conan-staging/.conan2" ../run_conan.sh)
-include conan-staging/conandeps.mk
-
-PKG_CPPFLAGS := $(shell "$R_HOME/bin/Rscript" -e 'Rcpp:::CxxFlags()' 2> /dev/null)
+PKG_CPPFLAGS := -std=c++17
+PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(shell "$(R_HOME)/bin/Rscript" -e 'Rcpp:::CxxFlags()' 2> /dev/null)
 PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
 PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))
 PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -D ,$(CONAN_DEFINES))
