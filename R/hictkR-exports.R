@@ -52,6 +52,11 @@ hictkR_open <- function(path, resolution = NULL, cell = NULL) {
         resolution <- path$bin_size
     }
 
+    if (!is.null(resolution)) {
+        resolution <- as.integer(resolution)
+    }
+
+
     if (is_multires_file(path)) {
         if (is.null(resolution)) {
             return(MultiResolutionFile(path))
