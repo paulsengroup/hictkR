@@ -14,6 +14,11 @@ if [ -f conan-staging/conandeps.mk ]; then
   exit 0
 fi
 
+
+if [ -n "$CONAN_HOME" ]; then
+  mkdir -p "$CONAN_HOME"
+fi
+
 conan profile detect &> /dev/null || true
 
 conan install ../conanfile.txt -s build_type=Release -s compiler.cppstd=17 --output-folder conan-staging --build=missing --update
