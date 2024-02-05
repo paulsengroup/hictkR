@@ -25,7 +25,7 @@ def run_conan_profile_detect(conan):
 def run_conan_install(conan):
     sp.check_call([conan, "install", "../conanfile.txt", "--settings=build_type=Release",
                   "--settings=compiler.cppstd=17", "--output-folder=conan-staging",
-                   "--build=missing" "--update"], stdout=sp.DEVNULL)
+                   "--build=missing", "--update"], stdout=sp.DEVNULL)
 
 
 def main():
