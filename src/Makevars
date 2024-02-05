@@ -1,6 +1,7 @@
 PWD := $(shell pwd)
-CONAN_HOME := "$(PWD)/conan-staging/.conan2"
-CONANDEPS_MK := $(shell env "$(CONAN_HOME)" ../run_conan.py)
+export CONAN_HOME := "$(PWD)/conan-staging/.conan2"
+
+CONANDEPS_MK := $(shell ../run_conan.py)
 include $(CONANDEPS_MK)
 
 PKG_CPPFLAGS := -std=c++17
