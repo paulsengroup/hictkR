@@ -3,7 +3,7 @@ dollar = $
 RUN_CONAN_RESULT := $(shell CONAN_HOME="$(dollar)PWD/conan-staging/.conan2" ../run_conan.sh)
 include conan-staging/conandeps.mk
 
-PKG_CPPFLAGS := $(shell Rscript -e 'Rcpp:::CxxFlags()' 2> /dev/null)
+PKG_CPPFLAGS := $(shell "$R_HOME/bin/Rscript" -e 'Rcpp:::CxxFlags()' 2> /dev/null)
 PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
 PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -D ,$(CONAN_DEFINES))
 
