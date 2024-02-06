@@ -24,6 +24,15 @@ def find_conan():
 def run_conan_profile_detect(conan, env):
     sp.run([conan, "profile", "detect"], stdout=sp.DEVNULL, env=env)
 
+    conan_profile = os.path.join(
+        env.get("CONAN_HOME", os.path.join(env.get("HOME"), ".conan2")),
+        "profiles",
+        "default",
+    )
+    with open(conan_profile) as f:
+        for line in f:
+            print(line, file=sys.stderr)
+
 
 def run_conan_install(conan, env):
     sp.check_call(
