@@ -49,7 +49,7 @@ File <-
 #' @examples
 #' \dontrun{
 #' MultiResolutionFile("interactions.mcool")
-#'
+#' }
 
 MultiResolutionFile <- function(path) {
   return(new(RcppMultiResolutionFile, path))
@@ -62,7 +62,7 @@ MultiResolutionFile <- function(path) {
 #' @examples
 #' \dontrun{
 #' SingleCellFile("interactions.scool")
-#'
+#' }
 
 SingleCellFile <- function(path) {
   return(new(RcppSingleCellFile, path))
@@ -105,7 +105,7 @@ SingleCellFile <- function(path) {
 #'       "chr1\t0\t10000000",
 #'       query_type="BED")              # Fetch interactions given a query in BED format
 #' fetch(f, type="dense")               # Fetch interactions in dense format (i.e. as a Matrix)
-#'
+#' }
 
 fetch <-
   function(file,
@@ -141,7 +141,7 @@ fetch <-
 #' hictkR_open("interactions.mcool", resolution=10000)
 #' hictkR_open("interactions.hic", resolution=10000)
 #' hictkR_open("interactions.scool", cell="id_0001")
-#'
+#' }
 
 hictkR_open <- function(path,
                         resolution = NULL,
@@ -187,4 +187,36 @@ hictkR_open <- function(path,
   }
 
   return(File(path, resolution))
+}
+
+#' Test whether a file is in .cool format
+#'
+#' @param path path to the file to be tested (Cooler URI syntax is supported).
+
+is_cooler <- function(path) {
+  return(Rcpp_is_cooler(path))
+}
+
+#' Test whether a file is in .mcool format
+#'
+#' @param path path to the file to be tested.
+
+is_multires_file <- function(path) {
+  return(Rcpp_is_multires_file(path))
+}
+
+#' Test whether a file is in .cool format
+#'
+#' @param path path to the file to be tested.
+
+is_scool_file <- function(path) {
+  return(Rcpp_is_scool_file(path))
+}
+
+#' Test whether a file is in .cool format
+#'
+#' @param path path to the file to be tested.
+
+is_hic_file <- function(path) {
+  return(Rcpp_is_hic_file(path))
 }
