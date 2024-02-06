@@ -44,18 +44,23 @@ def main():
         os.makedirs(conan_home, exist_ok=True)
 
         cc = os.getenv("CC")
-        if cc is not None:
-            new_cc = os.path.join(conan_home, "gcc")
-            if not os.path.exists(new_cc):
-                os.symlink(cc, new_cc)
-                os.environ["CC"] = new_cc
+
+        new_cc = os.path.join(conan_home, "gcc")
+        try:
+            os.symlink(cc, new_cc)
+        except FileExistsError:
+            pass
+        os.environ["CC"] = new_cc
 
         cxx = os.getenv("CXX")
         if cxx is not None:
             new_cxx = os.path.join(conan_home, "g++")
-            if not os.path.exists(new_cxx):
+
+            try:
                 os.symlink(cxx, new_cxx)
-                os.environ["CXX"] = new_cxx
+            except FileExistsError:
+                pass
+            os.environ["CXX"] = new_cxx
 
     run_conan_profile_detect(conan)
     run_conan_install(conan)
