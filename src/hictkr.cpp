@@ -13,11 +13,11 @@
 #include "./hictkr_validation.hpp"
 
 RCPP_MODULE(hictkR) {
-  Rcpp::function("is_cooler", &is_cooler, "Test whether a file or URI is a Cooler.");
-  Rcpp::function("is_multires_file", &is_multires_file,
+  Rcpp::function("Rcpp_is_cooler", &is_cooler, "Test whether a file or URI is a Cooler.");
+  Rcpp::function("Rcpp_is_multires_file", &is_multires_file,
                  "Test whether a file is a multi-resolution Cooler.");
-  Rcpp::function("is_scool_file", &is_scool_file, "Test whether a file is a single-cell Cooler.");
-  Rcpp::function("is_hic_file", &is_hic_file, "Test whether a file is in .hic format.");
+  Rcpp::function("Rcpp_is_scool_file", &is_scool_file, "Test whether a file is a single-cell Cooler.");
+  Rcpp::function("Rcpp_is_hic_file", &is_hic_file, "Test whether a file is in .hic format.");
 
   Rcpp::class_<HiCFile>("RcppHiCFile")
       .constructor<std::string, std::uint32_t, std::string, std::string>()

@@ -22,8 +22,10 @@ a file handle.
 Open a .hic or .cool file for reading
 }
 \examples{
+\dontrun{
 File("interactions.cool")
-File("interactions.mcool::/resolutions/10000")
-File("interactions.mcool", 10000)
-File("interactions.hic", 10000)
+File("interactions.mcool::/resolutions/100000")
+File("interactions.mcool", 100000)
+File("interactions.hic", 100000)
+}
 }

@@ -16,5 +16,7 @@ a file handle.
 Opena a .scool file for reading
 }
 \examples{
+\dontrun{
 SingleCellFile("interactions.scool")
+}
 }
