@@ -7,7 +7,7 @@ CXX17 := $(CXX)
 CONANDEPS_MK := $(shell ..\run_conan.py)
 include $(CONANDEPS_MK)
 
-CXX_STD=CXX17
+CXX_STD := CXX17
 
 PKG_CPPFLAGS := $(shell "$(R_HOME)\bin\Rscript" -e 'Rcpp:::CxxFlags()' 2> /dev/null)
 PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
