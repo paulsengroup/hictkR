@@ -1,7 +1,13 @@
 PWD := $(shell pwd)
 export CONAN_HOME := $(PWD)\conan-staging\.conan2
-export CC := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("gcc")')"
-export CXX := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("g++")')"
+CC := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("gcc")')"
+CXX := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("g++")')"
+
+SYMLINK_CC := $(shell ln -s "$CC" $(CONAN_HOME)/gcc)
+SYMLINK_CXX := $(shell ln -s "$CXX" $(CONAN_HOME)/g++)
+
+export CC := $(CONAN_HOME)/gcc
+export CXX := $(CONAN_HOME)g++
 
 CONANDEPS_MK := $(shell ..\run_conan.py)
 include $(CONANDEPS_MK)
