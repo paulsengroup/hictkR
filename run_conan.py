@@ -8,6 +8,7 @@ import subprocess as sp
 import shutil
 import os
 import sys
+import re
 
 
 def find_conan():
@@ -21,7 +22,37 @@ def find_conan():
     return conan
 
 
+def run_conan_profile_detect_windows(env):
+    assert os.name == "nt"
+
+    cc = env.get("CC")
+    gcc_version = sp.check_output([cc, "-dumpversion"]).decode("ascii")
+    gcc_version = re.search(r"^\d+", gcc_version).group(0)
+
+    profile = [
+        "[settings]",
+        "build_type=Release",
+        "compiler=gcc",
+        "compiler.cppstd=gnu17",
+        f"compiler.version={gcc_version}" "os=Windows",
+    ]
+
+    conan_profile = os.path.join(
+        env.get("CONAN_HOME", os.path.join(env.get("HOME"), ".conan2")),
+        "profiles",
+        "default",
+    )
+
+    os.makedirs(os.path.dirname(conan_profile), exist_ok=True)
+    with open(conan_profile, "w") as f:
+        print("\n".join(profile), file=f)
+
+
 def run_conan_profile_detect(conan, env):
+    if os.name == "nt":
+        run_conan_profile_detect_windows(env)
+        return
+
     sp.run([conan, "profile", "detect"], stdout=sp.DEVNULL, env=env)
 
     conan_profile = os.path.join(
