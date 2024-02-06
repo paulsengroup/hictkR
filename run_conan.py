@@ -34,7 +34,8 @@ def run_conan_profile_detect_windows(env):
         "build_type=Release",
         "compiler=gcc",
         "compiler.cppstd=gnu17",
-        f"compiler.version={gcc_version}" "os=Windows",
+        f"compiler.version={gcc_version}",
+        "os=Windows",
     ]
 
     conan_profile = os.path.join(
@@ -97,25 +98,6 @@ def main():
     conan_home = env.get("CONAN_HOME")
     if conan_home is not None:
         os.makedirs(conan_home, exist_ok=True)
-
-        cc = env.get("CC")
-
-        new_cc = os.path.join(conan_home, "gcc")
-        try:
-            os.symlink(cc, new_cc)
-        except FileExistsError:
-            pass
-        env["CC"] = new_cc
-
-        cxx = env.get("CXX")
-        if cxx is not None:
-            new_cxx = os.path.join(conan_home, "g++")
-
-            try:
-                os.symlink(cxx, new_cxx)
-            except FileExistsError:
-                pass
-            env["CXX"] = new_cxx
 
     print("CONAN_HOME=" + env.get("CONAN_HOME", ""), file=sys.stderr)
     print("CC=" + env.get("CC", ""), file=sys.stderr)
