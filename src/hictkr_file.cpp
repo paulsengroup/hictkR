@@ -141,8 +141,8 @@ static Rcpp::DataFrame fetch_as_df(const Selector &sel,
                                    const std::shared_ptr<const hictk::BinTable> &bins_ptr,
                                    bool join) {
   if (!join) {
-    std::vector<uint64_t> bin1_ids{};
-    std::vector<uint64_t> bin2_ids{};
+    std::vector<int64_t> bin1_ids{};
+    std::vector<int64_t> bin2_ids{};
     std::vector<N> counts{};
 
     std::for_each(sel.template begin<N>(), sel.template end<N>(),
@@ -162,12 +162,12 @@ static Rcpp::DataFrame fetch_as_df(const Selector &sel,
     chrom_names.push_back(std::string{chrom.name()});
   }
 
-  std::vector<std::uint32_t> chrom1_ids{};
-  std::vector<std::uint32_t> start1{};
-  std::vector<std::uint32_t> end1{};
-  std::vector<std::uint32_t> chrom2_ids{};
-  std::vector<std::uint32_t> start2{};
-  std::vector<std::uint32_t> end2{};
+  std::vector<std::int32_t> chrom1_ids{};
+  std::vector<std::int32_t> start1{};
+  std::vector<std::int32_t> end1{};
+  std::vector<std::int32_t> chrom2_ids{};
+  std::vector<std::int32_t> start2{};
+  std::vector<std::int32_t> end2{};
   std::vector<N> counts{};
 
   const hictk::transformers::JoinGenomicCoords jsel(sel.template begin<N>(), sel.template end<N>(),
