@@ -19,3 +19,4 @@ conan-staging$
 ^\.RData$
 CMakeLists.txt$
 ^docs$
+^requirements.txt$
