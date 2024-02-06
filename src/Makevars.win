@@ -2,6 +2,7 @@ PWD := $(shell pwd)
 export CONAN_HOME := $(PWD)\conan-staging\.conan2
 CC := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("gcc")')"
 CXX := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("g++")')"
+CXX17 := $(CXX)
 
 CONANDEPS_MK := $(shell ..\run_conan.py)
 include $(CONANDEPS_MK)
