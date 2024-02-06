@@ -17,3 +17,4 @@ gmon.out
 perf.*
 *.o
 *.so
+inst/doc
