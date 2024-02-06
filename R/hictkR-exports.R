@@ -24,10 +24,12 @@ loadModule(module = "hictkR", TRUE)
 #' @param matrix_unit unit of the matrix to be opened. Should be one of "BP", "FRAG".
 #' @returns a file handle.
 #' @examples
+#' \dontrun{
 #' File("interactions.cool")
 #' File("interactions.mcool::/resolutions/100000")
 #' File("interactions.mcool", 100000)
 #' File("interactions.hic", 100000)
+#' }
 
 File <-
   function(path,
@@ -45,7 +47,9 @@ File <-
 #' @param path path to the file to be opened.
 #' @returns a file handle.
 #' @examples
+#' \dontrun{
 #' MultiResolutionFile("interactions.mcool")
+#'
 
 MultiResolutionFile <- function(path) {
   return(new(RcppMultiResolutionFile, path))
@@ -56,7 +60,10 @@ MultiResolutionFile <- function(path) {
 #' @param path path to the file to be opened.
 #' @returns a file handle.
 #' @examples
+#' \dontrun{
 #' SingleCellFile("interactions.scool")
+#'
+
 SingleCellFile <- function(path) {
   return(new(RcppSingleCellFile, path))
 }
@@ -84,6 +91,7 @@ SingleCellFile <- function(path) {
 #'             Supported formats: "df", "dense".
 #' @returns a DataFrame or Matrix object with the interactions for the given query.
 #' @examples
+#' \dontrun{
 #' f <- File("interactions.hic",
 #'           1000000)
 #' fetch(f)                             # Fetch genome-wide interactions
@@ -97,6 +105,7 @@ SingleCellFile <- function(path) {
 #'       "chr1\t0\t10000000",
 #'       query_type="BED")              # Fetch interactions given a query in BED format
 #' fetch(f, type="dense")               # Fetch interactions in dense format (i.e. as a Matrix)
+#'
 
 fetch <-
   function(file,
@@ -125,12 +134,14 @@ fetch <-
 #'             Ignored when file is not in .scool format.
 #' @returns a file handle of the appropriate type.
 #' @examples
+#' \dontrun{
 #' hictkR_open("interactions.cool")
 #' hictkR_open("interactions.mcool")
 #' hictkR_open("interactions.scool")
 #' hictkR_open("interactions.mcool", resolution=10000)
 #' hictkR_open("interactions.hic", resolution=10000)
 #' hictkR_open("interactions.scool", cell="id_0001")
+#'
 
 hictkR_open <- function(path,
                         resolution = NULL,
