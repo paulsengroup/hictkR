@@ -19,6 +19,7 @@ def find_conan():
 
 
 def run_conan_profile_detect(conan):
+
     sp.run([conan, "profile", "detect"], stderr=sp.DEVNULL, stdout=sp.DEVNULL)
 
 
@@ -41,6 +42,18 @@ def main():
     conan_home = os.getenv("CONAN_HOME")
     if conan_home is not None:
         os.makedirs(conan_home, exist_ok=True)
+
+        cc = os.getenv("CC")
+        if cc is not None:
+            new_cc = os.path.join(conan_home, "gcc")
+            os.symlink(cc, new_cc)
+            os.environ["CC"] = new_cc
+
+        cxx = os.getenv("CXX")
+        if cxx is not None:
+            new_cxx = os.path.join(conan_home, "g++")
+            os.symlink(cc, new_cxx)
+            os.environ["CC"] = new_cxx
 
     run_conan_profile_detect(conan)
     run_conan_install(conan)
