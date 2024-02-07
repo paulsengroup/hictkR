@@ -68,15 +68,8 @@ jobs:
     - name: Install Conan
       run: pip install -r requirements.txt
 
-    - name: Install pandoc (macOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew install pandoc
-
-    - name: Install pandoc (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        choco install pandoc
+    - name: Install pandoc
+      uses: r-lib/actions/setup-pandoc@v2
 
     - name: Setup R
       uses: r-lib/actions/setup-r@v2
