@@ -49,16 +49,25 @@ def get_rtools_home() -> str:
         raise RuntimeError("Unable to infer R version")
 
     r_version = matches.group(1).replace(".", "")
+    rtools_string = f"rtools{r_version}"
 
-    rtools_home = os.path.join("C:\\", f"rtools{r_version}")
+    rtools_home = os.path.join("C:\\", rtools_string)
+    for p in get_path_as_r(add_rtools=False).split(";"):
+        if rtools_string in p:
+            matches = re.search(rf"^(.*{rtools_string})", p)
+            if matches:
+                rtools_home = matches.group(1)
+                break
 
     if not os.path.exists(rtools_home):
         raise RuntimeError("Unable to find RTOOLS_HOME at: " + rtools_home)
 
+    print(f'Found Rtools at "{rtools_home}"', file=sys.stderr)
+
     return rtools_home
 
 
-def get_path_as_r() -> str:
+def get_path_as_r(add_rtools: bool = True) -> str:
     res = sp.check_output(
         ["Rscript", "-e", "Sys.getenv('PATH')"], stderr=sp.DEVNULL
     ).decode("utf-8")
@@ -68,12 +77,13 @@ def get_path_as_r() -> str:
 
     path = [os.path.normpath(p) for p in matches.group(1).split(";")]
 
-    rtools_home = get_rtools_home()
+    if add_rtools:
+        rtools_home = get_rtools_home()
 
-    path = [
-        os.path.join(rtools_home, "usr", "bin"),
-        os.path.join(rtools_home, "mingw64", "bin"),
-    ] + path
+        path = [
+            os.path.join(rtools_home, "usr", "bin"),
+            os.path.join(rtools_home, "mingw64", "bin"),
+        ] + path
 
     return ";".join(path)
 
