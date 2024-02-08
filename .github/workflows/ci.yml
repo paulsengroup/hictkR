@@ -32,6 +32,7 @@ on:
 
 env:
   CONAN_HOME: "${{ github.workspace }}/conan/"
+  MACOSX_DEPLOYMENT_TARGET: 10.15
 
 # https://stackoverflow.com/a/72408109
 concurrency:
