@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "./hictkr_singlecell_file.hpp"
+#include "./hictkr_singlecell_file.h"
 
 #include <cstdint>
 #include <hictk/cooler/singlecell_cooler.hpp>
 #include <string>
 #include <vector>
 
-#include "./common.hpp"
+#include "./common.h"
 
 SingleCellFile::SingleCellFile(std::string path) : _fp(std::move(path)) {}
 

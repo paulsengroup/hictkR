@@ -2,11 +2,11 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "./hictkr_multi_resolution_file.hpp"
+#include "./hictkr_multi_resolution_file.h"
 
 #include <string>
 
-#include "./common.hpp"
+#include "./common.h"
 
 MultiResolutionFile::MultiResolutionFile(std::string path) : _fp(std::move(path)) {}
 

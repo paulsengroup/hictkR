@@ -7,10 +7,10 @@
 #include <cstdint>
 #include <string>
 
-#include "./hictkr_file.hpp"
-#include "./hictkr_multi_resolution_file.hpp"
-#include "./hictkr_singlecell_file.hpp"
-#include "./hictkr_validation.hpp"
+#include "./hictkr_file.h"
+#include "./hictkr_multi_resolution_file.h"
+#include "./hictkr_singlecell_file.h"
+#include "./hictkr_validation.h"
 
 RCPP_MODULE(hictkR) {
   Rcpp::function("Rcpp_is_cooler", &is_cooler, "Test whether a file or URI is a Cooler.");

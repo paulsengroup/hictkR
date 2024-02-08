@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "./hictkr_validation.hpp"
+#include "./hictkr_validation.h"
 
 #include <hictk/cooler/validation.hpp>
 #include <hictk/hic/validation.hpp>
