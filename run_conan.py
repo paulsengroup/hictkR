@@ -147,6 +147,10 @@ def run_conan_profile_detect_windows(env):
     env["CC"] = cc
     env["CXX"] = cxx
 
+    # HDF5, szip and zlib come with Rtools, and using the version from Conan causes
+    # weird link errors that are difficult to address.
+    # So we claim that hdf4/1.14.3 is available as a system library (even though
+    # a different version is likely installed) and call it a day
     profile = [
         "[settings]",
         f"arch={arch}",
@@ -157,6 +161,8 @@ def run_conan_profile_detect_windows(env):
         "os=Windows",
         "[buildenv]",
         f"PATH='" + env["PATH"] + "'",
+        "[platform_requires]",
+        "hdf5/1.14.3",
         "[platform_tool_requires]",
         f"cmake/{cmake_version}",
     ]
@@ -170,10 +176,6 @@ def run_conan_profile_detect_windows(env):
     os.makedirs(os.path.dirname(conan_profile), exist_ok=True)
     with open(conan_profile, "w") as f:
         print("\n".join(profile), file=f, end="")
-
-    print("CONAN_HOME=" + get_conan_home(), file=sys.stderr)
-    print("CC=" + env.get("CC", ""), file=sys.stderr)
-    print("CXX=" + env.get("CXX", ""), file=sys.stderr)
 
 
 def run_conan_profile_detect(conan, env):

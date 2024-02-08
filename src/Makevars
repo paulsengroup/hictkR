@@ -1,5 +1,7 @@
 PWD := $(shell pwd)
-# export CONAN_HOME := $(PWD)/conan-staging/.conan2
+export CONAN_HOME := $(PWD)/conan-staging/.conan2
+export CC := "$(shell "$(R_HOME)/bin/Rscript" -e 'Sys.which("gcc")')"
+export CXX := "$(shell "$(R_HOME)/bin/Rscript" -e 'Sys.which("g++")')"
 
 CONANDEPS_MK := $(shell ../run_conan.py)
 include $(CONANDEPS_MK)

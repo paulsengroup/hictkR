@@ -1,5 +1,5 @@
 PWD := $(shell pwd)
-export CONAN_HOME := $(PWD)\conan-staging\.conan2
+export CONAN_HOME := C:\Users\robom\conan-staging\.conan2
 export CC := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("gcc")')"
 export CXX := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("g++")')"
 
@@ -16,3 +16,6 @@ PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(shell "$(R_HOME)\bin\Rscript" -e 'Rcpp:::CxxFl
 PKG_LIBS := $(addprefix -L ,$(CONAN_LIB_DIRS))
 PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_LIBS))
 PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_SYSTEM_LIBS))
+
+# These libraries come with Rtools, and installing them with Conan leads to link errors that are difficult to address
+PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz
