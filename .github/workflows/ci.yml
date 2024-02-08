@@ -47,8 +47,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14]
-        r-version: ["4.0.5"]
+        os: [ windows-latest, macos-latest, ubuntu-latest ]
+        r-version: [ "3.6.3", "4.3.2" ]
 
     runs-on: ${{ matrix.os }}
 
