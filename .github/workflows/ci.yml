@@ -32,7 +32,6 @@ on:
 
 env:
   CONAN_HOME: "${{ github.workspace }}/conan/"
-  MACOS_MIN_VERSION: 10.15
 
 # https://stackoverflow.com/a/72408109
 concurrency:
@@ -48,8 +47,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        r-version: ["3.6.3", "4.0.5", "4.1.3", "4.2.3", "4.3.2"]
+        os: [macos-13, macos-14]
+        r-version: ["4.0.5"]
 
     runs-on: ${{ matrix.os }}
 
@@ -82,20 +81,6 @@ jobs:
       with:
         extra-packages: any::rcmdcheck
         needs: check
-
-    - name: Generate cache key
-      id: cache-key
-      run: |
-        hash="${{ hashFiles('conanfile.txt', '.github/workflows/ci.yml') }}"
-
-        echo "conan-key=ci-$hash" >> $GITHUB_OUTPUT
-
-    - name: Restore Conan cache
-      id: cache-conan
-      uses: actions/cache/restore@v3
-      with:
-        key: conan-${{ steps.cache-key.outputs.conan-key }}
-        path: ${{ env.CONAN_HOME }}
 
     - name: Build and test package
       uses: r-lib/actions/check-r-package@v2

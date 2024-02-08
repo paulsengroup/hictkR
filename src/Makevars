@@ -2,7 +2,7 @@ PWD := $(shell pwd)
 export CONAN_HOME := $(PWD)/conan-staging/.conan2
 export CC = "$(shell "$(R_HOME)/bin/Rscript" -e 'Sys.which("gcc")')"
 export CXX = "$(shell "$(R_HOME)/bin/Rscript" -e 'Sys.which("g++")')"
-
+export MACOSX_DEPLOYMENT_TARGET = 10.15
 
 CONANDEPS_MK := $(shell ../run_conan.py)
 include $(CONANDEPS_MK)
@@ -17,3 +17,5 @@ PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(shell "$(R_HOME)/bin/Rscript" -e 'Rcpp:::CxxFl
 PKG_LIBS := $(addprefix -L ,$(CONAN_LIB_DIRS))
 PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_LIBS))
 PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_SYSTEM_LIBS))
+
+OS := $(shell uname 2>/dev/null || echo Unknown)
