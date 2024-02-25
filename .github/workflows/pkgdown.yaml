@@ -27,6 +27,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Generate requirements.txt
+        run: |
+          echo 'conan>=2' > requirements.txt
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          cache: 'pip'
+
+      - name: Install Conan
+        run: pip install -r requirements.txt
+
       - name: Install pandoc
         uses: r-lib/actions/setup-pandoc@v2
 
