@@ -8,6 +8,8 @@
 .vscode/
 cmake-build*/
 conan-staging/
+hictkR.Rcheck/
+venv/
 
 # Ignored files
 .RData

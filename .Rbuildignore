@@ -3,9 +3,11 @@
 ^\.vscode$
 ^cmake-build-.*
 ^cmake$
+.*.Rcheck$
 
 ^\.github$
 conan-staging$
+^venv$
 
 .*.o$
 .*.so$
