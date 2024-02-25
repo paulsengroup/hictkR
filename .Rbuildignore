@@ -1,8 +1,10 @@
 ^\.idea$
 ^\.run$
 ^\.vscode$
+^_pkgdown\.yml$
 ^cmake-build-.*
 ^cmake$
+^pkgdown$
 .*.Rcheck$
 
 ^\.github$

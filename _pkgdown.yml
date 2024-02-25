@@ -1,0 +1,8 @@
+# Copyright (C) 2024 Roberto Rossini (roberros@uio.no)
+# SPDX-License-Identifier: MIT
+
+url: ~
+template:
+  bootstrap: 5
+  bootswatch: flatly
+  theme: github-light
