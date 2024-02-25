@@ -17,6 +17,7 @@ R bindings for hictk, a blazing fast toolkit to work with .hic and .cool files.
 hictkR can be installed directly from GitHub.
 
 Installing hictkR requires a compiler toolchain supporting C++17, such as:
+
 - GCC 8+
 - Clang 8+
 - Apple-Clang 10.0+
