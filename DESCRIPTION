@@ -8,7 +8,7 @@ Authors@R:
 Maintainer: Roberto Rossini <roberros@uio.no>
 Description: This package provides R binding for hictk: a blazing fast toolkit to work with .hic and .cool files
 License: MIT + file LICENSE
-URL: https://github.com/paulsengroup/hictkR
+URL: https://github.com/paulsengroup/hictkR, https://paulsengroup.github.io/hictkR
 BugReports: https://github.com/paulsengroup/hictkR/issues
 Encoding: UTF-8
 LazyData: true
