@@ -35,6 +35,5 @@ preferred-citation:
   journal: 'Cold Spring Harbor Laboratory'
   year: 2023
   month: 11
-  volume: 27
   title: 'hictk: blazing fast toolkit to work with .hic and .cool files'
   abstract: 'We developed hictk, a toolkit that can transparently operate on .hic and .cool files with excellent performance. The toolkit is written in C++ and consists of a C++ library with Python bindings as well as CLI tools to perform common operations directly from the shell, including converting between .hic and .mcool formats. We benchmark the performance of hictk and compare it with other popular tools and libraries. We conclude that hictk significantly outperforms existing tools while providing the flexibility of natively working with both file formats without code duplication.'
