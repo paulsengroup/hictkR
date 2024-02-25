@@ -15,6 +15,7 @@ venv/
 # Ignored files
 .RData
 *.bak
+*.html
 *.tar.*
 gmon.out
 perf.*
