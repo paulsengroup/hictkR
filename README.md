@@ -59,7 +59,7 @@ df
 | chr1   | 0       | 100000 | chr2   | 600000  | 700000  | 21    |
 | ...    | ...     | ...    | ...    | ...     | ...     | ...   |
 
-Refer to the manual and vignettes for more examples on how to use hictkR.
+Refer to the [manual](https://paulsengroup.github.io/hictkR/reference/index.html) and [vignette](https://paulsengroup.github.io/hictkR/articles/hictkR-vignette.html) available at [paulsengroup.github.io/hictkR](https://paulsengroup.github.io/hictkR/) for more examples on how to use hictkR.
 
 ## Citing
 
