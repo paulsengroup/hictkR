@@ -3,7 +3,8 @@ Type: Package
 Title: R bindings for hictk
 Version: 0.0.1
 Authors@R:
-  c(person("Roberto", "Rossini", email = "roberros@uio.no", role = c("aut", "cre")))
+  c(person("Roberto", "Rossini", email = "roberros@uio.no", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3096-1470")))
 Maintainer: Roberto Rossini <roberros@uio.no>
 Description: This package provides R binding for hictk: a blazing fast toolkit to work with .hic and .cool files
 License: MIT + file LICENSE
