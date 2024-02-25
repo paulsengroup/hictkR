@@ -1,7 +1,7 @@
 PWD := $(shell pwd)
 export CONAN_HOME := C:\Users\robom\conan-staging\.conan2
-export CC := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("gcc")')"
-export CXX := "$(shell "$(R_HOME)\bin\Rscript" -e 'Sys.which("g++")')"
+export CC = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("gcc"))' | sed -E 's/\[1\] "(.*)"/\1/')"
+export CXX = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("g++"))' | sed -E 's/\[1\] "(.*)"/\1/')"
 
 CONANDEPS_MK := $(shell ..\run_conan.py)
 include $(CONANDEPS_MK)
