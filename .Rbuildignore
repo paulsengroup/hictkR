@@ -19,6 +19,7 @@ conan-staging$
 ^\.gitignore$
 ^\.pre-commit-config.yaml$
 ^\.RData$
+CITATION.cff
 CMakeLists.txt$
 ^docs$
 ^requirements.txt$
