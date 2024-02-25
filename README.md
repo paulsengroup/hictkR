@@ -14,12 +14,25 @@ R bindings for hictk, a blazing fast toolkit to work with .hic and .cool files.
 
 ## Installing hictkR
 
-hictkR can be installed directly from GitHubin various ways. The simples method is using pip: `pip install hictkpy`.
+hictkR can be installed directly from GitHub.
+
+Installing hictkR requires a compiler toolchain supporting C++17, such as:
+- GCC 8+
+- Clang 8+
+- Apple-Clang 10.0+
+
+On Windows a suitable compiler toolchain can be installed using [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
+
+Furthermore, the following tools are required:
+
+- CMake 3.25+
+- Conan 2+
+
+Once all the build dependencies have been installed, the package can be installed as follows (note that this may require some time, as this involves the compilation of several packages):
 
 ```r
 install.packages("devtools")
-library(devtools)
-install_github("paulsengroup/hictkR")
+devtools::install_github("paulsengroup/hictkR")
 ```
 
 ## Using hictkR
@@ -28,13 +41,22 @@ install_github("paulsengroup/hictkR")
 library(hictkR)
 
 path <- "file.mcool"  # "file.hic"
-
 f <- File(path, resolution=100000)
 
 df <- fetch(f, "chr1:0-10,000,000", "chr2:0-20,000,000", join=TRUE)
-
 df
 ```
+
+| chrom1 | start1  | end1   | chrom2 | start2  | end2    | count |
+|--------|---------|--------|--------|---------|---------|-------|
+| chr1   | 0       | 100000 | chr2   | 0       | 100000  | 15    |
+| chr1   | 0       | 100000 | chr2   | 100000  | 200000  | 5     |
+| chr1   | 0       | 100000 | chr2   | 300000  | 400000  | 17    |
+| chr1   | 0       | 100000 | chr2   | 400000  | 500000  | 22    |
+| chr1   | 0       | 100000 | chr2   | 500000  | 600000  | 30    |
+| chr1   | 0       | 100000 | chr2   | 600000  | 700000  | 21    |
+| chr1   | 0       | 100000 | chr2   | 600000  | 700000  | 21    |
+| ...    | ...     | ...    | ...    | ...     | ...     | ...   |
 
 Refer to the manual and vignettes for more examples on how to use hictkR.
 
