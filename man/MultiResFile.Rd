@@ -17,6 +17,6 @@ Opena a .mcool file for reading
 }
 \examples{
 \dontrun{
-MultiResolutionFile("interactions.mcool")
+MultiResFile("interactions.mcool")
 }
 }

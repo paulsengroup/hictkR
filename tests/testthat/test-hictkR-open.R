@@ -26,7 +26,7 @@ test_that("hicrkR_open: .cool", {
   f <- hictkR_open(scool_file, cell="GSM2687248_41669_ACAGTG-R1-DpnII.100000.cool")
   expect_equal(expected, class(f))
 
-  mclr <- MultiResolutionFile(mcool_file)
+  mclr <- MultiResFile(mcool_file)
   sclr <- SingleCellFile(scool_file)
 
   f <- hictkR_open(mclr, resolution=100000)
@@ -38,7 +38,7 @@ test_that("hicrkR_open: .cool", {
 
 
 test_that("hicrkR_open: .mcool", {
-  expected <- class(MultiResolutionFile(mcool_file))
+  expected <- class(MultiResFile(mcool_file))
 
   f <- hictkR_open(mcool_file)
   expect_equal(expected, class(f))

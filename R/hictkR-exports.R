@@ -48,7 +48,7 @@ File <-
 #' @returns a file handle.
 #' @examples
 #' \dontrun{
-#' MultiResolutionFile("interactions.mcool")
+#' MultiResFile("interactions.mcool")
 #' }
 
 MultiResFile <- function(path) {
@@ -163,7 +163,7 @@ hictkR_open <- function(path,
 
   if (is_multires_file(path)) {
     if (is.null(resolution)) {
-      return(MultiResolutionFile(path))
+      return(MultiResFile(path))
     }
     uri <- paste(path, "::/resolutions/", resolution, sep = "")
     return(File(uri))
