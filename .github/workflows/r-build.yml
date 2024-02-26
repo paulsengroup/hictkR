@@ -80,6 +80,9 @@ jobs:
         extra-packages: any::rcmdcheck
         needs: check
 
+    - name: Setup Latex
+      uses: r-lib/actions/setup-tinytex@v2
+
     - name: Build package
       run: |
         MAKE="make -j$(nproc)" R CMD build .
