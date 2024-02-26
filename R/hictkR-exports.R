@@ -147,13 +147,13 @@ hictkR_open <- function(path,
                         resolution = NULL,
                         cell = NULL) {
   if ("path" %in% names(path)) {
-    # Assume path is actually an .mcool or .scool file
+    # Assume path is actually an .cool, .mcool, .scool or .hic file
     path <- path$path
   }
 
-  if ("bin_size" %in% names(path)) {
-    # Assume path is actually an .mcool or .scool file
-    resolution <- path$bin_size
+  if ("resolution" %in% names(path)) {
+    # Assume path is actually .cool, .scool or .hic file
+    resolution <- path$resolution
   }
 
   if (!is.null(resolution)) {

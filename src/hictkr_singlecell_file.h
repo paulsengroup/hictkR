@@ -17,7 +17,7 @@ class SingleCellFile {
   explicit SingleCellFile(std::string path);
 
   [[nodiscard]] std::string path() const;
-  [[nodiscard]] std::uint32_t bin_size() const noexcept;
+  [[nodiscard]] std::uint32_t resolution() const noexcept;
   [[nodiscard]] std::uint64_t nbins() const noexcept;
   [[nodiscard]] Rcpp::DataFrame chromosomes() const;
   [[nodiscard]] Rcpp::DataFrame bins() const;

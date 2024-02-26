@@ -15,7 +15,7 @@ SingleCellFile::SingleCellFile(std::string path) : _fp(std::move(path)) {}
 
 std::string SingleCellFile::path() const { return _fp.path(); }
 
-std::uint32_t SingleCellFile::bin_size() const noexcept { return _fp.bin_size(); }
+std::uint32_t SingleCellFile::resolution() const noexcept { return _fp.resolution(); }
 
 std::uint64_t SingleCellFile::nbins() const noexcept { return _fp.bins().size(); }
 

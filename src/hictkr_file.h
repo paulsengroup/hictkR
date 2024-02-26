@@ -30,7 +30,7 @@ class HiCFile {
   [[nodiscard]] Rcpp::DataFrame bins() const;
 
   [[nodiscard]] std::string path() const noexcept;
-  [[nodiscard]] std::uint32_t bin_size() const noexcept;
+  [[nodiscard]] std::uint32_t resolution() const noexcept;
   [[nodiscard]] std::uint64_t nbins() const noexcept;
   [[nodiscard]] std::uint64_t nchroms() const noexcept;
   [[nodiscard]] Rcpp::List attributes() const;

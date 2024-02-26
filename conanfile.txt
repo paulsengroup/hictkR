@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 [requires]
-hictk/0.0.8
+hictk/0.0.9
 
 [generators]
 CMakeDeps

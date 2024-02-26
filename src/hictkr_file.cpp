@@ -36,7 +36,7 @@ Rcpp::DataFrame HiCFile::chromosomes() const { return get_chromosomes(_fp); }
 Rcpp::DataFrame HiCFile::bins() const { return get_bins(_fp); }
 
 std::string HiCFile::path() const noexcept { return {_fp.path()}; }
-std::uint32_t HiCFile::bin_size() const noexcept { return _fp.bin_size(); }
+std::uint32_t HiCFile::resolution() const noexcept { return _fp.resolution(); }
 std::uint64_t HiCFile::nbins() const noexcept { return _fp.nbins(); }
 std::uint64_t HiCFile::nchroms() const noexcept { return _fp.nchroms(); }
 
@@ -115,7 +115,7 @@ std::uint64_t HiCFile::nchroms() const noexcept { return _fp.nchroms(); }
 [[nodiscard]] static Rcpp::List get_hic_attrs(const hictk::hic::File &hf) {
   // clang-format off
   return Rcpp::List::create(
-            Rcpp::Named("bin-size") = hf.bin_size(),
+            Rcpp::Named("bin-size") = hf.resolution(),
             Rcpp::Named("format") = "HIC",
             Rcpp::Named("format-version") = hf.version(),
             Rcpp::Named("assembly") = hf.assembly(),
@@ -234,7 +234,7 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::s
 
 template <typename N, typename Selector>
 static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel) {
-  const auto bin_size = sel.bins().bin_size();
+  const auto bin_size = sel.bins().resolution();
 
   const auto span1 = sel.coord1().bin2.end() - sel.coord1().bin1.start();
   const auto span2 = sel.coord2().bin2.end() - sel.coord2().bin1.start();
@@ -271,7 +271,7 @@ static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel) {
 template <typename N>
 static Rcpp::NumericMatrix fetch_as_matrix(const hictk::hic::PixelSelectorAll &sel,
                                            bool mirror_below_diagonal = true) {
-  const auto bin_size = sel.bins().bin_size();
+  const auto bin_size = sel.bins().resolution();
 
   const auto num_rows = sel.bins().size();
   const auto num_cols = sel.bins().size();

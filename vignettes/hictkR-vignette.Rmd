@@ -33,7 +33,7 @@ hictkR file handles returned by `File()` provide several attributes storing stat
 
 ```{r, results="hide"}
 path <- f$path
-resolution <- as.integer(f$bin_size)
+resolution <- as.integer(f$resolution)
 
 paste("File \"",
       basename(path),
