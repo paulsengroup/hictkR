@@ -4,13 +4,35 @@
 name: Deploy pkgdown website
 
 on:
+  workflow_dispatch:
+
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/pkgdown.yml"
+      - "R/**"
+      - "src/**"
+      - "tests/**"
+      - "conanfile.txt"
+      - "run_conan.py"
+      - "DESCRIPTION"
+      - "NAMESPACE"
+    tags:
+      - 'v*.*.*'
+
   pull_request:
     branches: [main]
+    paths:
+      - ".github/workflows/pkgdown.yml"
+      - "R/**"
+      - "src/**"
+      - "tests/**"
+      - "conanfile.txt"
+      - "run_conan.py"
+      - "DESCRIPTION"
+      - "NAMESPACE"
   release:
     types: [published]
-  workflow_dispatch:
 
 jobs:
   pkgdown:
