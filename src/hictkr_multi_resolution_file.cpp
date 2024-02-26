@@ -8,20 +8,12 @@
 
 #include "./common.h"
 
-MultiResolutionFile::MultiResolutionFile(std::string path) : _fp(std::move(path)) {}
+MultiResFile::MultiResFile(std::string path) : _fp(std::move(path)) {}
 
-std::string MultiResolutionFile::path() const { return _fp.path(); }
+std::string MultiResFile::path() const { return _fp.path(); }
 
-Rcpp::DataFrame MultiResolutionFile::chromosomes() const { return get_chromosomes(_fp); }
+Rcpp::DataFrame MultiResFile::chromosomes() const { return get_chromosomes(_fp); }
 
-Rcpp::List MultiResolutionFile::attributes() const {
-  return Rcpp::List::create(Rcpp::Named("format") = _fp.attributes().format,
-                            Rcpp::Named("format-version") = _fp.attributes().format_version,
-                            Rcpp::Named("bin-type") = _fp.attributes().bin_type.has_value()
-                                                          ? *_fp.attributes().bin_type
-                                                          : "fixed");
-}
-
-Rcpp::IntegerVector MultiResolutionFile::resolutions() const {
+Rcpp::IntegerVector MultiResFile::resolutions() const {
   return {_fp.resolutions().begin(), _fp.resolutions().end()};
 }

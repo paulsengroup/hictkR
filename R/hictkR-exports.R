@@ -7,7 +7,7 @@
 #' @export RcppSingleCellFile
 
 #' @export File
-#' @export MultiResolutionFile
+#' @export MultiResFile
 #' @export SingleCellFile
 
 #' @export fetch
@@ -51,8 +51,8 @@ File <-
 #' MultiResolutionFile("interactions.mcool")
 #' }
 
-MultiResolutionFile <- function(path) {
-  return(new(RcppMultiResolutionFile, path))
+MultiResFile <- function(path) {
+  return(new(RcppMultiResFile, path))
 }
 
 #' Opena a .scool file for reading

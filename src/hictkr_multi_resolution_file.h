@@ -7,17 +7,16 @@
 #include <Rcpp.h>
 
 #include <cstdint>
-#include <hictk/cooler/multires_cooler.hpp>
+#include <hictk/multires_file.hpp>
 #include <string>
 
-class MultiResolutionFile {
-  hictk::cooler::MultiResFile _fp;
+class MultiResFile {
+  hictk::MultiResFile _fp;
 
  public:
-  explicit MultiResolutionFile(std::string path);
+  explicit MultiResFile(std::string path);
 
   [[nodiscard]] std::string path() const;
   [[nodiscard]] Rcpp::DataFrame chromosomes() const;
-  [[nodiscard]] Rcpp::List attributes() const;
   [[nodiscard]] Rcpp::IntegerVector resolutions() const;
 };

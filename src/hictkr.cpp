@@ -34,12 +34,11 @@ RCPP_MODULE(hictkR) {
       .const_method("fetch_df", &HiCFile::fetch_df, "Fetch interactions as a DataFrame.")
       .const_method("fetch_dense", &HiCFile::fetch_dense, "Fetch interactions as a Matrix.");
 
-  Rcpp::class_<MultiResolutionFile>("RcppMultiResolutionFile")
+  Rcpp::class_<MultiResFile>("RcppMultiResFile")
       .constructor<std::string>()
-      .property("path", &MultiResolutionFile::path, "Path to the opened file.")
-      .property("chromosomes", &MultiResolutionFile::chromosomes)
-      .property("attributes", &MultiResolutionFile::attributes, "File attributes.")
-      .property("resolutions", &MultiResolutionFile::resolutions);
+      .property("path", &MultiResFile::path, "Path to the opened file.")
+      .property("chromosomes", &MultiResFile::chromosomes)
+      .property("resolutions", &MultiResFile::resolutions);
 
   Rcpp::class_<SingleCellFile>("RcppSingleCellFile")
       .constructor<std::string>()
