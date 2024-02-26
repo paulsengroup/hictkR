@@ -74,13 +74,24 @@ jobs:
       with:
         r-version: 'release'
 
+    - name: Add requirements
+      uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        extra-packages: any::rcmdcheck
+        needs: check
+
     - name: Build package
-      run: R CMD build .
+      run: |
+        MAKE="make -j$(nproc)" R CMD build .
+
+    - name: Check package
+      run: |
+        MAKE="make -j$(nproc)" R CMD check hictkR_*.*.*.tar.gz --as-cran
 
     - uses: actions/upload-artifact@v4
       with:
         name: package
-        path: hictk_*.tar.gz
+        path: hictkR_*.*.*.tar.gz
         if-no-files-found: 'error'
         retention-days: 7
         compression-level: 0
