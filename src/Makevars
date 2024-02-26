@@ -1,7 +1,7 @@
 PWD := $(shell pwd)
 export CONAN_HOME := $(PWD)/conan-staging/.conan2
-export CC = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("cc"))' | sed -E 's/\[1\] "(.*)"/\1/')"
-export CXX = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("c++"))' | sed -E 's/\[1\] "(.*)"/\1/')"
+export CC = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("gcc"))' | sed -E 's/\[1\] "(.*)"/\1/')"
+export CXX = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("g++"))' | sed -E 's/\[1\] "(.*)"/\1/')"
 export CXX17 = $(CXX)
 export MACOSX_DEPLOYMENT_TARGET = 10.15
 
