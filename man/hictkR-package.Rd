@@ -12,11 +12,12 @@ This package provides R binding for hictk: a blazing fast toolkit to work with .
 Useful links:
 \itemize{
   \item \url{https://github.com/paulsengroup/hictkR}
+  \item \url{https://paulsengroup.github.io/hictkR}
   \item Report bugs at \url{https://github.com/paulsengroup/hictkR/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Roberto Rossini \email{roberros@uio.no}
+\strong{Maintainer}: Roberto Rossini \email{roberros@uio.no} (\href{https://orcid.org/0000-0003-3096-1470}{ORCID})
 
 }
