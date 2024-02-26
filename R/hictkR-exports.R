@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 #' @export RcppHiCFile
-#' @export RcppMultiResolutionFile
+#' @export RcppMultiResFile
 #' @export RcppSingleCellFile
 
 #' @export File

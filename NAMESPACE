@@ -4,7 +4,7 @@ import(Rcpp)
 importFrom("methods", "new")
 
 export(File)
-export(MultiResolutionFile)
+export(MultiResFile)
 export(SingleCellFile)
 
 export(is_cooler)
