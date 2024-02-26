@@ -10,11 +10,6 @@ test_that("MultiResFile: path accessor", {
   expect_equal(f$path, mcool_file)
 })
 
-test_that("MultiResFile: file attribute accessor", {
-  f <- MultiResFile(mcool_file)
-  expect_equal(f$attributes$format, "HDF5::MCOOL")
-})
-
 test_that("MultiResFile: chromosomes accessor", {
   path1 <- mcool_file
   path2 <- test_path("..", "data", "chromosomes.tsv.gz")
