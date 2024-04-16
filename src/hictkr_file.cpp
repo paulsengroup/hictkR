@@ -255,13 +255,16 @@ static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel) {
     matrix.at(i1, i2) = tp.count;
 
     if (mirror_matrix) {
-      //  Mirror matrix below diagonal
-      if (i2 - i1 < num_rows && i1 < num_cols && i2 < num_rows) {
+      const auto delta = i2 - i1;
+      if (delta >= 0 && delta < num_rows && i1 < num_cols && i2 < num_rows) {
         matrix.at(i2, i1) = tp.count;
-      } else if (i2 - i1 > num_cols && i1 < num_cols && i2 < num_rows) {
+      } else if ((delta < 0 || delta > num_cols) && i1 < num_cols && i2 < num_rows) {
         const auto i3 = static_cast<std::int64_t>(tp.bin2_id - row_offset);
         const auto i4 = static_cast<std::int64_t>(tp.bin1_id - col_offset);
-        matrix.at(i3, i4) = tp.count;
+
+        if (i3 >= 0 && i3 < num_rows && i4 >= 0 && i4 < num_cols) {
+          matrix.at(i3, i4) = tp.count;
+        }
       }
     }
   });
