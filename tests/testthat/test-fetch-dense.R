@@ -19,7 +19,7 @@ for (path in test_files) {
     expect_equal(sum_, 178263235)
   })
 
-  test_that("HiCFile: fetch (dense) cis", {
+  test_that("HiCFile: fetch (dense) symmetric cis", {
     f <- File(path, 100000)
 
     m <- fetch(f, "chr2R:10,000,000-15,000,000", type="dense")
@@ -29,6 +29,35 @@ for (path in test_files) {
 
     expect_equal(shape, c(50, 50))
     expect_equal(sum_, 6029333)
+  })
+
+  test_that("HiCFile: fetch (dense) asymmetric cis", {
+    f <- File(path, 100000)
+
+    m <- fetch(f, ("chr2L:0-10,000,000", "chr2L:5,000,000-20,000,000", type="dense")
+
+    shape <- dim(m)
+    sum_ <- sum(m)
+
+    expect_equal(shape, c(100, 150))
+    expect_equal(sum_, 6287451)
+
+
+    m <- fetch(f, ("chr2L:0-10,000,000", "chr2L:10,000,000-20,000,000", type="dense")
+
+    shape <- dim(m)
+    sum_ <- sum(m)
+
+    expect_equal(shape, c(100, 100))
+    expect_equal(sum_, 761223)
+
+    m <- fetch(f, ("chr2L:0-10,000,000", "chr2L:0-15,000,000", type="dense")
+
+    shape <- dim(m)
+    sum_ <- sum(m)
+
+    expect_equal(shape, c(100, 150))
+    expect_equal(sum_, 12607205)
   })
 
   test_that("HiCFile: fetch (dense) cis BED queries", {
