@@ -5,7 +5,7 @@ export CXX = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("g++"))' | se
 export CXX17 = $(CXX)
 export MACOSX_DEPLOYMENT_TARGET = 10.15
 
-COMPILER_NAME = $(shell "$CC" --version | grep -oE '^gcc|clang' | head -n 1)
+COMPILER_NAME = $(shell "$(CC)" --version | grep -oE '^gcc|clang' | head -n 1)
 ifeq "$(COMPILER_NAME)" "gcc"
     FILESYSTEM_LINK_FLAGS = -lstdc++fs
 else
