@@ -6,9 +6,10 @@ export CXX17 = $(CXX)
 export MACOSX_DEPLOYMENT_TARGET = 10.15
 
 COMPILER_NAME = $(shell "$(CC)" --version | grep -oE '^gcc|clang' | head -n 1)
+FILESYSTEM_LINK_FLAGS = ""
 ifeq "$(COMPILER_NAME)" "gcc"
     FILESYSTEM_LINK_FLAGS = -lstdc++fs
-else
+else ifeq "$(COMPILER_NAME)" "clang"
     FILESYSTEM_LINK_FLAGS = -lc++fs
 endif
 
