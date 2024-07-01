@@ -5,6 +5,14 @@ export CXX = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("g++"))' | se
 export CXX17 = $(CXX)
 export MACOSX_DEPLOYMENT_TARGET = 10.15
 
+COMPILER_NAME = $(shell "$(CC)" --version | grep -oE '^gcc|^clang' | head -n 1)
+FILESYSTEM_LINK_FLAGS = ""
+ifeq "$(COMPILER_NAME)" "gcc"
+    FILESYSTEM_LINK_FLAGS = -lstdc++fs
+else ifeq "$(COMPILER_NAME)" "clang"
+    FILESYSTEM_LINK_FLAGS = -lc++fs
+endif
+
 CONANDEPS_MK := $(shell ../run_conan.py)
 include $(CONANDEPS_MK)
 
@@ -18,3 +26,4 @@ PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(shell "$(R_HOME)/bin/Rscript" -e 'Rcpp:::CxxFl
 PKG_LIBS := $(addprefix -L ,$(CONAN_LIB_DIRS))
 PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_LIBS))
 PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_SYSTEM_LIBS))
+PKG_LIBS := $(PKG_LIBS) $(FILESYSTEM_LINK_FLAGS)
