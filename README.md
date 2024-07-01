@@ -33,7 +33,7 @@ Once all the build dependencies have been installed, the package can be installe
 
 ```r
 install.packages("devtools")
-devtools::install_github("paulsengroup/hictkR")
+devtools::install_github("paulsengroup/hictkR@v0.0.3")
 ```
 
 ## Using hictkR
