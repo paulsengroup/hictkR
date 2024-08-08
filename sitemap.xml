@@ -1,54 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/404.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/articles/hictkR-vignette.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/index.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/File.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/MultiResFile.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/SingleCellFile.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/fetch.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/hictkR-package.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/hictkR_open.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/is_cooler.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/is_hic_file.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/is_multires_file.html</loc>
-  </url>
-  <url>
-    <loc>https://paulsengroup.github.io/hictkR/reference/is_scool_file.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://paulsengroup.github.io/hictkR/404.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/LICENSE-text.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/articles/hictkR-vignette.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/articles/index.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/authors.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/index.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/File.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/MultiResFile.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/SingleCellFile.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/fetch.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/hictkR-package.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/hictkR_open.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/index.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/is_cooler.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/is_hic_file.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/is_multires_file.html</loc></url>
+<url><loc>https://paulsengroup.github.io/hictkR/reference/is_scool_file.html</loc></url>
 </urlset>
+
