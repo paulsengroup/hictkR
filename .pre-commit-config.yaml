@@ -39,3 +39,9 @@ repos:
         language: python
         args: [ '-i' ]
         additional_dependencies: [ 'clang-format==18.1.8' ]
+      - id: styler
+        name: styler
+        entry: Rscript utils/devel/run_styler
+        types_or: [ r ]
+        language: r
+        additional_dependencies: [ 'roxygen2', 'styler' ]
