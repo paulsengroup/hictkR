@@ -2,15 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-test_files <- c(test_path("..", "data", "hic_test_file.hic"),
-                test_path("..", "data", "cooler_test_file.mcool"))
+test_files <- c(
+  test_path("..", "data", "hic_test_file.hic"),
+  test_path("..", "data", "cooler_test_file.mcool")
+)
 
 
 for (path in test_files) {
   test_that("HiCFile: fetch (dense) genome-wide", {
     f <- File(path, 100000)
 
-    m <- fetch(f, type="dense")
+    m <- fetch(f, type = "dense")
 
     shape <- dim(m)
     sum_ <- sum(m)
@@ -22,7 +24,7 @@ for (path in test_files) {
   test_that("HiCFile: fetch (dense) symmetric cis", {
     f <- File(path, 100000)
 
-    m <- fetch(f, "chr2R:10,000,000-15,000,000", type="dense")
+    m <- fetch(f, "chr2R:10,000,000-15,000,000", type = "dense")
 
     shape <- dim(m)
     sum_ <- sum(m)
@@ -34,7 +36,7 @@ for (path in test_files) {
   test_that("HiCFile: fetch (dense) asymmetric cis", {
     f <- File(path, 100000)
 
-    m <- fetch(f, "chr2L:0-10,000,000", "chr2L:5,000,000-20,000,000", type="dense")
+    m <- fetch(f, "chr2L:0-10,000,000", "chr2L:5,000,000-20,000,000", type = "dense")
 
     shape <- dim(m)
     sum_ <- sum(m)
@@ -43,7 +45,7 @@ for (path in test_files) {
     expect_equal(sum_, 6287451)
 
 
-    m <- fetch(f, "chr2L:0-10,000,000", "chr2L:10,000,000-20,000,000", type="dense")
+    m <- fetch(f, "chr2L:0-10,000,000", "chr2L:10,000,000-20,000,000", type = "dense")
 
     shape <- dim(m)
     sum_ <- sum(m)
@@ -51,7 +53,7 @@ for (path in test_files) {
     expect_equal(shape, c(100, 100))
     expect_equal(sum_, 761223)
 
-    m <- fetch(f, "chr2L:0-10,000,000", "chr2L:0-15,000,000", type="dense")
+    m <- fetch(f, "chr2L:0-10,000,000", "chr2L:0-15,000,000", type = "dense")
 
     shape <- dim(m)
     sum_ <- sum(m)
@@ -63,7 +65,7 @@ for (path in test_files) {
   test_that("HiCFile: fetch (dense) cis BED queries", {
     f <- File(path, 100000)
 
-    m <- fetch(f, "chr2R\t10000000\t15000000", type="dense", query_type="BED")
+    m <- fetch(f, "chr2R\t10000000\t15000000", type = "dense", query_type = "BED")
 
     shape <- dim(m)
     sum_ <- sum(m)
@@ -75,7 +77,7 @@ for (path in test_files) {
   test_that("HiCFile: fetch (dense) trans", {
     f <- File(path, 100000)
 
-    m <- fetch(f, "chr2R:10,000,000-15,000,000", "chrX:0-10,000,000", type="dense")
+    m <- fetch(f, "chr2R:10,000,000-15,000,000", "chrX:0-10,000,000", type = "dense")
 
     shape <- dim(m)
     sum_ <- sum(m)
@@ -87,7 +89,7 @@ for (path in test_files) {
   test_that("HiCFile: fetch (dense) trans BED queries", {
     f <- File(path, 100000)
 
-    m <- fetch(f, "chr2R\t10000000\t15000000", "chrX\t0\t10000000", type="dense", query_type="BED")
+    m <- fetch(f, "chr2R\t10000000\t15000000", "chrX\t0\t10000000", type = "dense", query_type = "BED")
 
     shape <- dim(m)
     sum_ <- sum(m)

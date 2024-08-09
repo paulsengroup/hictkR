@@ -33,10 +33,14 @@ test_that("SingleCellFile: chromosomes accessor", {
 
 test_that("SingleCellFile: file cells accessor", {
   f <- SingleCellFile(scool_file)
-  expect_equal(f$cells,
-               c("GSM2687248_41669_ACAGTG-R1-DpnII.100000.cool",
-                 "GSM2687249_41670_GGCTAC-R1-DpnII.100000.cool",
-                 "GSM2687250_41671_TTAGGC-R1-DpnII.100000.cool",
-                 "GSM2687251_41672_AGTTCC-R1-DpnII.100000.cool",
-                 "GSM2687252_41673_CCGTCC-R1-DpnII.100000.cool"))
+  expect_equal(
+    f$cells,
+    c(
+      "GSM2687248_41669_ACAGTG-R1-DpnII.100000.cool",
+      "GSM2687249_41670_GGCTAC-R1-DpnII.100000.cool",
+      "GSM2687250_41671_TTAGGC-R1-DpnII.100000.cool",
+      "GSM2687251_41672_AGTTCC-R1-DpnII.100000.cool",
+      "GSM2687252_41673_CCGTCC-R1-DpnII.100000.cool"
+    )
+  )
 })
