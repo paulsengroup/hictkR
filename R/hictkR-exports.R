@@ -132,6 +132,8 @@ fetch <-
     if (type == "dense") {
       return(file$fetch_dense(range1, range2, normalization, count_type, query_type))
     }
+
+    stop("type should be either \"df\" or \"dense\"")
   }
 
 #' Open files in .cool, .mcool, .scool, and .hic format

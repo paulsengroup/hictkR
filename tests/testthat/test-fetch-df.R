@@ -94,4 +94,26 @@ for (path in test_files) {
 
     expect_equal(sum_, 59.349524704033215)
   })
+
+  test_that("HiCFile: fetch (DF) count_type = int", {
+    f <- File(path, 100000)
+
+    m <- fetch(f, "chr2R:10,000,000-15,000,000", count_type = "int")
+
+    expect_type(m$count, "integer")
+  })
+
+  test_that("HiCFile: fetch (DF) count_type = float", {
+    f <- File(path, 100000)
+
+    m <- fetch(f, "chr2R:10,000,000-15,000,000", count_type = "float")
+
+    expect_type(m$count, "double")
+  })
+
+  test_that("HiCFile: fetch (DF) count_type = invalid", {
+    f <- File(path, 100000)
+
+    expect_error(fetch(f, type = "dense", count_type = "invalid"), regexp = "count_type should be")
+  })
 }
