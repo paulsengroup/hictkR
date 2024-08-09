@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-#include "./hictkr_file.h"
-
 #include <Rcpp.h>
 
 #include <cstddef>
@@ -19,6 +17,7 @@
 #include <vector>
 
 #include "./common.h"
+#include "./hictk_file.h"
 
 HiCFile::HiCFile(std::string uri, std::uint32_t resolution, std::string matrix_type,
                  std::string matrix_unit)
@@ -232,22 +231,11 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::s
       _fp.get());
 }
 
-template <typename N, typename Selector>
-static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel) {
-  const auto bin_size = sel.bins().resolution();
-
-  const auto span1 = sel.coord1().bin2.end() - sel.coord1().bin1.start();
-  const auto span2 = sel.coord2().bin2.end() - sel.coord2().bin1.start();
-  const auto num_rows = span1 == 0 ? sel.bins().size() : (span1 + bin_size - 1) / bin_size;
-  const auto num_cols = span2 == 0 ? sel.bins().size() : (span2 + bin_size - 1) / bin_size;
-
-  const auto row_offset = sel.coord1().bin1.id();
-  const auto col_offset = sel.coord2().bin1.id();
-
-  const auto mirror_matrix = sel.coord1().bin1.chrom() == sel.coord2().bin1.chrom();
-
-  Rcpp::NumericMatrix matrix(num_rows, num_cols);
-  std::fill(matrix.begin(), matrix.end(), N{0});
+template <typename N, typename Selector, typename MatrixT>
+static void fill_dense_matrix(const Selector &sel, MatrixT &matrix, bool mirror_matrix,
+                              std::uint64_t row_offset = 0, std::uint64_t col_offset = 0) {
+  const auto num_rows = matrix.nrow();
+  const auto num_cols = matrix.ncol();
 
   std::for_each(sel.template begin<N>(), sel.template end<N>(), [&](const auto &tp) {
     const auto i1 = static_cast<std::int64_t>(tp.bin1_id - row_offset);
@@ -268,42 +256,51 @@ static Rcpp::NumericMatrix fetch_as_matrix(const Selector &sel) {
       }
     }
   });
-  return matrix;
 }
 
-template <typename N>
-static Rcpp::NumericMatrix fetch_as_matrix(const hictk::hic::PixelSelectorAll &sel,
-                                           bool mirror_below_diagonal = true) {
+template <typename N, typename Selector,
+          typename RcppMatrixT =
+              std::conditional_t<std::is_integral_v<N>, Rcpp::IntegerMatrix, Rcpp::NumericMatrix>>
+static RcppMatrixT fetch_as_matrix(const Selector &sel) {
   const auto bin_size = sel.bins().resolution();
 
-  const auto num_rows = sel.bins().size();
-  const auto num_cols = sel.bins().size();
+  const auto span1 = sel.coord1().bin2.end() - sel.coord1().bin1.start();
+  const auto span2 = sel.coord2().bin2.end() - sel.coord2().bin1.start();
+  const auto num_rows =
+      static_cast<std::int64_t>(span1 == 0 ? sel.bins().size() : (span1 + bin_size - 1) / bin_size);
+  const auto num_cols =
+      static_cast<std::int64_t>(span2 == 0 ? sel.bins().size() : (span2 + bin_size - 1) / bin_size);
 
-  Rcpp::NumericMatrix matrix(num_rows, num_cols);
-  std::fill(matrix.begin(), matrix.end(), N{0});
+  constexpr auto bad_bin_id = std::numeric_limits<std::uint64_t>::max();
 
-  std::for_each(sel.template begin<N>(), sel.template end<N>(), [&](const auto &tp) {
-    const auto i1 = static_cast<std::int64_t>(tp.bin1_id);
-    const auto i2 = static_cast<std::int64_t>(tp.bin2_id);
-    matrix.at(i1, i2) = tp.count;
+  const auto row_offset =
+      static_cast<std::int64_t>(sel.coord1().bin1.id() == bad_bin_id ? 0 : sel.coord1().bin1.id());
+  const auto col_offset =
+      static_cast<std::int64_t>(sel.coord2().bin1.id() == bad_bin_id ? 0 : sel.coord2().bin1.id());
 
-    if (mirror_below_diagonal) {
-      //  Mirror matrix below diagonal
-      if (i2 - i1 < num_rows && i1 < num_cols && i2 < num_rows) {
-        matrix.at(i2, i1) = tp.count;
-      } else if (i2 - i1 > num_cols && i1 < num_cols && i2 < num_rows) {
-        const auto i3 = static_cast<std::int64_t>(tp.bin2_id);
-        const auto i4 = static_cast<std::int64_t>(tp.bin1_id);
-        matrix.at(i3, i4) = tp.count;
-      }
-    }
-  });
+  const auto mirror_matrix = sel.coord1().bin1.chrom() == sel.coord2().bin1.chrom();
+
+  // Matrix allocated this way is zero-filled
+  RcppMatrixT matrix(num_rows, num_cols);
+  fill_dense_matrix<N>(sel, matrix, mirror_matrix, row_offset, col_offset);
   return matrix;
 }
 
-Rcpp::NumericMatrix HiCFile::fetch_dense(std::string range1, std::string range2,
-                                         std::string normalization, std::string count_type,
-                                         std::string query_type) const {
+template <typename N, typename RcppMatrixT = std::conditional_t<
+                          std::is_integral_v<N>, Rcpp::IntegerMatrix, Rcpp::NumericMatrix>>
+static RcppMatrixT fetch_as_matrix(const hictk::hic::PixelSelectorAll &sel) {
+  const auto num_rows = static_cast<std::int64_t>(sel.bins().size());
+  const auto num_cols = static_cast<std::int64_t>(sel.bins().size());
+
+  // Matrix allocated this way is zero-filled
+  RcppMatrixT matrix(num_rows, num_cols);
+  fill_dense_matrix<N>(sel, matrix, true);
+  return matrix;
+}
+
+Rcpp::RObject HiCFile::fetch_dense(std::string range1, std::string range2,
+                                   std::string normalization, std::string count_type,
+                                   std::string query_type) const {
   if (normalization != "NONE") {
     count_type = "float";
   }
@@ -314,9 +311,9 @@ Rcpp::NumericMatrix HiCFile::fetch_dense(std::string range1, std::string range2,
         [&](const auto &ff) {
           auto sel = ff.fetch(hictk::balancing::Method{normalization});
           if (count_type == "int") {
-            return fetch_as_matrix<std::int32_t>(sel);
+            return static_cast<Rcpp::RObject>(fetch_as_matrix<std::int32_t>(sel));
           }
-          return fetch_as_matrix<double>(sel);
+          return static_cast<Rcpp::RObject>(fetch_as_matrix<double>(sel));
         },
         _fp.get());
   }
@@ -330,9 +327,9 @@ Rcpp::NumericMatrix HiCFile::fetch_dense(std::string range1, std::string range2,
                        ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
                        : ff.fetch(range1, range2, hictk::balancing::Method{normalization}, qt);
         if (count_type == "int") {
-          return fetch_as_matrix<std::int32_t>(sel);
+          return static_cast<Rcpp::RObject>(fetch_as_matrix<std::int32_t>(sel));
         }
-        return fetch_as_matrix<double>(sel);
+        return static_cast<Rcpp::RObject>(fetch_as_matrix<double>(sel));
       },
       _fp.get());
 }

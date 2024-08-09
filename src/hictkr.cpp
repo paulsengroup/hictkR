@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <string>
 
-#include "./hictkr_file.h"
+#include "./hictk_file.h"
 #include "./hictkr_multi_resolution_file.h"
 #include "./hictkr_singlecell_file.h"
 #include "./hictkr_validation.h"
