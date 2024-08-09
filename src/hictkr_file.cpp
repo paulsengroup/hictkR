@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+#include "./hictkr_file.h"
+
 #include <Rcpp.h>
 
 #include <cstddef>
@@ -17,7 +19,6 @@
 #include <vector>
 
 #include "./common.h"
-#include "./hictk_file.h"
 
 HiCFile::HiCFile(std::string uri, std::uint32_t resolution, std::string matrix_type,
                  std::string matrix_unit)
