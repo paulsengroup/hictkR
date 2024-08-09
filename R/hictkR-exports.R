@@ -121,6 +121,10 @@ fetch <-
       stop("count_type should be either \"int\" or \"float\"")
     }
 
+    if (query_type != "UCSC" && query_type != "BED") {
+      stop("query_type should be either \"UCSC\" or \"BED\"")
+    }
+
     if (type == "df") {
       return(file$fetch_df(range1, range2, normalization, count_type, join, query_type))
     }
