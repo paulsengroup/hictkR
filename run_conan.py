@@ -11,7 +11,6 @@ import shutil
 import subprocess as sp
 import sys
 
-
 """
 This script takes care of generating a valid conan profile and running conan install.
 Most of the complexity is due to Windows, as in this case we must use the compilers provided by the Rtools package.
