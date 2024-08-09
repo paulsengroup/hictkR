@@ -39,9 +39,9 @@ class HiCFile {
                                          std::string normalization, std::string count_type,
                                          bool join, std::string query_type) const;
 
-  [[nodiscard]] Rcpp::NumericMatrix fetch_dense(std::string range1, std::string range2,
-                                                std::string normalization, std::string count_type,
-                                                std::string query_type) const;
+  [[nodiscard]] Rcpp::RObject fetch_dense(std::string range1, std::string range2,
+                                          std::string normalization, std::string count_type,
+                                          std::string query_type) const;
 
   [[nodiscard]] Rcpp::CharacterVector avail_normalizations() const;
 };
