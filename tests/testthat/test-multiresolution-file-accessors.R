@@ -15,7 +15,7 @@ test_that("MultiResFile: chromosomes accessor", {
   path2 <- test_path("..", "data", "chromosomes.tsv.gz")
 
   chroms <- MultiResFile(path1)$chromosomes
-  expected_chroms <- read.csv(path2, sep="\t")
+  expected_chroms <- read.csv(path2, sep = "\t")
   expect_equal(chroms, expected_chroms)
 })
 

@@ -16,7 +16,8 @@ RCPP_MODULE(hictkR) {
   Rcpp::function("Rcpp_is_cooler", &is_cooler, "Test whether a file or URI is a Cooler.");
   Rcpp::function("Rcpp_is_multires_file", &is_multires_file,
                  "Test whether a file is a multi-resolution Cooler.");
-  Rcpp::function("Rcpp_is_scool_file", &is_scool_file, "Test whether a file is a single-cell Cooler.");
+  Rcpp::function("Rcpp_is_scool_file", &is_scool_file,
+                 "Test whether a file is a single-cell Cooler.");
   Rcpp::function("Rcpp_is_hic_file", &is_hic_file, "Test whether a file is in .hic format.");
 
   Rcpp::class_<HiCFile>("RcppHiCFile")

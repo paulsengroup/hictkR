@@ -37,7 +37,7 @@ test_that("File: chromosomes accessor", {
   path2 <- test_path("..", "data", "chromosomes.tsv.gz")
 
   chroms <- File(path1, 100000)$chromosomes
-  expected_chroms <- read.csv(path2, sep="\t")
+  expected_chroms <- read.csv(path2, sep = "\t")
   expect_equal(chroms, expected_chroms)
 })
 
@@ -48,7 +48,7 @@ test_that("File: bins accessor", {
 
   bins1 <- File(path1, 100000)$bins
   bins2 <- File(path2, 100000)$bins
-  expected_bins <- read.csv(path3, sep="\t", stringsAsFactors=FALSE)
+  expected_bins <- read.csv(path3, sep = "\t", stringsAsFactors = FALSE)
 
   bins1$chrom <- as.character(bins1$chrom)
   bins2$chrom <- as.character(bins2$chrom)
