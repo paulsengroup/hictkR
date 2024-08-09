@@ -19,6 +19,7 @@ for (path in test_files) {
 
     expect_equal(shape, c(1380, 1380))
     expect_equal(sum_, 178263235)
+    expect_equal(m, t(m))
   })
 
   test_that("HiCFile: fetch (dense) symmetric cis", {
@@ -31,6 +32,7 @@ for (path in test_files) {
 
     expect_equal(shape, c(50, 50))
     expect_equal(sum_, 6029333)
+    expect_equal(m, t(m))
   })
 
   test_that("HiCFile: fetch (dense) asymmetric cis", {
@@ -96,5 +98,27 @@ for (path in test_files) {
 
     expect_equal(shape, c(50, 100))
     expect_equal(sum_, 83604)
+  })
+
+  test_that("HiCFile: fetch (dense) count_type = int", {
+    f <- File(path, 100000)
+
+    m <- fetch(f, "chr2R:10,000,000-15,000,000", type = "dense", count_type = "int")
+
+    expect_type(m, "integer")
+  })
+
+  test_that("HiCFile: fetch (dense) count_type = float", {
+    f <- File(path, 100000)
+
+    m <- fetch(f, "chr2R:10,000,000-15,000,000", type = "dense", count_type = "float")
+
+    expect_type(m, "double")
+  })
+
+  test_that("HiCFile: fetch (dense) count_type = invalid", {
+    f <- File(path, 100000)
+
+    expect_error(fetch(f, type = "dense", count_type = "invalid"), regexp = "count_type should be")
   })
 }
