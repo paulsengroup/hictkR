@@ -10,10 +10,10 @@ set(MSVC_WARNINGS
     /w14254 # 'operator': conversion from 'type1:field_bits' to 'type2:field_bits', possible loss of data
     /w14263 # 'function': member function does not override any base class virtual member function
     /w14265 # 'classname': class has virtual functions, but destructor is not virtual instances of this class may not be
-            # destructed correctly
+    # destructed correctly
     /w14287 # 'operator': unsigned/negative constant mismatch
     /we4289 # nonstandard extension used: 'variable': loop control variable declared in the for-loop is used outside the
-            # for-loop scope
+    # for-loop scope
     /w14296 # 'operator': expression is always 'boolean_value'
     /w14311 # 'variable': pointer truncation from 'type1' to 'type2'
     /w14545 # expression before comma evaluates to a function which is missing an argument list
@@ -68,10 +68,15 @@ set(CUDA_WARNINGS
 )
 
 # Disable warnings that are problematic when enabled in certain compilers
-if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0))
-  string(
-    REPLACE -Wduplicated-branches
-            -Wno-duplicated-branches
-            GCC_WARNINGS
-            "${GCC_WARNINGS}")
+if(
+    (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+)
+    string(
+        REPLACE
+        -Wduplicated-branches
+        -Wno-duplicated-branches
+        GCC_WARNINGS
+        "${GCC_WARNINGS}"
+    )
 endif()

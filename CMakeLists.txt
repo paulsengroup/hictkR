@@ -14,39 +14,50 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(NOT CMAKE_FIND_PACKAGE_PREFER_CONFIG)
-  set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
+    set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 endif()
 
 project(
-  hictkR
-  LANGUAGES C CXX
-  HOMEPAGE_URL https://github.com/paulsengroup/hictkR
-  DESCRIPTION "R bindings for hictk")
+    hictkR
+    LANGUAGES C CXX
+    HOMEPAGE_URL https://github.com/paulsengroup/hictkR
+    DESCRIPTION "R bindings for hictk"
+)
 
 include(FetchContent)
 FetchContent_Declare(
-  hictkR_project_options
-  URL "${CMAKE_CURRENT_SOURCE_DIR}/external/project_options-v0.33.0.tar.xz"
-  URL_HASH SHA256=b55dddd6c8af37c35b0bdd90d78088ef05beb423d6a56a55850e33fa3d464675
-  SYSTEM)
+    hictkR_project_options
+    URL "${CMAKE_CURRENT_SOURCE_DIR}/external/project_options-v0.36.6.tar.xz"
+    URL_HASH
+        "SHA256=b4df2a4107847248d4711ee48477cdf93c1a1c7d51a931937759eb9ffba67af8"
+    SYSTEM
+)
 
 FetchContent_MakeAvailable(hictkR_project_options)
 
 get_property(BUILDING_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(BUILDING_MULTI_CONFIG)
-  if(NOT CMAKE_BUILD_TYPE)
-    # Make sure that all supported configuration types have their associated conan packages available. You can reduce
-    # this list to only the configuration types you use, but only if one is not forced-set on the command line for VS
-    message(TRACE "Setting up multi-config build types")
-    set(CMAKE_CONFIGURATION_TYPES
-        Debug Release RelWithDebInfo
-        CACHE STRING "Enabled build types" FORCE)
-  else()
-    message(TRACE "User chose a specific build type, so we are using that")
-    set(CMAKE_CONFIGURATION_TYPES
-        ${CMAKE_BUILD_TYPE}
-        CACHE STRING "Enabled build types" FORCE)
-  endif()
+    if(NOT CMAKE_BUILD_TYPE)
+        # Make sure that all supported configuration types have their associated conan packages available. You can reduce
+        # this list to only the configuration types you use, but only if one is not forced-set on the command line for VS
+        message(TRACE "Setting up multi-config build types")
+        set(CMAKE_CONFIGURATION_TYPES
+            Debug
+            Release
+            RelWithDebInfo
+            CACHE STRING
+            "Enabled build types"
+            FORCE
+        )
+    else()
+        message(TRACE "User chose a specific build type, so we are using that")
+        set(CMAKE_CONFIGURATION_TYPES
+            ${CMAKE_BUILD_TYPE}
+            CACHE STRING
+            "Enabled build types"
+            FORCE
+        )
+    endif()
 endif()
 
 include("${hictkr_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake")
@@ -89,12 +100,16 @@ dynamic_project_options(
   GCC_WARNINGS
   "${GCC_WARNINGS}"
   CUDA_WARNINGS
-  "${CUDA_WARNINGS}")
+  "${CUDA_WARNINGS}"
+)
 
-target_compile_features(hictkR_project_options INTERFACE "cxx_std_${CMAKE_CXX_STANDARD}")
+target_compile_features(
+    hictkR_project_options
+    INTERFACE "cxx_std_${CMAKE_CXX_STANDARD}"
+)
 
 if(MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif()
 
 add_subdirectory(src)
