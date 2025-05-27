@@ -19,7 +19,7 @@ conan-staging$
 ^\.clang-format$
 ^\.codespellrc$
 ^\.editorconfig$
-^\.gersemi$
+^\.gersemirc$
 ^\.gitignore$
 ^\.markdownlint.yaml$
 ^\.pre-commit-config.yaml$

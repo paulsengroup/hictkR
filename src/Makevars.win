@@ -1,5 +1,9 @@
 PWD := $(shell pwd)
-export CONAN_HOME := C:\Users\robom\conan-staging\.conan2
+
+ifndef HICTKR_CONAN_HOME
+  export HICTKR_CONAN_HOME := $(PWD)\conan-staging\.conan2
+endif
+
 export CC = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("gcc"))' | sed -E 's/\[1\] "(.*)"/\1/')"
 export CXX = "$(shell "$(R_HOME)/bin/Rscript" -e 'unname(Sys.which("g++"))' | sed -E 's/\[1\] "(.*)"/\1/')"
 

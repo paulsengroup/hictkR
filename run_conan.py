@@ -12,7 +12,9 @@ import re
 import shutil
 import subprocess as sp
 import sys
-from typing import Optional
+import tempfile
+import venv
+from typing import Dict, Optional, Tuple
 
 """
 This script takes care of generating a valid conan profile and running conan install.
@@ -32,7 +34,7 @@ def make_cli() -> argparse.ArgumentParser:
         "--force",
         action="store_true",
         default=False,
-        help="Run the script even if conandeps.mk already exists.",
+        help="Run the script even if conandeps.mk already exists (default: %(default)s).",
     )
 
     return cli
@@ -48,10 +50,6 @@ def find_conan() -> pathlib.Path:
     print(f'found {version} at "{conan}"', file=sys.stderr)
 
     return conan
-
-
-def get_conan_home() -> pathlib.Path:
-    return pathlib.Path(os.environ.get("CONAN_HOME", pathlib.Path().home() / ".conan2"))
 
 
 def get_rtools_home() -> pathlib.Path:
@@ -185,76 +183,110 @@ def run_conan_profile_detect_windows(env):
         f"cmake/{cmake_version}",
     ]
 
-    conan_profile = get_conan_home() / "profiles" / "hictkR"
+    conan_profile = pathlib.Path(env.get("CONAN_HOME")) / "profiles" / "hictkR"
     conan_profile.parent.mkdir(exist_ok=True)
     with conan_profile.open("w") as f:
         print("\n".join(profile), file=f, end="")
 
 
-def run_conan_profile_detect(conan, env):
+def run_conan_profile_detect(env):
     if os.name == "nt":
         run_conan_profile_detect_windows(env)
         return
 
     sp.check_call(
-        [conan, "profile", "detect", "--name", "hictkR", "--force"],
-        stdout=sp.DEVNULL,
+        ["conan", "profile", "detect", "--name", "hictkR", "--force"],
+        stdout=sys.stderr,
         env=env,
     )
 
-    conan_profile = pathlib.Path(env.get("CONAN_HOME", pathlib.Path().home() / ".conan2")) / "profiles" / "hictkR"
+    conan_profile = pathlib.Path(env.get("CONAN_HOME")) / "profiles" / "hictkR"
     with conan_profile.open() as f:
         for line in f:
             print(line, file=sys.stderr, end="")
 
 
-def run_conan_install(conan, env):
+def run_conan_install(env):
     hictk_conanfile = pathlib.Path().cwd().parent / "hictk.conanfile.py"
     hictkR_conanfile = pathlib.Path().cwd().parent / "conanfile.txt"
     assert hictk_conanfile.exists()
     assert hictkR_conanfile.exists()
 
+    default_options = [
+        "--profile:all=hictkR",
+        "--settings=build_type=Release",
+        "--settings=compiler.cppstd=17",
+    ]
+
+    conan_create_opts = default_options + [
+        "--build=missing",
+        "--update",
+    ]
+
+    conan_install_opts = default_options + [
+        "--output-folder=conan-staging",
+        "--build=never",
+        "--generator=MakeDeps",
+        "--generator=CMakeDeps",
+    ]
+
     sp.check_call(
-        [
-            conan,
-            "create",
-            hictk_conanfile,
-            "--profile:all=hictkR",
-            "--settings=build_type=Release",
-            "--settings=compiler.cppstd=17",
-            "--build=missing",
-            "--update",
-        ],
-        stdout=sp.DEVNULL,
+        ["conan", "create", hictk_conanfile] + conan_create_opts,
+        stdout=sys.stderr,
         env=env,
     )
 
     sp.check_call(
-        [
-            conan,
-            "install",
-            hictkR_conanfile,
-            "--profile:all=hictkR",
-            "--settings=build_type=Release",
-            "--settings=compiler.cppstd=17",
-            "--output-folder=conan-staging",
-            "--build=never",
-            "--generator=MakeDeps",
-            "--generator=CMakeDeps",
-        ],
-        stdout=sp.DEVNULL,
+        ["conan", "install", hictkR_conanfile] + conan_install_opts,
+        stdout=sys.stderr,
         env=env,
     )
+
+
+def get_or_init_conan_home(env: Optional[Dict[str, str]] = None) -> pathlib.Path:
+    if env is None:
+        env = os.environ.copy()
+
+    conan_home = env.get("HICTKR_CONAN_HOME")
+    if conan_home is None:
+        default_conan_home = pathlib.Path().home() / ".conan2"
+        conan_home = env.get("CONAN_HOME", default_conan_home)
+
+    conan_home = pathlib.Path(conan_home).absolute()
+    conan_home.mkdir(exist_ok=True, parents=True)
+
+    return conan_home
+
+
+def setup_venv(tmpdir: pathlib.Path) -> Tuple[pathlib.Path, Dict[str, str]]:
+    venv_path = tmpdir / "venv"
+    print(f'creating venv under "{venv_path}"...', file=sys.stderr)
+    venv.create(venv_path, with_pip=True, upgrade_deps=True)
+
+    env = os.environ.copy()
+    path = env["PATH"]
+
+    bin_path = venv_path / "bin"
+    if bin_path.exists():
+        env["PATH"] = f"{bin_path}:{path}"
+    else:
+        bin_path = venv_path / "Scripts"
+        assert bin_path.exists()
+        env["PATH"] = f"{bin_path};{path}"
+
+    sp.check_call(
+        ["pip", "install", "conan>=2", "cmake>=3.25"],
+        stdout=sys.stderr,
+        env=env,
+    )
+
+    return venv_path, env
 
 
 def main():
     args = make_cli().parse_args()
 
-    conan = find_conan()
     pwd = pathlib.Path().cwd()
-
-    env = os.environ.copy()
-
     conandeps_mk = pwd / "conan-staging" / "conandeps.mk"
 
     if args.force:
@@ -265,17 +297,23 @@ def main():
         print(conandeps_mk)
         return
 
-    conan_home = get_conan_home()
-    if conan_home is not None:
-        conan_home.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = pathlib.Path(tmpdir)
+        _, env = setup_venv(tmpdir)
 
-    run_conan_profile_detect(conan, env)
-    run_conan_install(conan, env)
+        conan_home = get_or_init_conan_home(env)
 
-    if not conandeps_mk.is_file():
-        raise RuntimeError(f"failed to create {conandeps_mk} file!")
+        print(f"CONAN_HOME={conan_home}", file=sys.stderr)
+        env["CONAN_HOME"] = str(conan_home)
+        env["TMPDIR"] = str(tmpdir.absolute())
 
-    print(conandeps_mk)
+        run_conan_profile_detect(env)
+        run_conan_install(env)
+
+        if not conandeps_mk.is_file():
+            raise RuntimeError(f"failed to create {conandeps_mk} file!")
+
+        print(conandeps_mk)
 
 
 if __name__ == "__main__":
