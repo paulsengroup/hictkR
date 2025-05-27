@@ -10,14 +10,20 @@
 #include <hictk/cooler/cooler.hpp>
 #include <hictk/file.hpp>
 #include <hictk/hic.hpp>
+#include <optional>
 #include <string>
 
 class HiCFile {
   hictk::File _fp;
 
+  HiCFile(std::string uri, std::optional<std::int64_t> resolution_, std::string matrix_type,
+          std::string matrix_unit);
+
  public:
   HiCFile() = delete;
-  HiCFile(std::string uri, std::uint32_t resolution, std::string matrix_type = "observed",
+  explicit HiCFile(std::string uri, std::string matrix_type = "observed",
+                   std::string matrix_unit = "BP");
+  HiCFile(std::string uri, std::int64_t resolution_, std::string matrix_type = "observed",
           std::string matrix_unit = "BP");
 
   explicit HiCFile(hictk::cooler::File&& clr);

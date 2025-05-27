@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![CI](https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml/badge.svg)](https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml)
+
 ---
 
 R bindings for hictk, a blazing fast toolkit to work with .hic and .cool files.
@@ -48,18 +49,19 @@ df <- fetch(f, "chr1:0-10,000,000", "chr2:0-20,000,000", join=TRUE)
 df
 ```
 
-| chrom1 | start1  | end1   | chrom2 | start2  | end2    | count |
-|--------|---------|--------|--------|---------|---------|-------|
-| chr1   | 0       | 100000 | chr2   | 0       | 100000  | 15    |
-| chr1   | 0       | 100000 | chr2   | 100000  | 200000  | 5     |
-| chr1   | 0       | 100000 | chr2   | 300000  | 400000  | 17    |
-| chr1   | 0       | 100000 | chr2   | 400000  | 500000  | 22    |
-| chr1   | 0       | 100000 | chr2   | 500000  | 600000  | 30    |
-| chr1   | 0       | 100000 | chr2   | 600000  | 700000  | 21    |
-| chr1   | 0       | 100000 | chr2   | 600000  | 700000  | 21    |
-| ...    | ...     | ...    | ...    | ...     | ...     | ...   |
+| chrom1 | start1 | end1   | chrom2 | start2 | end2   | count |
+| ------ | ------ | ------ | ------ | ------ | ------ | ----- |
+| chr1   | 0      | 100000 | chr2   | 0      | 100000 | 15    |
+| chr1   | 0      | 100000 | chr2   | 100000 | 200000 | 5     |
+| chr1   | 0      | 100000 | chr2   | 300000 | 400000 | 17    |
+| chr1   | 0      | 100000 | chr2   | 400000 | 500000 | 22    |
+| chr1   | 0      | 100000 | chr2   | 500000 | 600000 | 30    |
+| chr1   | 0      | 100000 | chr2   | 600000 | 700000 | 21    |
+| chr1   | 0      | 100000 | chr2   | 600000 | 700000 | 21    |
+| ...    | ...    | ...    | ...    | ...    | ...    | ...   |
 
-Refer to the [manual](https://paulsengroup.github.io/hictkR/reference/index.html) and [vignette](https://paulsengroup.github.io/hictkR/articles/hictkR-vignette.html) available at [paulsengroup.github.io/hictkR](https://paulsengroup.github.io/hictkR/) for more examples on how to use hictkR.
+Refer to the [manual](https://paulsengroup.github.io/hictkR/reference/index.html) and [vignette](https://paulsengroup.github.io/hictkR/articles/hictkR-vignette.html) available at
+[paulsengroup.github.io/hictkR](https://paulsengroup.github.io/hictkR/) for more examples on how to use hictkR.
 
 ## Citing
 

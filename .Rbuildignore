@@ -1,3 +1,4 @@
+^\.conan2$
 ^\.idea$
 ^\.run$
 ^\.vscode$
@@ -5,6 +6,7 @@
 ^cmake-build-.*
 ^cmake$
 ^pkgdown$
+^utils$
 .*.Rcheck$
 
 ^\.github$
@@ -16,9 +18,11 @@ conan-staging$
 .*\.tar\.gz$
 
 ^\.clang-format$
-^\.cmake-format.yaml$
+^\.codespellrc$
 ^\.editorconfig$
+^\.gersemirc$
 ^\.gitignore$
+^\.markdownlint.yaml$
 ^\.pre-commit-config.yaml$
 ^\.RData$
 CITATION.cff

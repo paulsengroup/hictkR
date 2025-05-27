@@ -33,7 +33,16 @@ Rcpp::List SingleCellFile::attributes() const {
   r_attrs.push_back(attrs.bin_size);
 
   r_attr_names.push_back("bin-type");
-  r_attrs.push_back(attrs.bin_type);
+  switch (attrs.bin_type) {
+    case hictk::BinTable::Type::fixed: {
+      r_attrs.push_back("fixed");
+      break;
+    }
+    case hictk::BinTable::Type::variable: {
+      r_attrs.push_back("variable");
+      break;
+    }
+  }
 
   r_attr_names.push_back("format");
   r_attrs.push_back(attrs.format);

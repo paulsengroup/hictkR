@@ -21,7 +21,8 @@ RCPP_MODULE(hictkR) {
   Rcpp::function("Rcpp_is_hic_file", &is_hic_file, "Test whether a file is in .hic format.");
 
   Rcpp::class_<HiCFile>("RcppHiCFile")
-      .constructor<std::string, std::uint32_t, std::string, std::string>()
+      .constructor<std::string, std::string, std::string>()
+      .constructor<std::string, std::int64_t, std::string, std::string>()
       .property("is_cooler", &HiCFile::is_cooler)
       .property("is_hic", &HiCFile::is_hic)
       .property("chromosomes", &HiCFile::chromosomes)
