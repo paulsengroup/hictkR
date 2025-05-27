@@ -38,10 +38,14 @@ def make_cli() -> argparse.ArgumentParser:
     return cli
 
 
-def find_conan() -> str:
+def find_conan() -> pathlib.Path:
     conan = shutil.which("conan")
     if conan is None:
-        raise RuntimeError("Unable to find conan in your PATH.\n" "Please install conan: https://conan.io/downloads")
+        raise RuntimeError("Unable to find conan in your PATH.\nPlease install conan: https://conan.io/downloads")
+
+    conan = pathlib.Path(conan).absolute()
+    version = sp.check_output([conan, "--version"])
+    print(f'found {version} at "{conan}"', file=sys.stderr)
 
     return conan
 
@@ -50,7 +54,7 @@ def get_conan_home() -> pathlib.Path:
     return pathlib.Path(os.environ.get("CONAN_HOME", pathlib.Path().home() / ".conan2"))
 
 
-def get_rtools_home() -> str:
+def get_rtools_home() -> pathlib.Path:
     res = sp.check_output(["Rscript", "-e", "package_version(R.version)"], stderr=sp.DEVNULL).decode("utf-8")
     matches = re.search(r"(\d+\.\d+).\d+", res)
     if not matches:
@@ -64,11 +68,11 @@ def get_rtools_home() -> str:
         if rtools_string in p:
             matches = re.search(rf"^(.*{rtools_string})", p)
             if matches:
-                rtools_home = matches.group(1)
+                rtools_home = pathlib.Path(matches.group(1))
                 break
 
     if not rtools_home.exists():
-        raise RuntimeError("Unable to find RTOOLS_HOME at: " + rtools_home)
+        raise RuntimeError(f"Unable to find RTOOLS_HOME at: {rtools_home}")
 
     print(f'Found Rtools at "{rtools_home}"', file=sys.stderr)
 
@@ -150,7 +154,7 @@ def get_arch() -> str:
 def run_conan_profile_detect_windows(env):
     assert os.name == "nt"
 
-    env["PATH"] = get_path_as_r()
+    env["PATH"] = str(get_path_as_r())
 
     arch = get_arch()
     cc = find_cc()
@@ -158,8 +162,8 @@ def run_conan_profile_detect_windows(env):
     cc_version = get_cc_version(cc)
     cmake_version = get_cmake_version(env)
 
-    env["CC"] = cc
-    env["CXX"] = cxx
+    env["CC"] = str(cc)
+    env["CXX"] = str(cxx)
 
     # HDF5, szip and zlib come with Rtools, and using the version from Conan causes
     # weird link errors that are difficult to address.
@@ -176,7 +180,7 @@ def run_conan_profile_detect_windows(env):
         "[buildenv]",
         f"PATH='" + env["PATH"] + "'",
         "[platform_requires]",
-        "hdf5/1.14.3",
+        "hdf5/1.14.5",
         "[platform_tool_requires]",
         f"cmake/{cmake_version}",
     ]
@@ -192,7 +196,11 @@ def run_conan_profile_detect(conan, env):
         run_conan_profile_detect_windows(env)
         return
 
-    sp.run([conan, "profile", "detect", "--name", "hictkR", "--force"], stdout=sp.DEVNULL, env=env)
+    sp.check_call(
+        [conan, "profile", "detect", "--name", "hictkR", "--force"],
+        stdout=sp.DEVNULL,
+        env=env,
+    )
 
     conan_profile = pathlib.Path(env.get("CONAN_HOME", pathlib.Path().home() / ".conan2")) / "profiles" / "hictkR"
     with conan_profile.open() as f:
