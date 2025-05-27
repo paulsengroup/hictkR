@@ -4,12 +4,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+import argparse
 import os
+import pathlib
 import platform
 import re
 import shutil
 import subprocess as sp
 import sys
+from typing import Optional
 
 """
 This script takes care of generating a valid conan profile and running conan install.
@@ -22,27 +25,33 @@ This means that:
 """
 
 
+def make_cli() -> argparse.ArgumentParser:
+    cli = argparse.ArgumentParser()
+
+    cli.add_argument(
+        "--force",
+        action="store_true",
+        default=False,
+        help="Run the script even if conandeps.mk already exists.",
+    )
+
+    return cli
+
+
 def find_conan() -> str:
     conan = shutil.which("conan")
     if conan is None:
-        raise RuntimeError(
-            "Unable to find conan in your PATH.\n"
-            "Please install conan: https://conan.io/downloads"
-        )
+        raise RuntimeError("Unable to find conan in your PATH.\n" "Please install conan: https://conan.io/downloads")
 
     return conan
 
 
-def get_conan_home() -> str:
-    return os.environ.get(
-        "CONAN_HOME", os.path.join(os.path.expanduser("~"), ".conan2")
-    )
+def get_conan_home() -> pathlib.Path:
+    return pathlib.Path(os.environ.get("CONAN_HOME", pathlib.Path().home() / ".conan2"))
 
 
 def get_rtools_home() -> str:
-    res = sp.check_output(
-        ["Rscript", "-e", "package_version(R.version)"], stderr=sp.DEVNULL
-    ).decode("utf-8")
+    res = sp.check_output(["Rscript", "-e", "package_version(R.version)"], stderr=sp.DEVNULL).decode("utf-8")
     matches = re.search(r"(\d+\.\d+).\d+", res)
     if not matches:
         raise RuntimeError("Unable to infer R version")
@@ -50,7 +59,7 @@ def get_rtools_home() -> str:
     r_version = matches.group(1).replace(".", "")
     rtools_string = f"rtools{r_version}"
 
-    rtools_home = os.path.join("C:\\", rtools_string)
+    rtools_home = pathlib.Path("C:\\") / rtools_string
     for p in get_path_as_r(add_rtools=False).split(";"):
         if rtools_string in p:
             matches = re.search(rf"^(.*{rtools_string})", p)
@@ -58,7 +67,7 @@ def get_rtools_home() -> str:
                 rtools_home = matches.group(1)
                 break
 
-    if not os.path.exists(rtools_home):
+    if not rtools_home.exists():
         raise RuntimeError("Unable to find RTOOLS_HOME at: " + rtools_home)
 
     print(f'Found Rtools at "{rtools_home}"', file=sys.stderr)
@@ -67,39 +76,35 @@ def get_rtools_home() -> str:
 
 
 def get_path_as_r(add_rtools: bool = True) -> str:
-    res = sp.check_output(
-        ["Rscript", "-e", "Sys.getenv('PATH')"], stderr=sp.DEVNULL
-    ).decode("utf-8")
+    res = sp.check_output(["Rscript", "-e", "Sys.getenv('PATH')"], stderr=sp.DEVNULL).decode("utf-8")
     matches = re.search(r"\"(.*)\"", res, re.MULTILINE)
     if not matches:
         return ""
 
-    path = [os.path.normpath(p) for p in matches.group(1).split(";")]
+    path = [pathlib.Path(p).resolve() for p in matches.group(1).split(";")]
 
     if add_rtools:
         rtools_home = get_rtools_home()
 
         path = [
-            os.path.join(rtools_home, "usr", "bin"),
-            os.path.join(rtools_home, "mingw64", "bin"),
+            rtools_home / "usr" / "bin",
+            rtools_home / "mingw64" / "bin",
         ] + path
 
-    return ";".join(path)
+    return ";".join(str(p) for p in path)
 
 
-def r_which(program: str) -> str:
-    res = sp.check_output(
-        ["Rscript", "-e", f'Sys.which("{program}")'], stderr=sp.DEVNULL
-    ).decode("utf-8")
+def r_which(program: str) -> Optional[pathlib.Path]:
+    res = sp.check_output(["Rscript", "-e", f'Sys.which("{program}")'], stderr=sp.DEVNULL).decode("utf-8")
 
     matches = re.search(r"\n\"(.*)\"", res, re.MULTILINE)
     if not matches:
-        return ""
+        return None
 
-    return os.path.normpath(matches.group(1))
+    return pathlib.Path(matches.group(1)).resolve()
 
 
-def find_cc():
+def find_cc() -> pathlib.Path:
     cc = r_which("gcc")
 
     if cc == "":
@@ -108,10 +113,10 @@ def find_cc():
     if cc == "":
         raise RuntimeError("Unable to find a gcc or clang in your PATH")
 
-    return os.path.realpath(cc)
+    return cc.resolve()
 
 
-def find_cxx():
+def find_cxx() -> pathlib.Path:
     cxx = r_which("g++")
 
     if cxx == "":
@@ -120,7 +125,7 @@ def find_cxx():
     if cxx == "":
         raise RuntimeError("Unable to find a g++ or clang++ in your PATH")
 
-    return os.path.realpath(cxx)
+    return cxx.resolve()
 
 
 def get_cc_version(cc) -> str:
@@ -176,14 +181,9 @@ def run_conan_profile_detect_windows(env):
         f"cmake/{cmake_version}",
     ]
 
-    conan_profile = os.path.join(
-        get_conan_home(),
-        "profiles",
-        "default",
-    )
-
-    os.makedirs(os.path.dirname(conan_profile), exist_ok=True)
-    with open(conan_profile, "w") as f:
+    conan_profile = get_conan_home() / "profiles" / "hictkR"
+    conan_profile.parent.mkdir(exist_ok=True)
+    with conan_profile.open("w") as f:
         print("\n".join(profile), file=f, end="")
 
 
@@ -192,29 +192,28 @@ def run_conan_profile_detect(conan, env):
         run_conan_profile_detect_windows(env)
         return
 
-    sp.run([conan, "profile", "detect"], stdout=sp.DEVNULL, env=env)
+    sp.run([conan, "profile", "detect", "--name", "hictkR", "--force"], stdout=sp.DEVNULL, env=env)
 
-    conan_profile = os.path.join(
-        env.get("CONAN_HOME", os.path.join(os.path.expanduser("~"), ".conan2")),
-        "profiles",
-        "default",
-    )
-    with open(conan_profile) as f:
+    conan_profile = pathlib.Path(env.get("CONAN_HOME", pathlib.Path().home() / ".conan2")) / "profiles" / "hictkR"
+    with conan_profile.open() as f:
         for line in f:
-            print(line, file=sys.stderr)
+            print(line, file=sys.stderr, end="")
 
 
 def run_conan_install(conan, env):
-    conanfile = os.path.join("..", "conanfile.txt")
+    hictk_conanfile = pathlib.Path().cwd().parent / "hictk.conanfile.py"
+    hictkR_conanfile = pathlib.Path().cwd().parent / "conanfile.txt"
+    assert hictk_conanfile.exists()
+    assert hictkR_conanfile.exists()
 
     sp.check_call(
         [
             conan,
-            "install",
-            conanfile,
+            "create",
+            hictk_conanfile,
+            "--profile:all=hictkR",
             "--settings=build_type=Release",
             "--settings=compiler.cppstd=17",
-            "--output-folder=conan-staging",
             "--build=missing",
             "--update",
         ],
@@ -222,25 +221,52 @@ def run_conan_install(conan, env):
         env=env,
     )
 
+    sp.check_call(
+        [
+            conan,
+            "install",
+            hictkR_conanfile,
+            "--profile:all=hictkR",
+            "--settings=build_type=Release",
+            "--settings=compiler.cppstd=17",
+            "--output-folder=conan-staging",
+            "--build=never",
+            "--generator=MakeDeps",
+            "--generator=CMakeDeps",
+        ],
+        stdout=sp.DEVNULL,
+        env=env,
+    )
+
 
 def main():
+    args = make_cli().parse_args()
+
     conan = find_conan()
-    pwd = os.getcwd()
+    pwd = pathlib.Path().cwd()
 
     env = os.environ.copy()
 
-    conandeps_mk = os.path.join(pwd, "conan-staging", "conandeps.mk")
+    conandeps_mk = pwd / "conan-staging" / "conandeps.mk"
 
-    if os.path.exists(conandeps_mk):
+    if args.force:
+        if conandeps_mk.parent.exists():
+            shutil.rmtree(conandeps_mk.parent)
+
+    if conandeps_mk.exists():
         print(conandeps_mk)
         return
 
     conan_home = get_conan_home()
     if conan_home is not None:
-        os.makedirs(conan_home, exist_ok=True)
+        conan_home.mkdir(parents=True, exist_ok=True)
 
     run_conan_profile_detect(conan, env)
     run_conan_install(conan, env)
+
+    if not conandeps_mk.is_file():
+        raise RuntimeError(f"failed to create {conandeps_mk} file!")
+
     print(conandeps_mk)
 
 

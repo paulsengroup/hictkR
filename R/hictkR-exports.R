@@ -19,7 +19,7 @@ loadModule(module = "hictkR", TRUE)
 #' Open a .hic or .cool file for reading
 #'
 #' @param path path to the file to be opened (Cooler URI syntax is supported).
-#' @param resolution matrix resolution. Required when file is in .hic format.
+#' @param resolution matrix resolution. Required when file is multi-resolution (e.g., .hic or .mcool).
 #' @param matrix_type type of the matrix to be opened. Should be one of "observed", "oe" or "expected".
 #' @param matrix_unit unit of the matrix to be opened. Should be one of "BP", "FRAG".
 #' @returns a file handle.
@@ -36,7 +36,7 @@ File <-
            matrix_type = "observed",
            matrix_unit = "BP") {
     if (is.null(resolution)) {
-      resolution <- 0
+      return(new(RcppHiCFile, path, matrix_type, matrix_unit))
     }
     return(new(RcppHiCFile, path, resolution, matrix_type, matrix_unit))
   }

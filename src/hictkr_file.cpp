@@ -5,6 +5,7 @@
 #include "./hictkr_file.h"
 
 #include <Rcpp.h>
+#include <fmt/format.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -13,17 +14,47 @@
 #include <hictk/genomic_interval.hpp>
 #include <hictk/pixel.hpp>
 #include <hictk/transformers/join_genomic_coords.hpp>
+#include <limits>
 #include <memory>
+#include <optional>
+#include <stdexcept>
 #include <string>
 #include <variant>
 #include <vector>
 
 #include "./common.h"
 
-HiCFile::HiCFile(std::string uri, std::uint32_t resolution, std::string matrix_type,
+[[nodiscard]] static std::optional<std::uint32_t> get_resolution_checked(
+    std::optional<std::int64_t> resolution) {
+  if (!resolution.has_value()) {
+    return {};
+  }
+
+  if (*resolution < 0) {
+    throw std::invalid_argument("resolution cannot be negative");
+  }
+
+  constexpr auto max_res = std::numeric_limits<std::uint32_t>::max();
+  if (*resolution > max_res) {
+    throw std::invalid_argument(
+        fmt::format(FMT_STRING("resolution cannot be greater than {}"), max_res));
+  }
+
+  return static_cast<std::uint32_t>(*resolution);
+}
+
+HiCFile::HiCFile(std::string uri, std::optional<std::int64_t> resolution_, std::string matrix_type,
                  std::string matrix_unit)
-    : _fp(uri, resolution, hictk::hic::ParseMatrixTypeStr(matrix_type),
+    : _fp(uri, get_resolution_checked(resolution_), hictk::hic::ParseMatrixTypeStr(matrix_type),
           hictk::hic::ParseUnitStr(matrix_unit)) {}
+
+HiCFile::HiCFile(std::string uri, std::string matrix_type, std::string matrix_unit)
+    : HiCFile(std::move(uri), std::nullopt, std::move(matrix_type), std::move(matrix_unit)) {}
+
+HiCFile::HiCFile(std::string uri, std::int64_t resolution_, std::string matrix_type,
+                 std::string matrix_unit)
+    : HiCFile(std::move(uri), std::make_optional(resolution_), std::move(matrix_type),
+              std::move(matrix_unit)) {}
 
 HiCFile::HiCFile(hictk::cooler::File &&clr) : _fp(std::move(clr)) {}
 HiCFile::HiCFile(hictk::hic::File &&hf) : _fp(std::move(hf)) {}
@@ -50,10 +81,15 @@ std::uint64_t HiCFile::nchroms() const noexcept { return _fp.nchroms(); }
   r_attrs.push_back(attrs.bin_size);
 
   r_attr_names.push_back("bin-type");
-  if (attrs.bin_type.has_value()) {
-    r_attrs.push_back(*attrs.bin_type);
-  } else {
-    r_attrs.push_back("fixed");
+  switch (attrs.bin_type) {
+    case hictk::BinTable::Type::fixed: {
+      r_attrs.push_back("fixed");
+      break;
+    }
+    case hictk::BinTable::Type::variable: {
+      r_attrs.push_back("variable");
+      break;
+    }
   }
 
   r_attr_names.push_back("format");
