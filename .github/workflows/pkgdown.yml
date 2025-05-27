@@ -37,7 +37,7 @@ on:
     types: [published]
 
 env:
-  HICTKR_CONAN_HOME: "${{ github.workspace }}/conan/"
+  HICTKR_CONAN_HOME: "${{ github.workspace }}/.conan2/"
 
 jobs:
   pkgdown:

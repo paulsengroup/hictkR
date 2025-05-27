@@ -34,7 +34,7 @@ on:
       - "NAMESPACE"
 
 env:
-  HICTKR_CONAN_HOME: "${{ github.workspace }}/conan/"
+  HICTKR_CONAN_HOME: "${{ github.workspace }}/.conan2/"
 
 # https://stackoverflow.com/a/72408109
 concurrency:
@@ -75,7 +75,9 @@ jobs:
           cmd='import multiprocessing as mp; print(mp.cpu_count())'
           NPROC="$(python -c "$cmd")"
           echo "NPROC=$NPROC" >> "$GITHUB_ENV"
-          echo "MAKE='make -j$NPROC'" >> "$GITHUB_ENV"
+          if [[ ! '${{ matrix.os }}' == windows-* ]]; then
+            echo "MAKE='make -j$NPROC'" >> "$GITHUB_ENV"
+          fi
 
       - name: Install pandoc
         uses: r-lib/actions/setup-pandoc@v2

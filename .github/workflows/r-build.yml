@@ -38,7 +38,7 @@ on:
       - published
 
 env:
-  CONAN_HOME: "${{ github.workspace }}/conan/"
+  HICTKR_CONAN_HOME: "${{ github.workspace }}/.conan2/"
 
 # https://stackoverflow.com/a/72408109
 concurrency:
