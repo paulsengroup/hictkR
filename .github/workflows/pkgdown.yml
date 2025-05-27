@@ -14,6 +14,7 @@ on:
       - "src/**"
       - "tests/**"
       - "conanfile.txt"
+      - "hictk.conanfile.py"
       - "run_conan.py"
       - "DESCRIPTION"
       - "NAMESPACE"
@@ -28,11 +29,15 @@ on:
       - "src/**"
       - "tests/**"
       - "conanfile.txt"
+      - "hictk.conanfile.py"
       - "run_conan.py"
       - "DESCRIPTION"
       - "NAMESPACE"
   release:
     types: [published]
+
+env:
+  HICTKR_CONAN_HOME: "${{ github.workspace }}/conan/"
 
 jobs:
   pkgdown:
@@ -43,24 +48,22 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
     permissions:
       contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Generate requirements.txt
+      - name: Detect number of CPUs
         run: |
-          echo 'conan>=2' > requirements.txt
+          echo "NPROC=$(nproc)" >> "$GITHUB_ENV"
+          echo "MAKE='make -j$(nproc)'" >> "$GITHUB_ENV"
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
-          cache: "pip"
-
-      - name: Install Conan
-        run: pip install -r requirements.txt
+          python-version: 3.13
 
       - name: Install pandoc
         uses: r-lib/actions/setup-pandoc@v2
@@ -68,13 +71,33 @@ jobs:
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:
+          r-version: release
           use-public-rspm: true
+          Ncpus: ${{ env.NPROC }}
+
+      - name: Restore Conan cache
+        uses: actions/cache@v4
+        id: restore-conan-cache
+        with:
+          key: conan-cache-pkgdown-${{ hashFiles('hictk.conanfile.py', 'conanfile.txt', 'run_conan.py') }}
+          path: ${{ env.HICTKR_CONAN_HOME }}/p
 
       - name: Add requirements
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+
+      - name: Clean Conan cache (post-build)
+        if: steps.restore-conan-cache.outputs.cache-hit != 'true'
+        run: |
+          pip install 'conan>=2'
+
+          export CONAN_HOME="$HICTKR_CONAN_HOME"
+
+          conan cache clean "*" --build
+          conan cache clean "*" --download
+          conan cache clean "*" --source
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
