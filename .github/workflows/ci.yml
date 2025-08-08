@@ -10,12 +10,13 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/ci.yml"
+      - "deps/conanfile.py"
+      - "deps/generate_makevars.py"
       - "R/**"
       - "src/**"
       - "tests/**"
-      - "conanfile.txt"
-      - "hictk.conanfile.py"
-      - "run_conan.py"
+      - "configure"
+      - "configure.win"
       - "DESCRIPTION"
       - "NAMESPACE"
     tags:
@@ -24,17 +25,15 @@ on:
   pull_request:
     paths:
       - ".github/workflows/ci.yml"
+      - "deps/conanfile.py"
+      - "deps/generate_makevars.py"
       - "R/**"
       - "src/**"
       - "tests/**"
-      - "conanfile.txt"
-      - "hictk.conanfile.py"
-      - "run_conan.py"
+      - "configure"
+      - "configure.win"
       - "DESCRIPTION"
       - "NAMESPACE"
-
-env:
-  HICTKR_CONAN_HOME: "${{ github.workspace }}/.conan2/"
 
 # https://stackoverflow.com/a/72408109
 concurrency:
@@ -51,16 +50,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: windows-latest, r-version: 4.5 }
-          - { os: macos-latest, r-version: 4.5 }
-          - { os: ubuntu-latest, r-version: 4.0 }
-          - { os: ubuntu-latest, r-version: 4.1 }
-          - { os: ubuntu-latest, r-version: 4.2 }
-          - { os: ubuntu-latest, r-version: 4.3 }
-          - { os: ubuntu-latest, r-version: 4.4 }
-          - { os: ubuntu-latest, r-version: 4.5 }
+          - { os: windows-latest, r-version: 4.5, cc: "gcc", cxx: "g++" }
+          - { os: macos-latest, r-version: 4.5, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-latest, r-version: 4.0, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-latest, r-version: 4.1, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-latest, r-version: 4.2, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-latest, r-version: 4.3, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-latest, r-version: 4.4, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-latest, r-version: 4.5, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-latest, r-version: 4.0, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-latest, r-version: 4.1, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-latest, r-version: 4.2, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-latest, r-version: 4.3, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-latest, r-version: 4.4, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-latest, r-version: 4.5, cc: "clang", cxx: "clang++" }
 
     runs-on: ${{ matrix.os }}
+
+    env:
+      HICTKR_CONAN_HOME: "${{ github.workspace }}/.conan2/"
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
 
     steps:
       - uses: actions/checkout@v4
@@ -75,7 +85,8 @@ jobs:
           cmd='import multiprocessing as mp; print(mp.cpu_count())'
           NPROC="$(python -c "$cmd")"
           echo "NPROC=$NPROC" >> "$GITHUB_ENV"
-          if [[ ! '${{ matrix.os }}' == windows-* ]]; then
+          # shellcheck disable=SC2193
+          if [[ '${{ matrix.os }}' != windows-* ]]; then
             echo "MAKE='make -j$NPROC'" >> "$GITHUB_ENV"
           fi
 
@@ -99,7 +110,7 @@ jobs:
         uses: actions/cache@v4
         id: restore-conan-cache
         with:
-          key: conan-cache-ci-${{ matrix.os }}-${{ hashFiles('hictk.conanfile.py', 'conanfile.txt', 'run_conan.py') }}
+          key: conan-cache-ci-${{ matrix.os }}-${{ hashFiles( 'configure', 'deps/conanfile.py', 'deps/generate_makevars.py') }}
           path: ${{ env.HICTKR_CONAN_HOME }}/p
 
       - name: Build and test package

@@ -159,7 +159,6 @@ def get_cc_version(cc) -> str:
     return re.search(r"^\d+", cc_version).group(0)
 
 
-@functools.cache
 def get_cmake_version(env: EnvDict) -> str:
     res = sp.check_output(["cmake", "--version"], env=env).decode("utf-8")
     matches = re.search(r"(\d+\.\d+.\d+)", res)
