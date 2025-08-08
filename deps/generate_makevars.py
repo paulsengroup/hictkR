@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import argparse
+import functools
 import json
 import logging
 import os
@@ -49,6 +50,7 @@ def make_cli() -> argparse.ArgumentParser:
     return cli
 
 
+@functools.cache
 def find_conan() -> pathlib.Path:
     conan = shutil.which("conan")
     if conan is None:
@@ -61,6 +63,7 @@ def find_conan() -> pathlib.Path:
     return conan
 
 
+@functools.cache
 def get_rtools_home() -> pathlib.Path:
     res = sp.check_output(["Rscript", "-e", "package_version(R.version)"], stderr=sp.DEVNULL).decode("utf-8")
     matches = re.search(r"(\d+\.\d+).\d+", res)
@@ -86,6 +89,7 @@ def get_rtools_home() -> pathlib.Path:
     return rtools_home
 
 
+@functools.cache
 def get_path_as_r(add_rtools: bool = True) -> str:
     res = sp.check_output(["Rscript", "-e", "Sys.getenv('PATH')"], stderr=sp.DEVNULL).decode("utf-8")
     matches = re.search(r"\"(.*)\"", res, re.MULTILINE)
@@ -105,6 +109,7 @@ def get_path_as_r(add_rtools: bool = True) -> str:
     return ";".join(str(p) for p in path)
 
 
+@functools.cache
 def r_which(program: str, resolve: bool = True) -> pathlib.Path | None:
     res = sp.check_output(["Rscript", "-e", f'Sys.which("{program}")'], stderr=sp.DEVNULL).decode("utf-8")
 
@@ -119,8 +124,9 @@ def r_which(program: str, resolve: bool = True) -> pathlib.Path | None:
     return exe
 
 
+@functools.cache
 def find_cc() -> pathlib.Path:
-    for name in (os.getenv("CC", "cc"), "cc", "gcc", "clang"):
+    for name in (os.getenv("CC", "clang"), "clang", "gcc", "cc"):
         cc = r_which(name, resolve=False)
         if cc is not None:
             if "ccache" in str(cc):
@@ -130,8 +136,9 @@ def find_cc() -> pathlib.Path:
     raise RuntimeError("Unable to find a gcc or clang in your PATH")
 
 
+@functools.cache
 def find_cxx() -> pathlib.Path:
-    for name in (os.getenv("CXX", "c++"), "c++", "g++", "clang++"):
+    for name in (os.getenv("CXX", "clang++"), "clang++", "g++", "c++"):
         cxx = r_which(name, resolve=False)
         if cxx is not None:
             if "ccache" in str(cxx):
@@ -141,15 +148,18 @@ def find_cxx() -> pathlib.Path:
     raise RuntimeError("Unable to find a g++ or clang++ in your PATH")
 
 
+@functools.cache
 def cxx_flags_rcpp() -> str:
     return sp.check_output(["Rscript", "-e", "Rcpp:::CxxFlags()"], stderr=sp.DEVNULL).decode("utf-8")
 
 
+@functools.cache
 def get_cc_version(cc) -> str:
     cc_version = sp.check_output([cc, "-dumpversion"]).decode("ascii")
     return re.search(r"^\d+", cc_version).group(0)
 
 
+@functools.cache
 def get_cmake_version(env: EnvDict) -> str:
     res = sp.check_output(["cmake", "--version"], env=env).decode("utf-8")
     matches = re.search(r"(\d+\.\d+.\d+)", res)
@@ -160,6 +170,7 @@ def get_cmake_version(env: EnvDict) -> str:
     return matches.group(1)
 
 
+@functools.cache
 def get_arch() -> str:
     return platform.uname()[4].lower().replace("amd64", "x86_64")
 
@@ -205,6 +216,11 @@ def run_conan_profile_detect_windows(env: EnvDict):
 
 
 def run_conan_profile_detect(env: EnvDict):
+    env = env.copy()
+
+    env["CC"] = find_cc()
+    env["CXX"] = find_cxx()
+
     if platform.system() == "Windows":
         run_conan_profile_detect_windows(env)
         return
@@ -217,12 +233,10 @@ def run_conan_profile_detect(env: EnvDict):
 
     conan_profile = pathlib.Path(env.get("CONAN_HOME")) / "profiles" / "hictkR"
 
-    with conan_profile.open("a") as f:
-        f.write("[tool_requires]\n!cmake/*: cmake/[>=3.5 <4]")
-
     logging.info("\n%s", conan_profile.read_text())
 
 
+@functools.cache
 def extract_hictk_version(conanfile: pathlib.Path) -> str:
     res = sp.check_output(["conan", "inspect", conanfile, "--format=json"]).decode("utf-8")
     metadata = json.loads(res)

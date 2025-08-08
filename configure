@@ -77,7 +77,7 @@ uv venv \
   --link-mode=copy \
   "$VIRTUAL_ENV"
 
-uv pip install 'conan>=2.15'
+uv pip install 'conan>=2.15,<3' 'cmake>=3.25,<4'
 
 
 if [ -d "$VIRTUAL_ENV/bin" ]; then
@@ -93,7 +93,7 @@ which conan
 conan --version
 
 set +u
-if [ -n "$HICTKR_CONAN_HOME" ]; then
+if [ -z "$HICTKR_CONAN_HOME" ]; then
   export HICTKR_CONAN_HOME="$wd/conan-staging/.conan2"
 fi
 set -u
