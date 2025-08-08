@@ -9,13 +9,17 @@ on:
   push:
     branches: [main]
     paths:
-      - ".github/workflows/pkgdown.yml"
+      - ".github/workflows/ci.yml"
+      - "deps/conanfile.py"
+      - "deps/generate_makevars.py"
       - "R/**"
+      - "inst/extdata/**"
+      - "man/**"
       - "src/**"
       - "tests/**"
-      - "conanfile.txt"
-      - "hictk.conanfile.py"
-      - "run_conan.py"
+      - ".Rbuildignore"
+      - "configure"
+      - "configure.win"
       - "DESCRIPTION"
       - "NAMESPACE"
     tags:
@@ -24,13 +28,17 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - ".github/workflows/pkgdown.yml"
+      - ".github/workflows/ci.yml"
+      - "deps/conanfile.py"
+      - "deps/generate_makevars.py"
       - "R/**"
+      - "inst/extdata/**"
+      - "man/**"
       - "src/**"
       - "tests/**"
-      - "conanfile.txt"
-      - "hictk.conanfile.py"
-      - "run_conan.py"
+      - ".Rbuildignore"
+      - "configure"
+      - "configure.win"
       - "DESCRIPTION"
       - "NAMESPACE"
   release:
@@ -60,11 +68,6 @@ jobs:
           echo "NPROC=$(nproc)" >> "$GITHUB_ENV"
           echo "MAKE='make -j$(nproc)'" >> "$GITHUB_ENV"
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.13
-
       - name: Install pandoc
         uses: r-lib/actions/setup-pandoc@v2
 
@@ -79,7 +82,7 @@ jobs:
         uses: actions/cache@v4
         id: restore-conan-cache
         with:
-          key: conan-cache-pkgdown-${{ hashFiles('hictk.conanfile.py', 'conanfile.txt', 'run_conan.py') }}
+          key: conan-cache-pkgdown-${{ hashFiles( 'configure', 'deps/conanfile.py', 'deps/generate_makevars.py') }}
           path: ${{ env.HICTKR_CONAN_HOME }}/p
 
       - name: Add requirements
@@ -87,6 +90,12 @@ jobs:
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+
+      - name: Setup Python
+        if: steps.restore-conan-cache.outputs.cache-hit != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
 
       - name: Clean Conan cache (post-build)
         if: steps.restore-conan-cache.outputs.cache-hit != 'true'

@@ -4,6 +4,8 @@
 
 # Excluded folders
 __pycache__$
+# required by the CI
+\.conan2$
 conan-staging$
 ^cmake$
 ^cmake-build-.*
