@@ -129,9 +129,7 @@ def find_cc() -> pathlib.Path:
     for name in (os.getenv("CC", "clang"), "clang", "gcc", "cc"):
         cc = r_which(name, resolve=False)
         if cc is not None:
-            if "ccache" in str(cc):
-                return cc
-            return cc.resolve()
+            return cc
 
     raise RuntimeError("Unable to find a gcc or clang in your PATH")
 
@@ -141,9 +139,7 @@ def find_cxx() -> pathlib.Path:
     for name in (os.getenv("CXX", "clang++"), "clang++", "g++", "c++"):
         cxx = r_which(name, resolve=False)
         if cxx is not None:
-            if "ccache" in str(cxx):
-                return cxx
-            return cxx.resolve()
+            return cxx
 
     raise RuntimeError("Unable to find a g++ or clang++ in your PATH")
 
@@ -180,13 +176,8 @@ def run_conan_profile_detect_windows(env: EnvDict):
     env["PATH"] = str(get_path_as_r())
 
     arch = get_arch()
-    cc = find_cc()
-    cxx = find_cxx()
-    cc_version = get_cc_version(cc)
+    cc_version = get_cc_version(env["CC"])
     cmake_version = get_cmake_version(env)
-
-    env["CC"] = str(cc)
-    env["CXX"] = str(cxx)
 
     # HDF5, szip and zlib come with Rtools, and using the version from Conan causes
     # weird link errors that are difficult to address.
@@ -203,7 +194,7 @@ def run_conan_profile_detect_windows(env: EnvDict):
         "[buildenv]",
         "PATH='" + env["PATH"] + "'",
         "[platform_requires]",
-        "hdf5/1.14.5",
+        "hdf5/1.14.6",
         "[platform_tool_requires]",
         f"cmake/{cmake_version}",
     ]
@@ -217,8 +208,8 @@ def run_conan_profile_detect_windows(env: EnvDict):
 def run_conan_profile_detect(env: EnvDict):
     env = env.copy()
 
-    env["CC"] = find_cc()
-    env["CXX"] = find_cxx()
+    env["CC"] = str(find_cc())
+    env["CXX"] = str(find_cxx())
 
     if platform.system() == "Windows":
         run_conan_profile_detect_windows(env)
@@ -336,11 +327,11 @@ def detect_filesystem_link_flag(tmpdir: pathlib.Path) -> str | None:
             if try_compile(flag):
                 return flag
 
-        raise RuntimeError("Cannot compile a simple program using the std::filesystem library")
+        raise RuntimeError(f"{find_cxx().resolve()} cannot compile a simple program using the std::filesystem library")
 
     finally:
-        src_file.unlink()
-        test_program.unlink()
+        src_file.unlink(missing_ok=True)
+        test_program.unlink(missing_ok=True)
 
 
 def generate_makevars(
@@ -357,9 +348,9 @@ def generate_makevars(
         PWD := $(shell pwd)
         TMPDIR := PWD
 
-        export CC := {cc}"
+        export CC := {cc}
         export CXX := {cxx}
-        export CXX17 = $(CXX)
+        export CXX17 := {cxx}
 
         ### BEGINNING OF conandeps.mk
         {conandeps_mk}
@@ -387,7 +378,7 @@ def generate_makevars(
     else:
         makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))"
 
-    dest.write_text(makevars)
+    dest.write_text(makevars, newline="\n")
 
 
 def get_or_init_conan_home(env: EnvDict | None) -> pathlib.Path:
