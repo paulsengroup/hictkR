@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Excluded folders
+__pycache__$
 conan-staging$
 ^cmake$
 ^cmake-build-.*

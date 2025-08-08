@@ -170,7 +170,61 @@ def get_arch() -> str:
     return platform.uname()[4].lower().replace("amd64", "x86_64")
 
 
-def run_conan_profile_detect_windows(env: EnvDict):
+def compile_and_check_output(source: str, tmpdir: pathlib.Path) -> str:
+    prefix = hash(source)
+    src_file = tmpdir / f"{prefix}.cpp"
+    test_program = tmpdir / f"{prefix}.bin"
+
+    try:
+        src_file.write_text(source)
+
+        cmd = [find_cxx(), src_file, "-o", test_program, "-std=c++17", "-O0"]
+        res = sp.check_output(cmd)
+
+        return res.decode("utf-8")
+
+    finally:
+        src_file.unlink(missing_ok=True)
+        test_program.unlink(missing_ok=True)
+
+
+def detect_hdf5_version(tmpdir: pathlib.Path) -> str:
+    compile_and_check_output(
+        source=textwrap.dedent(
+            """
+            #include <H5public.h>
+            #include <cstdio>
+            #include <cstdlib>
+
+            int main() {
+              printf("%d.%d.%d\\n", int{H5_VERS_MAJOR}, int{H5_VERS_MINOR}, int{H5_VERS_RELEASE});
+              return EXIT_SUCCESS;
+            }
+            """
+        ),
+        tmpdir=tmpdir,
+    )
+
+
+def detect_zlib_version(tmpdir: pathlib.Path) -> str:
+    compile_and_check_output(
+        source=textwrap.dedent(
+            """
+            #include <cstdio>
+            #include <cstdlib>
+            #include <zlib.h>
+
+            int main() {
+            printf("%d.%d.%d\\n", int{ZLIB_VER_MAJOR}, int{ZLIB_VER_MINOR}, int{ZLIB_VER_REVISION});
+            return EXIT_SUCCESS;
+            }
+            """
+        ),
+        tmpdir=tmpdir,
+    )
+
+
+def run_conan_profile_detect_windows(tmpdir: pathlib.Path, env: EnvDict):
     assert platform.system() == "Windows"
 
     env["PATH"] = str(get_path_as_r())
@@ -179,10 +233,9 @@ def run_conan_profile_detect_windows(env: EnvDict):
     cc_version = get_cc_version(env["CC"])
     cmake_version = get_cmake_version(env)
 
-    # HDF5, szip and zlib come with Rtools, and using the version from Conan causes
+    # HDF5 and zlib come with Rtools, and using the version from Conan causes
     # weird link errors that are difficult to address.
-    # So we claim that hdf4/1.14.5 is available as a system library (even though
-    # a different version is likely installed) and call it a day
+    # So we override the version in the conan profile
     profile = [
         "[settings]",
         f"arch={arch}",
@@ -194,9 +247,13 @@ def run_conan_profile_detect_windows(env: EnvDict):
         "[buildenv]",
         "PATH='" + env["PATH"] + "'",
         "[platform_requires]",
-        "hdf5/1.14.6",
+        f"hdf5/{detect_hdf5_version(tmpdir)}",
+        f"zlib/{detect_zlib_version(tmpdir)}",
         "[platform_tool_requires]",
         f"cmake/{cmake_version}",
+        "[replace_requires]",
+        f"hdf5/*: hdf5/{detect_hdf5_version(tmpdir)}",
+        f"zlib/*: zlib/{detect_zlib_version(tmpdir)}",
     ]
 
     conan_profile = pathlib.Path(env.get("CONAN_HOME")) / "profiles" / "hictkR"
@@ -205,14 +262,14 @@ def run_conan_profile_detect_windows(env: EnvDict):
         print("\n".join(profile), file=f, end="")
 
 
-def run_conan_profile_detect(env: EnvDict):
+def run_conan_profile_detect(tmpdir: pathlib.Path, env: EnvDict):
     env = env.copy()
 
     env["CC"] = str(find_cc())
     env["CXX"] = str(find_cxx())
 
     if platform.system() == "Windows":
-        run_conan_profile_detect_windows(env)
+        run_conan_profile_detect_windows(tmpdir, env)
         return
 
     sp.check_call(
@@ -456,7 +513,7 @@ def main():
         env["CONAN_HOME"] = str(conan_home)
         env["TMPDIR"] = str(tmpdir.absolute())
 
-        run_conan_profile_detect(env)
+        run_conan_profile_detect(tmpdir, env)
         conandeps_mk = run_conan_install(workdir / "deps" / "conanfile.py", tmpdir, env)
 
         generate_makevars(makevars_file, tmpdir, conandeps_mk)
