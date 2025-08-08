@@ -1,0 +1,88 @@
+#!/usr/bin/env sh
+
+# Copyright (C) 2025 Roberto Rossini <roberros@uio.no>
+#
+# SPDX-License-Identifier: MIT
+
+
+set -e
+set -u
+
+# shellcheck disable=SC2064
+trap "cd '$PWD'" EXIT
+
+wd="$PWD"
+
+export TMPDIR="$wd/tmp/"
+mkdir -p "$TMPDIR"
+
+UV_VERSION='0.8.5'
+export UV_INSTALLER_URL="https://astral.sh/uv/$UV_VERSION/install.sh"
+export UV_INSTALLER_SHA256='8e6284da8ff65d4c1d9d978eeb8fc905462eeba7b7e6e55a4c12ecb0412965d9'
+export UV_INSTALLER_DEST="$wd/install.sh"
+
+export UV_INSTALL_DIR="$wd/uv-install"
+export UV_CACHE_DIR="$wd/uv-cache"
+export UV_PYTHON_INSTALL_DIR="$wd/python-install"
+export UV_NO_MODIFY_PATH=1
+
+export VIRTUAL_ENV="$wd/venv/"
+
+set +u
+if [ -n "$R_HOME" ]; then
+  Rscript="$R_HOME/bin/Rscript"
+else
+  Rscript="$(which Rscript)"
+fi
+set -u
+
+cat << EOF > "$wd/setup-uv.R"
+
+#!/usr/bin/env Rscript
+
+# Required to call sha256sum
+library(tools)
+
+install_script <- Sys.getenv("UV_INSTALLER_DEST")
+
+download.file(
+  Sys.getenv("UV_INSTALLER_URL"),
+  dest=install_script,
+  mode="wb"
+)
+
+expected_checksum <- Sys.getenv("UV_INSTALLER_SHA256")
+calculated_checksum <- sha256sum(install_script)
+
+if (calculated_checksum != expected_checksum) {
+  stop("FAILURE: Checksum verification for uv's install script failed!")
+}
+
+EOF
+
+"$Rscript" "$wd/setup-uv.R"
+
+sh "$UV_INSTALLER_DEST"
+
+PATH="$UV_INSTALL_DIR:$PATH"
+
+uv venv \
+  --python 3.13 \
+  --link-mode=copy \
+  "$VIRTUAL_ENV"
+
+uv pip install \
+  'conan>=2.15'
+
+PATH="$VIRTUAL_ENV/bin/:$PATH"
+
+which conan
+conan --version
+
+set +u
+if [ -n "$HICTKR_CONAN_HOME" ]; then
+  export HICTKR_CONAN_HOME="$wd/conan-staging/.conan2"
+fi
+set -u
+
+python "$(dirname "$0")/deps/generate_makevars.py" --no-venv --workdir "$(dirname "$0")"

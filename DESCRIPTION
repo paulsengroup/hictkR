@@ -21,7 +21,6 @@ Imports:
 SystemRequirements:
     C++17,
     GNU make,
-    Python3 (with venv and pip)
 Suggests:
     knitr,
     rmarkdown,

@@ -1,22 +1,31 @@
-^\.conan2$
+# Copyright (C) 2025 Roberto Rossini <roberros@uio.no>
+#
+# SPDX-License-Identifier: MIT
+
+# Excluded folders
+conan-staging$
+^cmake$
+^cmake-build-.*
+^docs$
+^pkgdown$
+^scratch$
+^staging$
+^utils$
+^venv$
+^\.github$
 ^\.idea$
 ^\.run$
 ^\.vscode$
-^_pkgdown\.yml$
-^cmake-build-.*
-^cmake$
-^pkgdown$
-^utils$
-.*.Rcheck$
 
-^\.github$
-conan-staging$
-^venv$
-
-.*.o$
-.*.so$
+# Excluded files
+.*\.Rcheck$
+.*\.o$
+.*\.so$
 .*\.tar\.gz$
-
+^CITATION.cff$
+CMakeLists.txt$
+Makevars$
+^\.RData$
 ^\.clang-format$
 ^\.codespellrc$
 ^\.editorconfig$
@@ -24,8 +33,4 @@ conan-staging$
 ^\.gitignore$
 ^\.markdownlint.yaml$
 ^\.pre-commit-config.yaml$
-^\.RData$
-CITATION.cff
-CMakeLists.txt$
-^docs$
-^requirements.txt$
+^_pkgdown\.yml$
