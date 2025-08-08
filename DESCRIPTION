@@ -20,8 +20,7 @@ Imports:
     methods
 SystemRequirements:
     C++17,
-    GNU make,
-    Python3 (with venv and pip)
+    GNU make
 Suggests:
     knitr,
     rmarkdown,
