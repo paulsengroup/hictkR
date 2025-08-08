@@ -36,31 +36,37 @@ else
 fi
 set -u
 
-cat << EOF > "$wd/setup-uv.R"
-
+cat << EOF > "$wd/download-uv.R"
 #!/usr/bin/env Rscript
-
-# Required to call sha256sum
-library(tools)
 
 install_script <- Sys.getenv("UV_INSTALLER_DEST")
 
 download.file(
   Sys.getenv("UV_INSTALLER_URL"),
-  dest=install_script,
+  dest=Sys.getenv("UV_INSTALLER_DEST"),
   mode="wb"
 )
-
-expected_checksum <- Sys.getenv("UV_INSTALLER_SHA256")
-calculated_checksum <- sha256sum(install_script)
-
-if (calculated_checksum != expected_checksum) {
-  stop("FAILURE: Checksum verification for uv's install script failed!")
-}
-
 EOF
 
-"$Rscript" "$wd/setup-uv.R"
+"$Rscript" "$wd/download-uv.R"
+
+if command -v sha256sum >/dev/null 2>&1; then
+  checksum="$(sha256sum "$UV_INSTALLER_DEST")"
+elif command -v shasum >/dev/null 2>&1; then
+  checksum="$(shasum -a 256 "$UV_INSTALLER_DEST")"
+elif command -v openssl >/dev/null 2>&1; then
+  checksum="$(openssl dgst -sha256 "$UV_INSTALLER_DEST")"
+else
+  1>&2 echo "Error: Cannot find a command to compute SHA-256 checksums."
+  1>&2 echo "Skipping uv checksum!!"
+  checksum="$UV_INSTALLER_SHA256"
+fi
+
+checksum="$(echo "$checksum" | cut -f 1 -d ' ')"
+if [ "$checksum" != "$UV_INSTALLER_SHA256" ]; then
+  1>&2 echo "FAILURE: Checksum verification for uv's install script failed!"
+  exit 1
+fi
 
 sh "$UV_INSTALLER_DEST"
 
@@ -71,10 +77,17 @@ uv venv \
   --link-mode=copy \
   "$VIRTUAL_ENV"
 
-uv pip install \
-  'conan>=2.15'
+uv pip install 'conan>=2.15'
 
-PATH="$VIRTUAL_ENV/bin/:$PATH"
+
+if [ -d "$VIRTUAL_ENV/bin" ]; then
+  PATH="$VIRTUAL_ENV/bin/:$PATH"
+elif [ -d "$VIRTUAL_ENV/Scripts" ]; then
+  PATH="$VIRTUAL_ENV/Scripts/:$PATH"
+else
+  1>&2 echo "FAILURE: unable to add venv bin folder to PATH!"
+  exit 1
+fi
 
 which conan
 conan --version

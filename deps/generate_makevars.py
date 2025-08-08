@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import argparse
+import json
 import logging
 import os
 import pathlib
@@ -18,21 +19,13 @@ import textwrap
 import venv
 from typing import Dict, Tuple
 
-"""
-This script takes care of generating a valid conan profile and running conan install.
-Most of the complexity is due to Windows, as in this case we must use the compilers provided by the Rtools package.
-This means that:
-- We need to figure out Rtools' home folder
-- Inject the several bin folders into PATH
-- Detect compiler and cmake version
-- Make conan use the msys2 toolchain installed by Rtools
-"""
-
 type EnvDict = Dict[str, str]
 
 
 def make_cli() -> argparse.ArgumentParser:
-    cli = argparse.ArgumentParser()
+    cli = argparse.ArgumentParser(
+        "Generate a Makevars file suitable to build hictkR by linking to third-party dependencies built using Conan."
+    )
 
     cli.add_argument(
         "--force",
@@ -172,7 +165,7 @@ def get_arch() -> str:
 
 
 def run_conan_profile_detect_windows(env: EnvDict):
-    assert os.name == "nt"
+    assert platform.system() == "Windows"
 
     env["PATH"] = str(get_path_as_r())
 
@@ -187,7 +180,7 @@ def run_conan_profile_detect_windows(env: EnvDict):
 
     # HDF5, szip and zlib come with Rtools, and using the version from Conan causes
     # weird link errors that are difficult to address.
-    # So we claim that hdf4/1.14.3 is available as a system library (even though
+    # So we claim that hdf4/1.14.5 is available as a system library (even though
     # a different version is likely installed) and call it a day
     profile = [
         "[settings]",
@@ -198,7 +191,7 @@ def run_conan_profile_detect_windows(env: EnvDict):
         f"compiler.version={cc_version}",
         "os=Windows",
         "[buildenv]",
-        f"PATH='" + env["PATH"] + "'",
+        "PATH='" + env["PATH"] + "'",
         "[platform_requires]",
         "hdf5/1.14.5",
         "[platform_tool_requires]",
@@ -212,7 +205,7 @@ def run_conan_profile_detect_windows(env: EnvDict):
 
 
 def run_conan_profile_detect(env: EnvDict):
-    if os.name == "nt":
+    if platform.system() == "Windows":
         run_conan_profile_detect_windows(env)
         return
 
@@ -223,16 +216,33 @@ def run_conan_profile_detect(env: EnvDict):
     )
 
     conan_profile = pathlib.Path(env.get("CONAN_HOME")) / "profiles" / "hictkR"
+
+    with conan_profile.open("a") as f:
+        f.write("[tool_requires]\n!cmake/*: cmake/[>=3.5 <4]")
+
     logging.info("\n%s", conan_profile.read_text())
+
+
+def extract_hictk_version(conanfile: pathlib.Path) -> str:
+    res = sp.check_output(["conan", "inspect", conanfile, "--format=json"]).decode("utf-8")
+    metadata = json.loads(res)
+
+    if "version" not in metadata:
+        raise RuntimeError(f"Unable to extract hictk's version from {conanfile}!")
+
+    return str(metadata["version"])
 
 
 def run_conan_install(
     conanfile: pathlib.Path,
     tmpdir: pathlib.Path,
     env: EnvDict,
-) -> pathlib.Path:
+) -> str:
     assert conanfile.is_file()
     assert tmpdir.is_dir()
+
+    env = env.copy()
+    env["CMAKE_POLICY_VERSION_MINIMUM"] = "3.5"
 
     default_options = [
         "--profile:all=hictkR",
@@ -246,7 +256,7 @@ def run_conan_install(
     ]
 
     conan_install_opts = default_options + [
-        "--requires=hictk/[>=2.1 <2.2]",
+        f"--requires=hictk/{extract_hictk_version(conanfile)}",
         f"--output-folder={tmpdir}",
         "--build=never",
         "--generator=MakeDeps",
@@ -268,7 +278,7 @@ def run_conan_install(
     if not conandeps_mk.is_file():
         raise RuntimeError(f"failed to create {conandeps_mk} file!")
 
-    return conandeps_mk
+    return conandeps_mk.read_text(encoding="utf-8")
 
 
 def detect_filesystem_link_flag(tmpdir: pathlib.Path) -> str | None:
@@ -320,14 +330,17 @@ def detect_filesystem_link_flag(tmpdir: pathlib.Path) -> str | None:
         test_program.unlink()
 
 
-def generate_makevars_unix(dest: pathlib.Path, tmpdir: pathlib.Path, conandeps_mk: pathlib.Path):
+def generate_makevars(
+    dest: pathlib.Path,
+    tmpdir: pathlib.Path,
+    conandeps_mk: str,
+):
     cc = find_cc()
     cxx = find_cxx()
     cxx_flags = cxx_flags_rcpp()
 
-    makevars = (
-        textwrap.dedent(
-            f"""
+    makevars = textwrap.dedent(
+        f"""
         PWD := $(shell pwd)
         TMPDIR := PWD
 
@@ -336,17 +349,12 @@ def generate_makevars_unix(dest: pathlib.Path, tmpdir: pathlib.Path, conandeps_m
         export CXX17 = $(CXX)
 
         ### BEGINNING OF conandeps.mk
-        """
-        )
-        + conandeps_mk.read_text(encoding="utf-8")
-        + textwrap.dedent(
-            f"""
+        {conandeps_mk}
         ### END OF conandeps.mk
 
         CXX_STD := CXX17
 
         PKG_CPPFLAGS := $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
-        PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))
         PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -D ,$(CONAN_DEFINES))
         PKG_CPPFLAGS := $(PKG_CPPFLAGS) {cxx_flags}
 
@@ -354,25 +362,19 @@ def generate_makevars_unix(dest: pathlib.Path, tmpdir: pathlib.Path, conandeps_m
         PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_LIBS))
         PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_SYSTEM_LIBS))
         """
-        )
     )
 
     filesystem_link_flags = detect_filesystem_link_flag(tmpdir)
     if filesystem_link_flags is not None:
         makevars += f"PKG_LIBS := $(PKG_LIBS) {filesystem_link_flags}"
 
-    dest.write_text(makevars)
-
-
-def generate_makevars_windows(dest: pathlib.Path, conandeps_mk: pathlib.Path):
-    pass
-
-
-def generate_makevars(dest: pathlib.Path, conandeps_mk: pathlib.Path, tmpdir: pathlib.Path):
-    if os.name == "nt":
-        generate_makevars_windows(dest, conandeps_mk)
+    if platform.system() == "Windows":
+        # These libraries come with Rtools, and installing them with Conan leads to link errors that are difficult to address
+        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz"
     else:
-        generate_makevars_unix(dest, tmpdir, conandeps_mk)
+        makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))"
+
+    dest.write_text(makevars)
 
 
 def get_or_init_conan_home(env: EnvDict | None) -> pathlib.Path:
@@ -453,7 +455,7 @@ def main():
         run_conan_profile_detect(env)
         conandeps_mk = run_conan_install(workdir / "deps" / "conanfile.py", tmpdir, env)
 
-        generate_makevars(makevars_file, conandeps_mk, tmpdir)
+        generate_makevars(makevars_file, tmpdir, conandeps_mk)
 
         logging.debug("\n%s", makevars_file.read_text())
         logging.info('Makevars file has been written to "%s"...', makevars_file.resolve())
