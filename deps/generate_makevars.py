@@ -427,13 +427,14 @@ def generate_makevars(
 
     filesystem_link_flags = detect_filesystem_link_flag(tmpdir)
     if filesystem_link_flags is not None:
-        makevars += f"PKG_LIBS := $(PKG_LIBS) {filesystem_link_flags}"
+        makevars += f"PKG_LIBS := $(PKG_LIBS) {filesystem_link_flags}\n"
 
     if platform.system() == "Windows":
         # These libraries come with Rtools, and installing them with Conan leads to link errors that are difficult to address
-        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz"
+        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz\n"
     else:
-        makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))"
+        makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))\n"
+
 
     dest.write_text(makevars, newline="\n")
 

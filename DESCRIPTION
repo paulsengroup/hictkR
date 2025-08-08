@@ -20,7 +20,7 @@ Imports:
     methods
 SystemRequirements:
     C++17,
-    GNU make,
+    GNU make
 Suggests:
     knitr,
     rmarkdown,
