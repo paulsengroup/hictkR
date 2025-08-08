@@ -6,6 +6,7 @@
 .idea/
 .run/
 .vscode/
+__pycache__/
 cmake-build*/
 conan-staging/
 docs/
