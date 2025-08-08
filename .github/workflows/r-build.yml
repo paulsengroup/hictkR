@@ -9,6 +9,7 @@ on:
   push:
     branches: [main]
     paths:
+      - ".github/workflows/r-build.yml"
       - "deps/conanfile.py"
       - "deps/generate_makevars.py"
       - "R/**"
@@ -26,6 +27,7 @@ on:
 
   pull_request:
     paths:
+      - ".github/workflows/r-build.yml"
       - "deps/conanfile.py"
       - "deps/generate_makevars.py"
       - "R/**"
@@ -45,6 +47,8 @@ on:
 
 env:
   HICTKR_CONAN_HOME: "${{ github.workspace }}/.conan2/"
+  CC: "gcc"
+  CXX: "g++"
 
 # https://stackoverflow.com/a/72408109
 concurrency:

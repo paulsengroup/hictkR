@@ -9,7 +9,7 @@ on:
   push:
     branches: [main]
     paths:
-      - ".github/workflows/ci.yml"
+      - ".github/workflows/pkgdown.yml"
       - "deps/conanfile.py"
       - "deps/generate_makevars.py"
       - "R/**"
@@ -28,7 +28,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - ".github/workflows/ci.yml"
+      - ".github/workflows/pkgdown.yml"
       - "deps/conanfile.py"
       - "deps/generate_makevars.py"
       - "R/**"
@@ -46,6 +46,8 @@ on:
 
 env:
   HICTKR_CONAN_HOME: "${{ github.workspace }}/.conan2/"
+  CC: "gcc"
+  CXX: "g++"
 
 jobs:
   pkgdown:

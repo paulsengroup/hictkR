@@ -7,6 +7,7 @@ __pycache__$
 # required by the CI
 \.conan2$
 conan-staging$
+venv$
 ^cmake$
 ^cmake-build-.*
 ^docs$
@@ -14,7 +15,6 @@ conan-staging$
 ^scratch$
 ^staging$
 ^utils$
-^venv$
 ^\.github$
 ^\.idea$
 ^\.run$
