@@ -8,9 +8,6 @@
 set -e
 set -u
 
-# shellcheck disable=SC2064
-trap "cd '$PWD'" EXIT
-
 wd="$PWD"
 
 export TMPDIR="$wd/tmp/"
@@ -19,14 +16,18 @@ mkdir -p "$TMPDIR"
 UV_VERSION='0.8.5'
 export UV_INSTALLER_URL="https://astral.sh/uv/$UV_VERSION/install.sh"
 export UV_INSTALLER_SHA256='8e6284da8ff65d4c1d9d978eeb8fc905462eeba7b7e6e55a4c12ecb0412965d9'
-export UV_INSTALLER_DEST="$wd/install.sh"
+export UV_INSTALLER_DEST="$TMPDIR/install.sh"
 
-export UV_INSTALL_DIR="$wd/uv-install"
-export UV_CACHE_DIR="$wd/uv-cache"
-export UV_PYTHON_INSTALL_DIR="$wd/python-install"
+export UV_INSTALL_DIR="$TMPDIR/uv-install"
+export UV_CACHE_DIR="$TMPDIR/uv-cache"
+export UV_PYTHON_INSTALL_DIR="$TMPDIR/python-install"
 export UV_NO_MODIFY_PATH=1
 
 export VIRTUAL_ENV="$wd/venv/"
+
+
+# shellcheck disable=SC2064
+trap "rm -rf '$TMPDIR' && cd '$PWD'" EXIT
 
 set +u
 if [ -n "$R_HOME" ]; then
@@ -36,7 +37,7 @@ else
 fi
 set -u
 
-cat << EOF > "$wd/download-uv.R"
+cat << EOF > "$TMPDIR/download-uv.R"
 #!/usr/bin/env Rscript
 
 install_script <- Sys.getenv("UV_INSTALLER_DEST")
@@ -48,7 +49,7 @@ download.file(
 )
 EOF
 
-"$Rscript" "$wd/download-uv.R"
+"$Rscript" "$TMPDIR/download-uv.R"
 
 if command -v sha256sum >/dev/null 2>&1; then
   checksum="$(sha256sum "$UV_INSTALLER_DEST")"
