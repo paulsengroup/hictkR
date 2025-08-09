@@ -5,20 +5,26 @@
 #include "./hictkr_file.h"
 
 #include <Rcpp.h>
+#include <RcppEigen.h>
 #include <fmt/format.h>
 
-#include <cstddef>
+#include <algorithm>
+#include <cassert>
 #include <cstdint>
+#include <hictk/balancing/methods.hpp>
 #include <hictk/bin_table.hpp>
-#include <hictk/file.hpp>
+#include <hictk/cooler/cooler.hpp>
 #include <hictk/genomic_interval.hpp>
+#include <hictk/hic.hpp>
 #include <hictk/pixel.hpp>
 #include <hictk/transformers/join_genomic_coords.hpp>
+#include <hictk/transformers/to_dense_matrix.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -268,71 +274,11 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::s
       _fp.get());
 }
 
-template <typename N, typename Selector, typename MatrixT>
-static void fill_dense_matrix(const Selector &sel, MatrixT &matrix, bool mirror_matrix,
-                              std::uint64_t row_offset = 0, std::uint64_t col_offset = 0) {
-  const auto num_rows = matrix.nrow();
-  const auto num_cols = matrix.ncol();
-
-  std::for_each(sel.template begin<N>(), sel.template end<N>(), [&](const auto &tp) {
-    const auto i1 = static_cast<std::int64_t>(tp.bin1_id - row_offset);
-    const auto i2 = static_cast<std::int64_t>(tp.bin2_id - col_offset);
-    matrix.at(i1, i2) = tp.count;
-
-    if (mirror_matrix) {
-      const auto delta = i2 - i1;
-      if (delta >= 0 && delta < num_rows && i1 < num_cols && i2 < num_rows) {
-        matrix.at(i2, i1) = tp.count;
-      } else if ((delta < 0 || delta > num_cols) && i1 < num_cols && i2 < num_rows) {
-        const auto i3 = static_cast<std::int64_t>(tp.bin2_id - row_offset);
-        const auto i4 = static_cast<std::int64_t>(tp.bin1_id - col_offset);
-
-        if (i3 >= 0 && i3 < num_rows && i4 >= 0 && i4 < num_cols) {
-          matrix.at(i3, i4) = tp.count;
-        }
-      }
-    }
-  });
-}
-
-template <typename N, typename Selector,
+template <typename N, typename PixelSelector,
           typename RcppMatrixT =
               std::conditional_t<std::is_integral_v<N>, Rcpp::IntegerMatrix, Rcpp::NumericMatrix>>
-static RcppMatrixT fetch_as_matrix(const Selector &sel) {
-  const auto bin_size = sel.bins().resolution();
-
-  const auto span1 = sel.coord1().bin2.end() - sel.coord1().bin1.start();
-  const auto span2 = sel.coord2().bin2.end() - sel.coord2().bin1.start();
-  const auto num_rows =
-      static_cast<std::int64_t>(span1 == 0 ? sel.bins().size() : (span1 + bin_size - 1) / bin_size);
-  const auto num_cols =
-      static_cast<std::int64_t>(span2 == 0 ? sel.bins().size() : (span2 + bin_size - 1) / bin_size);
-
-  constexpr auto bad_bin_id = std::numeric_limits<std::uint64_t>::max();
-
-  const auto row_offset =
-      static_cast<std::int64_t>(sel.coord1().bin1.id() == bad_bin_id ? 0 : sel.coord1().bin1.id());
-  const auto col_offset =
-      static_cast<std::int64_t>(sel.coord2().bin1.id() == bad_bin_id ? 0 : sel.coord2().bin1.id());
-
-  const auto mirror_matrix = sel.coord1().bin1.chrom() == sel.coord2().bin1.chrom();
-
-  // Matrix allocated this way is zero-filled
-  RcppMatrixT matrix(num_rows, num_cols);
-  fill_dense_matrix<N>(sel, matrix, mirror_matrix, row_offset, col_offset);
-  return matrix;
-}
-
-template <typename N, typename RcppMatrixT = std::conditional_t<
-                          std::is_integral_v<N>, Rcpp::IntegerMatrix, Rcpp::NumericMatrix>>
-static RcppMatrixT fetch_as_matrix(const hictk::hic::PixelSelectorAll &sel) {
-  const auto num_rows = static_cast<std::int64_t>(sel.bins().size());
-  const auto num_cols = static_cast<std::int64_t>(sel.bins().size());
-
-  // Matrix allocated this way is zero-filled
-  RcppMatrixT matrix(num_rows, num_cols);
-  fill_dense_matrix<N>(sel, matrix, true);
-  return matrix;
+static RcppMatrixT fetch_as_matrix(PixelSelector &&sel) {
+  return Rcpp::wrap(hictk::transformers::ToDenseMatrix(std::move(sel), N{})());
 }
 
 Rcpp::RObject HiCFile::fetch_dense(std::string range1, std::string range2,
@@ -345,12 +291,12 @@ Rcpp::RObject HiCFile::fetch_dense(std::string range1, std::string range2,
   if (range1.empty()) {
     assert(range2.empty());
     return std::visit(
-        [&](const auto &ff) {
+        [&](const auto &ff) -> Rcpp::RObject {
           auto sel = ff.fetch(hictk::balancing::Method{normalization});
           if (count_type == "int") {
-            return static_cast<Rcpp::RObject>(fetch_as_matrix<std::int32_t>(sel));
+            return fetch_as_matrix<std::int64_t>(std::move(sel));
           }
-          return static_cast<Rcpp::RObject>(fetch_as_matrix<double>(sel));
+          return fetch_as_matrix<double>(std::move(sel));
         },
         _fp.get());
   }
@@ -359,14 +305,14 @@ Rcpp::RObject HiCFile::fetch_dense(std::string range1, std::string range2,
       query_type == "UCSC" ? hictk::GenomicInterval::Type::UCSC : hictk::GenomicInterval::Type::BED;
 
   return std::visit(
-      [&](const auto &ff) {
+      [&](const auto &ff) -> Rcpp::RObject {
         auto sel = range2.empty() || range1 == range2
                        ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
                        : ff.fetch(range1, range2, hictk::balancing::Method{normalization}, qt);
         if (count_type == "int") {
-          return static_cast<Rcpp::RObject>(fetch_as_matrix<std::int32_t>(sel));
+          return fetch_as_matrix<std::int64_t>(std::move(sel));
         }
-        return static_cast<Rcpp::RObject>(fetch_as_matrix<double>(sel));
+        return fetch_as_matrix<double>(std::move(sel));
       },
       _fp.get());
 }
