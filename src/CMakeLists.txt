@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 find_package(Rcpp REQUIRED)
+find_package(RcppEigen REQUIRED)
 find_package(hictk REQUIRED)
 
 add_library(hictkR)
@@ -21,4 +22,5 @@ target_link_libraries(
   PUBLIC
     hictk::libhictk
     rcpp
+    rcpp_eigen
 )

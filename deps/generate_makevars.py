@@ -435,7 +435,6 @@ def generate_makevars(
     else:
         makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))\n"
 
-
     dest.write_text(makevars, newline="\n")
 
 
