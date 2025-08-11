@@ -21,7 +21,8 @@ LinkingTo:
     Rcpp,
     RcppEigen
 Imports:
-    methods
+    methods,
+    nanoarrow
 SystemRequirements:
     C++17,
     GNU make

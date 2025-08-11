@@ -110,8 +110,8 @@ SingleCellFile <- function(path) {
 #' }
 fetch <-
   function(file,
-           range1 = "",
-           range2 = "",
+           range1 = NULL,
+           range2 = NULL,
            normalization = "NONE",
            count_type = "int",
            join = FALSE,
@@ -123,6 +123,14 @@ fetch <-
 
     if (query_type != "UCSC" && query_type != "BED") {
       stop("query_type should be either \"UCSC\" or \"BED\"")
+    }
+
+    if (is.null(range1)) {
+      range1 <- ""
+    }
+
+    if (is.null(range2)) {
+      range1 <- ""
     }
 
     if (type == "df") {

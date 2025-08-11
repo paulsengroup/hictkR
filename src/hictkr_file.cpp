@@ -6,6 +6,9 @@
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
+#include <arrow/c/abi.h>
+#include <arrow/c/bridge.h>
+#include <arrow/table.h>
 #include <fmt/format.h>
 
 #include <algorithm>
@@ -16,8 +19,8 @@
 #include <hictk/cooler/cooler.hpp>
 #include <hictk/genomic_interval.hpp>
 #include <hictk/hic.hpp>
-#include <hictk/pixel.hpp>
 #include <hictk/transformers/join_genomic_coords.hpp>
+#include <hictk/transformers/to_dataframe.hpp>
 #include <hictk/transformers/to_dense_matrix.hpp>
 #include <limits>
 #include <memory>
@@ -178,65 +181,131 @@ Rcpp::List HiCFile::attributes() const {
   return get_hic_attrs(_fp.get<hictk::hic::File>());
 }
 
-template <typename N, typename Selector>
-static Rcpp::DataFrame fetch_as_df(const Selector &sel,
-                                   const std::shared_ptr<const hictk::BinTable> &bins_ptr,
-                                   bool join) {
-  if (!join) {
-    std::vector<int64_t> bin1_ids{};
-    std::vector<int64_t> bin2_ids{};
-    std::vector<N> counts{};
+template <typename N, typename PixelSelector>
+[[nodiscard]] static std::shared_ptr<arrow::Table> make_bg2_arrow_df(
+    const PixelSelector &sel, hictk::transformers::QuerySpan span,
+    std::optional<std::uint64_t> diagonal_band_width) {
+  if constexpr (std::is_same_v<N, long double>) {
+    return make_bg2_arrow_df<double>(sel, span, diagonal_band_width);
+  } else {
+    return hictk::transformers::ToDataFrame(
+        sel, sel.template end<N>(), hictk::transformers::DataFrameFormat::BG2, sel.bins_ptr(), span,
+        false, 256'000, diagonal_band_width)();
+  }
+}
 
-    std::for_each(sel.template begin<N>(), sel.template end<N>(),
-                  [&](const hictk::ThinPixel<N> &p) {
-                    bin1_ids.push_back(p.bin1_id);
-                    bin2_ids.push_back(p.bin2_id);
-                    counts.push_back(p.count);
-                  });
+template <typename N, typename PixelSelector>
+[[nodiscard]] static std::shared_ptr<arrow::Table> make_coo_arrow_df(
+    const PixelSelector &sel, hictk::transformers::QuerySpan span,
+    std::optional<std::uint64_t> diagonal_band_width) {
+  if constexpr (std::is_same_v<N, long double>) {
+    return make_coo_arrow_df<double>(sel, span, diagonal_band_width);
+  } else {
+    return hictk::transformers::ToDataFrame(
+        sel, sel.template end<N>(), hictk::transformers::DataFrameFormat::COO, sel.bins_ptr(), span,
+        false, 256'000, diagonal_band_width)();
+  }
+}
 
-    return Rcpp::DataFrame::create(Rcpp::Named("bin1_id") = bin1_ids,
-                                   Rcpp::Named("bin2_id") = bin2_ids,
-                                   Rcpp::Named("count") = counts);
+static void arrow_schema_deleter(ArrowSchema *schema) noexcept {
+  try {
+    if (schema->release) {
+      schema->release(schema);
+    }
+    free(schema);
+  } catch (...) {  // NOLINT
+  }
+}
+
+static void arrow_array_stream_deleter(ArrowArrayStream *stream) noexcept {
+  try {
+    if (stream->release) {
+      stream->release(stream);
+    }
+    free(stream);
+  } catch (...) {  // NOLINT
+  }
+}
+
+using ArrowSchemaXPtr = Rcpp::XPtr<ArrowSchema, Rcpp::PreserveStorage, arrow_schema_deleter>;
+using ArrowArrayStreamXPtr =
+    Rcpp::XPtr<ArrowArrayStream, Rcpp::PreserveStorage, arrow_array_stream_deleter>;
+
+[[nodiscard]] static ArrowSchemaXPtr export_arrow_schema(
+    const std::shared_ptr<arrow::Schema> &schema_in) {
+  auto *schema = static_cast<ArrowSchema *>(malloc(sizeof(ArrowSchema)));
+  if (!schema) {
+    throw std::bad_alloc();
   }
 
-  Rcpp::CharacterVector chrom_names{};
-  for (const auto &chrom : bins_ptr->chromosomes()) {
-    chrom_names.push_back(std::string{chrom.name()});
+  const auto status = arrow::ExportSchema(*schema_in, schema);
+  if (!status.ok()) {
+    free(schema);
+    throw std::runtime_error(fmt::format(
+        FMT_STRING("Failed to export arrow::Schema as ArrowSchema: {}"), status.message()));
   }
 
-  std::vector<std::int32_t> chrom1_ids{};
-  std::vector<std::int32_t> start1{};
-  std::vector<std::int32_t> end1{};
-  std::vector<std::int32_t> chrom2_ids{};
-  std::vector<std::int32_t> start2{};
-  std::vector<std::int32_t> end2{};
-  std::vector<N> counts{};
+  ArrowSchemaXPtr ptr{schema, true};
+  ptr.attr("class") = "nanoarrow_schema";
+  return ptr;
+}
 
-  const hictk::transformers::JoinGenomicCoords jsel(sel.template begin<N>(), sel.template end<N>(),
-                                                    bins_ptr);
+[[nodiscard]] static ArrowArrayStreamXPtr export_arrow_array_stream(
+    std::shared_ptr<arrow::ChunkedArray> column, const ArrowSchemaXPtr &schema) {
+  auto *array_stream = static_cast<ArrowArrayStream *>(malloc(sizeof(ArrowArrayStream)));
+  if (!array_stream) {
+    throw std::bad_alloc();
+  }
 
-  std::for_each(jsel.begin(), jsel.end(), [&](const hictk::Pixel<N> &p) {
-    chrom1_ids.push_back(p.coords.bin1.chrom().id() + 1);
-    start1.push_back(p.coords.bin1.start());
-    end1.push_back(p.coords.bin1.end());
-    chrom2_ids.push_back(p.coords.bin2.chrom().id() + 1);
-    start2.push_back(p.coords.bin2.start());
-    end2.push_back(p.coords.bin2.end());
-    counts.push_back(p.count);
-  });
+  const auto status = arrow::ExportChunkedArray(std::move(column), array_stream);
+  if (!status.ok()) {
+    free(array_stream);
+    throw std::runtime_error(
+        fmt::format(FMT_STRING("Failed to export arrow::ChunkedArray as ArrowArrayStream: {}"),
+                    status.message()));
+  }
 
-  Rcpp::IntegerVector chrom1{chrom1_ids.begin(), chrom1_ids.end()};
-  Rcpp::IntegerVector chrom2{chrom2_ids.begin(), chrom2_ids.end()};
+  ArrowArrayStreamXPtr ptr{array_stream, true};
+  ptr.attr("class") = "nanoarrow_array_stream";
+  ptr.attr("schema") = schema;
+  return ptr;
+}
 
-  chrom1.attr("class") = "factor";
-  chrom1.attr("levels") = chrom_names;
-  chrom2.attr("class") = "factor";
-  chrom2.attr("levels") = chrom_names;
+[[nodiscard]] static Rcpp::DataFrame arrow_table_to_df(
+    const std::shared_ptr<arrow::Table> &arrow_table) {
+  assert(arrow_table);
 
-  return Rcpp::DataFrame::create(Rcpp::Named("chrom1") = chrom1, Rcpp::Named("start1") = start1,
-                                 Rcpp::Named("end1") = end1, Rcpp::Named("chrom2") = chrom2,
-                                 Rcpp::Named("start2") = start2, Rcpp::Named("end2") = end2,
-                                 Rcpp::Named("count") = counts);
+  auto schema_r = export_arrow_schema(arrow_table->schema());
+  const auto col_names = arrow_table->ColumnNames();
+
+  Rcpp::List columns_r(arrow_table->num_columns());
+
+  auto nanoarrow = Rcpp::Environment::namespace_env("nanoarrow");
+  const Rcpp::Function nanoarrow_convert_array_stream{nanoarrow["convert_array_stream"]};
+
+  for (R_xlen_t i = 0; i < columns_r.size(); ++i) {
+    columns_r[i] = nanoarrow_convert_array_stream(export_arrow_array_stream(
+        arrow_table->column(hictk::conditional_static_cast<int>(i)), schema_r));
+  }
+
+  columns_r.attr("names") = Rcpp::CharacterVector(col_names.begin(), col_names.end());
+
+  auto base = Rcpp::Environment::base_namespace();
+  const Rcpp::Function as_data_frame = base["as.data.frame"];
+
+  return as_data_frame(columns_r);
+}
+
+template <typename N, bool join, typename PixelSelector>
+[[nodiscard]] static Rcpp::DataFrame make_df(
+    const PixelSelector &sel,
+    hictk::transformers::QuerySpan span = hictk::transformers::QuerySpan::upper_triangle,
+    std::optional<std::uint64_t> diagonal_band_width = {}) {
+  if constexpr (join) {
+    return arrow_table_to_df(make_bg2_arrow_df<N>(sel, span, diagonal_band_width));
+  } else {
+    return arrow_table_to_df(make_coo_arrow_df<N>(sel, span, diagonal_band_width));
+  }
 }
 
 Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::string normalization,
@@ -251,9 +320,9 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::s
         [&](const auto &ff) {
           auto sel = ff.fetch(hictk::balancing::Method{normalization});
           if (count_type == "int") {
-            return fetch_as_df<std::int32_t>(sel, ff.bins_ptr(), join);
+            return join ? make_df<std::int32_t, true>(sel) : make_df<std::int32_t, false>(sel);
           }
-          return fetch_as_df<double>(sel, ff.bins_ptr(), join);
+          return join ? make_df<double, true>(sel) : make_df<double, false>(sel);
         },
         _fp.get());
   }
@@ -267,9 +336,9 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::s
                        ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
                        : ff.fetch(range1, range2, hictk::balancing::Method{normalization}, qt);
         if (count_type == "int") {
-          return fetch_as_df<std::int32_t>(sel, ff.bins_ptr(), join);
+          return join ? make_df<std::int32_t, true>(sel) : make_df<std::int32_t, false>(sel);
         }
-        return fetch_as_df<double>(sel, ff.bins_ptr(), join);
+        return join ? make_df<double, true>(sel) : make_df<double, false>(sel);
       },
       _fp.get());
 }
