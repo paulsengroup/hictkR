@@ -13,16 +13,14 @@ BugReports: https://github.com/paulsengroup/hictkR/issues
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
-Depends:
-    R (>= 4.0),
-    Rcpp,
-    RcppEigen
+Depends: R (>= 4.0)
 LinkingTo:
     Rcpp,
     RcppEigen
 Imports:
     methods,
-    nanoarrow
+    nanoarrow,
+    Rcpp
 SystemRequirements:
     C++17,
     GNU make
