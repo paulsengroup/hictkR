@@ -308,17 +308,28 @@ template <typename N, bool join, typename PixelSelector>
   }
 }
 
-Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::string normalization,
+[[nodiscard]] static hictk::balancing::Method to_hictk_normalization_method(
+    const Rcpp::Nullable<Rcpp::String> &name) {
+  if (name.isNull() || Rcpp::as<Rcpp::String>(name) == "NONE") {
+    return hictk::balancing::Method::NONE();
+  }
+  return hictk::balancing::Method{Rcpp::as<std::string>(name)};
+}
+
+Rcpp::DataFrame HiCFile::fetch_df(Rcpp::Nullable<Rcpp::String> range1,
+                                  Rcpp::Nullable<Rcpp::String> range2,
+                                  Rcpp::Nullable<Rcpp::String> normalization,
                                   std::string count_type, bool join, std::string query_type) const {
-  if (normalization != "NONE") {
+  const auto normalization_method = to_hictk_normalization_method(normalization);
+  if (normalization_method != "NONE") {
     count_type = "float";
   }
 
-  if (range1.empty()) {
-    assert(range2.empty());
+  if (range1.isNull()) {
+    assert(range2.isNull());
     return std::visit(
         [&](const auto &ff) {
-          auto sel = ff.fetch(hictk::balancing::Method{normalization});
+          auto sel = ff.fetch(normalization_method);
           if (count_type == "int") {
             return join ? make_df<std::int32_t, true>(sel) : make_df<std::int32_t, false>(sel);
           }
@@ -332,9 +343,10 @@ Rcpp::DataFrame HiCFile::fetch_df(std::string range1, std::string range2, std::s
 
   return std::visit(
       [&](const auto &ff) {
-        auto sel = range2.empty() || range1 == range2
-                       ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
-                       : ff.fetch(range1, range2, hictk::balancing::Method{normalization}, qt);
+        auto sel = range2.isNull() || range1 == range2
+                       ? ff.fetch(Rcpp::as<std::string>(range1), normalization_method, qt)
+                       : ff.fetch(Rcpp::as<std::string>(range1), Rcpp::as<std::string>(range2),
+                                  normalization_method, qt);
         if (count_type == "int") {
           return join ? make_df<std::int32_t, true>(sel) : make_df<std::int32_t, false>(sel);
         }
@@ -350,18 +362,20 @@ static RcppMatrixT fetch_as_matrix(PixelSelector &&sel) {
   return Rcpp::wrap(hictk::transformers::ToDenseMatrix(std::move(sel), N{})());
 }
 
-Rcpp::RObject HiCFile::fetch_dense(std::string range1, std::string range2,
-                                   std::string normalization, std::string count_type,
-                                   std::string query_type) const {
-  if (normalization != "NONE") {
+Rcpp::RObject HiCFile::fetch_dense(Rcpp::Nullable<Rcpp::String> range1,
+                                   Rcpp::Nullable<Rcpp::String> range2,
+                                   Rcpp::Nullable<Rcpp::String> normalization,
+                                   std::string count_type, std::string query_type) const {
+  const auto normalization_method = to_hictk_normalization_method(normalization);
+  if (normalization_method != "NONE") {
     count_type = "float";
   }
 
-  if (range1.empty()) {
-    assert(range2.empty());
+  if (range1.isNull()) {
+    assert(range2.isNull());
     return std::visit(
         [&](const auto &ff) -> Rcpp::RObject {
-          auto sel = ff.fetch(hictk::balancing::Method{normalization});
+          auto sel = ff.fetch(normalization_method);
           if (count_type == "int") {
             return fetch_as_matrix<std::int64_t>(std::move(sel));
           }
@@ -375,9 +389,10 @@ Rcpp::RObject HiCFile::fetch_dense(std::string range1, std::string range2,
 
   return std::visit(
       [&](const auto &ff) -> Rcpp::RObject {
-        auto sel = range2.empty() || range1 == range2
-                       ? ff.fetch(range1, hictk::balancing::Method{normalization}, qt)
-                       : ff.fetch(range1, range2, hictk::balancing::Method{normalization}, qt);
+        auto sel = range2.isNull() || range1 == range2
+                       ? ff.fetch(Rcpp::as<std::string>(range1), normalization_method, qt)
+                       : ff.fetch(Rcpp::as<std::string>(range1), Rcpp::as<std::string>(range2),
+                                  normalization_method, qt);
         if (count_type == "int") {
           return fetch_as_matrix<std::int64_t>(std::move(sel));
         }

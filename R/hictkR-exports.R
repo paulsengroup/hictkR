@@ -125,14 +125,6 @@ fetch <-
       stop("query_type should be either \"UCSC\" or \"BED\"")
     }
 
-    if (is.null(range1)) {
-      range1 <- ""
-    }
-
-    if (is.null(range2)) {
-      range1 <- ""
-    }
-
     if (type == "df") {
       return(file$fetch_df(range1, range2, normalization, count_type, join, query_type))
     }
