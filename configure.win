@@ -23,7 +23,7 @@ export UV_CACHE_DIR="$TMPDIR/uv-cache"
 export UV_PYTHON_INSTALL_DIR="$TMPDIR/python-install"
 export UV_NO_MODIFY_PATH=1
 
-export VIRTUAL_ENV="$wd/venv/"
+export VIRTUAL_ENV="$TMPDIR/venv/"
 
 
 # shellcheck disable=SC2064
