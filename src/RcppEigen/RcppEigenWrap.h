@@ -19,8 +19,17 @@
 // You should have received a copy of the GNU General Public License
 // along with RcppEigen.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RcppEigen__RcppEigenWrap__h
-#define RcppEigen__RcppEigenWrap__h
+#pragma once
+
+#include <iterator>
+#include <RcppCommon.h>
+#include <Rconfig.h>
+
+#if __has_include(<eigen3/Eigen/Dense>)
+#include <eigen3/Eigen/Dense>
+#else
+#include <Eigen/Dense>
+#endif
 
 namespace Rcpp{
 
@@ -163,7 +172,7 @@ namespace Rcpp{
         private:
             SEXP object;
         };
-
+        /*
         // Provides only Map::VectorX<t> export
         template<typename T>
         class Exporter<Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1> > > {
@@ -247,6 +256,7 @@ namespace Rcpp{
             }
             OUT get() {return OUT(vec.begin(), d_nrow, d_ncol );}
         } ;
+        */
 
         template <typename T>
         class Exporter<Eigen::Matrix<T, Eigen::Dynamic, 1> >
@@ -292,6 +302,7 @@ namespace Rcpp{
                 MatrixExporterForEigen< Eigen::Array<T, Eigen::Dynamic, Eigen::Dynamic>, T >(x){}
         };
 
+        /*
         // Starting from Eigen 3.3 MappedSparseMatrix was deprecated.
         // The new type is Map<SparseMatrix>.
         template<typename T>
@@ -416,8 +427,7 @@ namespace Rcpp{
             IntegerVector d_dims, d_j, d_p;
             Vector<RTYPE> xx ;
         };
+        */
 
     } // namespace traits
 }
-
-#endif

@@ -19,14 +19,10 @@
 // You should have received a copy of the GNU General Public License
 // along with RcppEigen.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RcppEigen__RcppEigen__h
-#define RcppEigen__RcppEigen__h
+#pragma once
 
-#include <RcppEigenForward.h>
 #include <Rcpp.h>
-#include <RcppEigenWrap.h>
+#include "./RcppEigenWrap.h"
 
 //#include <Eigen/Dense>
 //#include <unsupported/Eigen/SparseExtra> // also includes Eigen/Sparse
-
-#endif

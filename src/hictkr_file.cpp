@@ -4,8 +4,12 @@
 
 #include "./hictkr_file.h"
 
+// clang-format on
 #include <Rcpp.h>
-#include <RcppEigen.h>
+
+#include "./RcppEigen/RcppEigen.h"
+// clang-format off
+
 #include <arrow/c/abi.h>
 #include <arrow/c/bridge.h>
 #include <arrow/table.h>
