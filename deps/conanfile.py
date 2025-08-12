@@ -8,7 +8,13 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import copy, get, rmdir
+from conan.tools.files import (
+    apply_conandata_patches,
+    copy,
+    export_conandata_patches,
+    get,
+    rmdir,
+)
 from conan.tools.scm import Version
 
 required_conan_version = ">=2.0"
@@ -33,7 +39,16 @@ class HictkConan(ConanFile):
                     "url": f"https://github.com/paulsengroup/hictk/archive/refs/tags/v{HictkConan.version}.tar.gz",
                     "sha256": "3a0030425176dacc25c20afc6fedb5dfbbc3c1a67f773be11ac77d7fa6b7efde",
                 },
-            }
+            },
+            "patches": {
+                "2.1.4": [
+                    {
+                        "patch_file": "patches/hictk_v2.1.4_eigen_include.patch",
+                        "patch_type": "portabiliy",
+                        "patch_description": "Support including Eigen headers located under eigen3/",
+                    }
+                ]
+            },
         }
 
     def layout(self):
@@ -58,6 +73,9 @@ class HictkConan(ConanFile):
 
     def package_id(self):
         self.info.clear()
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def validate(self):
         check_min_cppstd(self, 17)
@@ -85,6 +103,8 @@ class HictkConan(ConanFile):
         cmakedeps.generate()
 
     def build(self):
+        apply_conandata_patches(self)
+
         cmake = CMake(self)
         cmake.configure()
         cmake.build()

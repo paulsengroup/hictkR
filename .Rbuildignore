@@ -27,7 +27,7 @@ venv$
 .*\.tar\.gz$
 ^CITATION.cff$
 CMakeLists.txt$
-Makevars$
+^src/Makevars*$
 ^\.RData$
 ^\.clang-format$
 ^\.codespellrc$

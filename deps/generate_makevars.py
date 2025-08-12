@@ -352,6 +352,7 @@ def run_conan_install(
 
     conan_create_opts = default_options + [
         "--build=missing",
+        "--build=hictk/*",
         "--update",
     ]
 
