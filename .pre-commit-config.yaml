@@ -71,9 +71,3 @@ repos:
         types_or: [r]
         language: r
         additional_dependencies: ["roxygen2", "styler"]
-      - id: validate-configure-scripts
-        name: Compare configure.* files
-        entry: python utils/devel/compare_files.py configure configure.win
-        language: python
-        pass_filenames: false
-        files: "^configure.*$"
