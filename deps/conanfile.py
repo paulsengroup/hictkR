@@ -77,7 +77,7 @@ class HictkConan(ConanFile):
         tc.variables["HICTK_ENABLE_TELEMETRY"] = "OFF"
         tc.variables["HICTK_ENABLE_TESTING"] = "OFF"
         tc.variables["HICTK_ENABLE_FUZZY_TESTING"] = "OFF"
-        tc.variables["HICTK_WITH_ARROW"] = "OFF"
+        tc.variables["HICTK_WITH_ARROW"] = "ON"
         tc.variables["HICTK_WITH_EIGEN"] = "ON"
         tc.generate()
 
