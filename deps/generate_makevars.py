@@ -486,7 +486,8 @@ def generate_makevars(
 
     if platform.system() == "Windows":
         # These libraries come with Rtools, and installing them with Conan leads to link errors that are difficult to address
-        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz\n"
+        # -lole32 is used to workaround linker errors complaining about missing __imp_CoTaskMemFree
+        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz -lole32\n"
     else:
         makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))\n"
 
