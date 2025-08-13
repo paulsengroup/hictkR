@@ -5,10 +5,22 @@
 default_language_version:
   python: python3 # Defaults to python2, so override it.
 
+ci:
+  skip:
+    - lintr
+    - style-files
+    - readme-rmd-rendered
+    - parsable-R
+    - no-browser-statement
+    - no-print-statement
+    - no-debug-statement
+    - deps-in-desc
+    - use-tidy-description
+
 exclude: ^tests/data
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -21,8 +33,22 @@ repos:
         args:
           - --fix=lf
       - id: trailing-whitespace
+  - repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.4.3.9013
+    hooks:
+      - id: lintr
+        args: [--warn_only]
+      - id: style-files
+        args: [--cache-root=styler]
+      - id: readme-rmd-rendered
+      - id: parsable-R
+      - id: no-browser-statement
+      - id: no-print-statement
+      - id: no-debug-statement
+      - id: deps-in-desc
+      - id: use-tidy-description
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
   - repo: https://github.com/rhysd/actionlint
@@ -35,7 +61,7 @@ repos:
       - id: codespell
         exclude: (?x)(^src/RcppEigen)
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.18.0
+    rev: v0.18.1
     hooks:
       - id: markdownlint-cli2
   # Formatters should be run late so that they can re-format any prior changes.
@@ -50,26 +76,22 @@ repos:
       - id: isort
         args: ["--profile", "black", "--py", "313"]
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v20.1.4
+    rev: v20.1.8
     hooks:
       - id: clang-format
         types_or: [c, c++]
         exclude: (?x)(^src/RcppEigen)
   - repo: https://github.com/BlankSpruce/gersemi
-    rev: 0.19.3
+    rev: 0.22.1
     hooks:
       - id: gersemi
         exclude: (?x)(^cmake/modules)
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
-    hooks:
-      - id: prettier
-        types_or: [markdown, yaml]
   - repo: local
     hooks:
-      - id: styler
-        name: styler
-        entry: Rscript utils/devel/run_styler
-        types_or: [r]
-        language: r
-        additional_dependencies: ["roxygen2", "styler"]
+      - id: prettier
+        name: prettier
+        entry: prettier
+        language: node
+        additional_dependencies: [prettier@3.6.2]
+        types_or: [json, markdown, yaml]
+        args: ["--write", "--ignore-unknown"]

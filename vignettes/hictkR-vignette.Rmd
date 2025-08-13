@@ -25,8 +25,8 @@ hictkR supports opening .hic and .cool files using the `File()` function.
 When opening files in .hic format, `resolution` is a mandatory parameter.
 
 ```{r}
-path <- system.file("extdata", "interactions.hic", package="hictkR")
-f <- File(path, resolution=100000)
+path <- system.file("extdata", "interactions.hic", package = "hictkR")
+f <- File(path, resolution = 100000)
 ```
 
 hictkR file handles returned by `File()` provide several attributes storing static properties of the opened file
@@ -36,11 +36,12 @@ path <- f$path
 resolution <- as.integer(f$resolution)
 
 paste("File \"",
-      basename(path),
-      "\" has the following resolution: ",
-      resolution,
-      "bp",
-      sep="")
+  basename(path),
+  "\" has the following resolution: ",
+  resolution,
+  "bp",
+  sep = ""
+)
 ```
 
 __File "`r basename(path)`" has the following resolution: `r resolution` bp__
@@ -58,22 +59,22 @@ normalizations <- f$normalizations
 
 ```{r, echo=FALSE}
 chroms_ <- t(chroms)
-knitr::kable(chroms_, format="html", caption="Chromosomes")
+knitr::kable(chroms_, format = "html", caption = "Chromosomes")
 ```
 
 ```{r, echo=FALSE}
 bins_ <- head(bins)
 
 bins_[] <- lapply(bins_, as.character)
-bins_[nrow(bins_) + 1,] <- "..."
+bins_[nrow(bins_) + 1, ] <- "..."
 
-knitr::kable(t(bins_), format="html", caption="Bin table", col.names=NULL)
+knitr::kable(t(bins_), format = "html", caption = "Bin table", col.names = NULL)
 ```
 
 
 ```{r, echo=FALSE}
 normalizations_ <- t(normalizations)
-knitr::kable(normalizations_, format="html", caption="Normalizations", col.names=NULL)
+knitr::kable(normalizations_, format = "html", caption = "Normalizations", col.names = NULL)
 ```
 
 ## Fetching interactions
@@ -83,21 +84,21 @@ hictkR support fetching interactions through the `fetch()` function.
 #### Fetch genome-wide interactions with genomic coordinates
 
 ```{r, results="hide", eval=FALSE}
-fetch(f, join=TRUE)
+fetch(f, join = TRUE)
 ```
 ```{r, echo=FALSE}
-df <- head(fetch(f, join=TRUE))
-knitr::kable(df, format="html", format.args=list(scientific=FALSE))
+df <- head(fetch(f, join = TRUE))
+knitr::kable(df, format = "html", format.args = list(scientific = FALSE))
 ```
 
 Interactions can also be normalized using one of the available normalization methods (see `f$normalizations`).
 
 ```{r, results="hide", eval=FALSE}
-fetch(f, join=TRUE, normalization="ICE")
+fetch(f, join = TRUE, normalization = "ICE")
 ```
 ```{r, echo=FALSE}
-df <- head(fetch(f, join=TRUE, normalization="ICE"))
-knitr::kable(df, format="html", format.args=list(scientific=FALSE))
+df <- head(fetch(f, join = TRUE, normalization = "ICE"))
+knitr::kable(df, format = "html", format.args = list(scientific = FALSE))
 ```
 
 #### Fetch interactions for a region of interest
@@ -107,22 +108,23 @@ hictkR can be instructed to fetch interactions for a region of interest.
 This is much more efficient than fetching genome-wide interactions and then filtering interactions using R.
 
 ```{r, results="hide", eval=FALSE}
-fetch(f, "chr2L", join=TRUE)
+fetch(f, "chr2L", join = TRUE)
 ```
 ```{r, echo=FALSE}
-df <- head(fetch(f, "chr2L", join=TRUE))
-knitr::kable(df, format="html", format.args=list(scientific=FALSE))
+df <- head(fetch(f, "chr2L", join = TRUE))
+knitr::kable(df, format = "html", format.args = list(scientific = FALSE))
 ```
 
 ```{r, results="hide", eval=FALSE}
 fetch(f,
-      "chr2L:0-10,000,000",
-      "chr3R:10,000,000-20,000,000",
-      join=TRUE)
+  "chr2L:0-10,000,000",
+  "chr3R:10,000,000-20,000,000",
+  join = TRUE
+)
 ```
 ```{r, echo=FALSE}
-df <- head(fetch(f, "chr2L:0-10,000,000", "chr3R:10,000,000-20,000,000", join=TRUE))
-knitr::kable(df, format="html", format.args=list(scientific=FALSE))
+df <- head(fetch(f, "chr2L:0-10,000,000", "chr3R:10,000,000-20,000,000", join = TRUE))
+knitr::kable(df, format = "html", format.args = list(scientific = FALSE))
 ```
 
 #### Fetch interactions as a dense matrix
@@ -131,14 +133,15 @@ hictkR can return interactions as a `Matrix` when specifying `type="dense"`.
 
 ```{r}
 fetch(f,
-      "chr2L:0-1,000,000",
-      "chr3R:1,000,000-2,000,000",
-      type="dense")
+  "chr2L:0-1,000,000",
+  "chr3R:1,000,000-2,000,000",
+  type = "dense"
+)
 ```
 
 This can be very useful to visualize interaction matrices as heatmaps.
 
 ```{r, show_figure, fig.width = 7.5, fig.height = 7.5}
-m <- fetch(f, "chr3R:0-20,000,000", normalization="ICE", type="dense")
-image(log(m), axes=FALSE)
+m <- fetch(f, "chr3R:0-20,000,000", normalization = "ICE", type = "dense")
+image(log(m), axes = FALSE)
 ```
