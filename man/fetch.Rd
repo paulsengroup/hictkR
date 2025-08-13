@@ -6,8 +6,8 @@
 \usage{
 fetch(
   file,
-  range1 = "",
-  range2 = "",
+  range1 = NULL,
+  range2 = NULL,
   normalization = "NONE",
   count_type = "int",
   join = FALSE,
@@ -50,18 +50,23 @@ Fetch interactions from a File object
 }
 \examples{
 \dontrun{
-f <- File("interactions.hic",
-          1000000)
-fetch(f)                             # Fetch genome-wide interactions
-fetch(f, "chr2L")                    # Fetch interactions overlapping a symmetric query
+f <- File(
+  "interactions.hic",
+  1000000
+)
+fetch(f) # Fetch genome-wide interactions
+fetch(f, "chr2L") # Fetch interactions overlapping a symmetric query
+fetch(
+  f,
+  "chr2L:0-10,000,000",
+  "chr3L:10,000,000-20,000,000"
+) # Fetch interactions overlapping an asymmetric query
+fetch(f, normalization = "ICE") # Fetch ICE-normalized interactions
+fetch(f, join = TRUE) # Fetch interactions together with their genomic coordinates
 fetch(f,
-      "chr2L:0-10,000,000",
-      "chr3L:10,000,000-20,000,000") # Fetch interactions overlapping an asymmetric query
-fetch(f, normalization="ICE")        # Fetch ICE-normalized interactions
-fetch(f, join=TRUE)                  # Fetch interactions together with their genomic coordinates
-fetch(f,
-      "chr1\t0\t10000000",
-      query_type="BED")              # Fetch interactions given a query in BED format
-fetch(f, type="dense")               # Fetch interactions in dense format (i.e. as a Matrix)
+  "chr1\t0\t10000000",
+  query_type = "BED"
+) # Fetch interactions given a query in BED format
+fetch(f, type = "dense") # Fetch interactions in dense format (i.e. as a Matrix)
 }
 }

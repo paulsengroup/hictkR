@@ -13,18 +13,13 @@ wd="$PWD"
 export TMPDIR="$wd/tmp/"
 mkdir -p "$TMPDIR"
 
-UV_VERSION='0.8.5'
-export UV_INSTALLER_URL="https://astral.sh/uv/$UV_VERSION/install.sh"
-export UV_INSTALLER_SHA256='8e6284da8ff65d4c1d9d978eeb8fc905462eeba7b7e6e55a4c12ecb0412965d9'
-export UV_INSTALLER_DEST="$TMPDIR/install.sh"
-
-export UV_INSTALL_DIR="$TMPDIR/uv-install"
-export UV_CACHE_DIR="$TMPDIR/uv-cache"
-export UV_PYTHON_INSTALL_DIR="$TMPDIR/python-install"
-export UV_NO_MODIFY_PATH=1
-
-export VIRTUAL_ENV="$TMPDIR/venv/"
-
+# The version of b2 built by Conan is not suitable for use with the toolchain shipped as part of Rtools,
+# so we have to manually build b2 and tell Conan to use this version instead of the built by Conan.
+B2_VERSION='5.3.3'
+export B2_TAR_URL="https://github.com/bfgroup/b2/releases/download/$B2_VERSION/b2-$B2_VERSION.tar.bz2"
+export B2_TAR_SHA256='7eb278af94c3800d2369e7e6fdce733cd39736808c5bc0cec5c51a34339f8fcb'
+# shellcheck disable=SC2155
+export B2_TAR_DEST="$TMPDIR/$(basename "$B2_TAR_URL")"
 
 # shellcheck disable=SC2064
 trap "rm -rf '$TMPDIR' && cd '$PWD'" EXIT
@@ -37,66 +32,52 @@ else
 fi
 set -u
 
-cat << EOF > "$TMPDIR/download-uv.R"
+cat << EOF > "$TMPDIR/download-b2.R"
 #!/usr/bin/env Rscript
 
-install_script <- Sys.getenv("UV_INSTALLER_DEST")
-
 download.file(
-  Sys.getenv("UV_INSTALLER_URL"),
-  dest=Sys.getenv("UV_INSTALLER_DEST"),
+  Sys.getenv("B2_TAR_URL"),
+  dest=Sys.getenv("B2_TAR_DEST"),
   mode="wb"
 )
 EOF
 
-"$Rscript" "$TMPDIR/download-uv.R"
+"$Rscript" "$TMPDIR/download-b2.R"
 
 if command -v sha256sum >/dev/null 2>&1; then
-  checksum="$(sha256sum "$UV_INSTALLER_DEST")"
+  checksum="$(sha256sum "$B2_TAR_DEST")"
 elif command -v shasum >/dev/null 2>&1; then
-  checksum="$(shasum -a 256 "$UV_INSTALLER_DEST")"
+  checksum="$(shasum -a256 "$B2_TAR_DEST")"
 elif command -v openssl >/dev/null 2>&1; then
-  checksum="$(openssl dgst -sha256 "$UV_INSTALLER_DEST")"
+  checksum="$(openssl dgst -sha256 "$B2_TAR_DEST")"
 else
   1>&2 echo "Error: Cannot find a command to compute SHA-256 checksums."
-  1>&2 echo "Skipping uv checksum!!"
-  checksum="$UV_INSTALLER_SHA256"
+  1>&2 echo "Skipping $(basename "$B2_TAR_URL") checksum!!"
+  checksum="$B2_TAR_SHA256"
 fi
 
 checksum="$(echo "$checksum" | cut -f 1 -d ' ')"
-if [ "$checksum" != "$UV_INSTALLER_SHA256" ]; then
-  1>&2 echo "FAILURE: Checksum verification for uv's install script failed!"
+
+if [ "$checksum" != "$B2_TAR_SHA256" ]; then
+  1>&2 echo "FAILURE: Checksum verification for $(basename "$B2_TAR_URL") file failed!"
   exit 1
 fi
 
-sh "$UV_INSTALLER_DEST"
+B2_WD="$TMPDIR/b2"
+mkdir -p "$B2_WD"
 
-PATH="$UV_INSTALL_DIR:$PATH"
+tar -C "$B2_WD" --strip-components=1 -xf "$B2_TAR_DEST"
 
-uv venv \
-  --python 3.13 \
-  --link-mode=copy \
-  "$VIRTUAL_ENV"
+cd "$B2_WD"
+./bootstrap.sh gcc
+mkdir b2-install
+./b2 install --prefix="$TMPDIR/b2-install" --toolset=gcc
+PATH="$PATH:$TMPDIR/b2-install/"
 
-uv pip install 'conan>=2.15,<3' 'cmake>=3.25,<4'
+cd "$wd"
+rm -rf "$B2_WD"
 
+which b2
+b2 --version
 
-if [ -d "$VIRTUAL_ENV/bin" ]; then
-  PATH="$VIRTUAL_ENV/bin/:$PATH"
-elif [ -d "$VIRTUAL_ENV/Scripts" ]; then
-  PATH="$VIRTUAL_ENV/Scripts/:$PATH"
-else
-  1>&2 echo "FAILURE: unable to add venv bin folder to PATH!"
-  exit 1
-fi
-
-which conan
-conan --version
-
-set +u
-if [ -z "$HICTKR_CONAN_HOME" ]; then
-  export HICTKR_CONAN_HOME="$wd/conan-staging/.conan2"
-fi
-set -u
-
-python "$(dirname "$0")/deps/generate_makevars.py" --no-venv --workdir "$(dirname "$0")"
+"$(dirname "$0")/configure"

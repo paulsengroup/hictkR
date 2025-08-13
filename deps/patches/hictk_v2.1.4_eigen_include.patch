@@ -1,0 +1,68 @@
+diff --git a/src/libhictk/transformers/include/hictk/transformers/impl/to_dense_matrix_impl.hpp b/src/libhictk/transformers/include/hictk/transformers/impl/to_dense_matrix_impl.hpp
+index 042d8eb1..1445fab6 100644
+--- a/src/libhictk/transformers/include/hictk/transformers/impl/to_dense_matrix_impl.hpp
++++ b/src/libhictk/transformers/include/hictk/transformers/impl/to_dense_matrix_impl.hpp
+@@ -4,7 +4,12 @@
+
+ #pragma once
+
++#if __has_include(<eigen3/Eigen/Dense>)
++#include <eigen3/Eigen/Dense>
++#else
+ #include <Eigen/Dense>
++#endif
++
+ #include <algorithm>
+ #include <cassert>
+ #include <cstdint>
+diff --git a/src/libhictk/transformers/include/hictk/transformers/impl/to_sparse_matrix_impl.hpp b/src/libhictk/transformers/include/hictk/transformers/impl/to_sparse_matrix_impl.hpp
+index 98d961c7..032ab4dd 100644
+--- a/src/libhictk/transformers/include/hictk/transformers/impl/to_sparse_matrix_impl.hpp
++++ b/src/libhictk/transformers/include/hictk/transformers/impl/to_sparse_matrix_impl.hpp
+@@ -6,7 +6,12 @@
+
+ #include <spdlog/spdlog.h>
+
++#if __has_include(<eigen3/Eigen/SparseCore>)
++#include <eigen3/Eigen/SparseCore>
++#else
+ #include <Eigen/SparseCore>
++#endif
++
+ #include <algorithm>
+ #include <cassert>
+ #include <cstdint>
+diff --git a/src/libhictk/transformers/include/hictk/transformers/to_dense_matrix.hpp b/src/libhictk/transformers/include/hictk/transformers/to_dense_matrix.hpp
+index 498ecfea..7879be49 100644
+--- a/src/libhictk/transformers/include/hictk/transformers/to_dense_matrix.hpp
++++ b/src/libhictk/transformers/include/hictk/transformers/to_dense_matrix.hpp
+@@ -6,7 +6,12 @@
+
+ #ifdef HICTK_WITH_EIGEN
+
++#if __has_include(<eigen3/Eigen/Dense>)
++#include <eigen3/Eigen/Dense>
++#else
+ #include <Eigen/Dense>
++#endif
++
+ #include <cstdint>
+ #include <memory>
+ #include <optional>
+diff --git a/src/libhictk/transformers/include/hictk/transformers/to_sparse_matrix.hpp b/src/libhictk/transformers/include/hictk/transformers/to_sparse_matrix.hpp
+index afe0b849..dcd4483a 100644
+--- a/src/libhictk/transformers/include/hictk/transformers/to_sparse_matrix.hpp
++++ b/src/libhictk/transformers/include/hictk/transformers/to_sparse_matrix.hpp
+@@ -6,7 +6,12 @@
+
+ #ifdef HICTK_WITH_EIGEN
+
++#if __has_include(<eigen3/Eigen/SparseCore>)
++#include <eigen3/Eigen/SparseCore>
++#else
+ #include <Eigen/SparseCore>
++#endif
++
+ #include <cstdint>
+ #include <memory>
+ #include <optional>

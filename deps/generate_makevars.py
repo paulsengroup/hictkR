@@ -156,11 +156,29 @@ def get_cc_version(cc) -> str:
 
 
 def get_cmake_version(env: EnvDict) -> str:
-    res = sp.check_output(["cmake", "--version"], env=env).decode("utf-8")
-    matches = re.search(r"(\d+\.\d+.\d+)", res)
+    if platform.system() == "Windows":
+        res = sp.check_output(["cmake.exe", "--version"], env=env).decode("utf-8")
+    else:
+        res = sp.check_output(["cmake", "--version"], env=env).decode("utf-8")
+
+    matches = re.search(r"^cmake version (\d+\.\d+\.\d+)", res.partition("\n")[0])
 
     if not matches:
         raise RuntimeError("Unable to infer cmake version")
+
+    return matches.group(1)
+
+
+def get_b2_version(env: EnvDict) -> str:
+    if platform.system() == "Windows":
+        res = sp.check_output(["b2.exe", "--version"], env=env).decode("utf-8")
+    else:
+        res = sp.check_output(["b2", "--version"], env=env).decode("utf-8")
+
+    matches = re.search(r"^B2 (\d+\.\d+\.\d+).*$", res.partition("\n")[0])
+
+    if not matches:
+        raise RuntimeError("Unable to infer b2 version")
 
     return matches.group(1)
 
@@ -178,8 +196,17 @@ def compile_and_check_output(source: str, tmpdir: pathlib.Path) -> str:
     try:
         src_file.write_text(source)
 
-        cmd = [find_cxx(), src_file, "-o", test_program, "-std=c++17", "-O0"]
-        res = sp.check_output(cmd)
+        cmd = [
+            find_cxx(),
+            src_file,
+            "-o",
+            test_program,
+            "-std=c++17",
+            "-O0",
+        ]
+        sp.check_call(cmd)
+
+        res = sp.check_output(test_program)
 
         return res.decode("utf-8")
 
@@ -189,7 +216,7 @@ def compile_and_check_output(source: str, tmpdir: pathlib.Path) -> str:
 
 
 def detect_hdf5_version(tmpdir: pathlib.Path) -> str:
-    compile_and_check_output(
+    res = compile_and_check_output(
         source=textwrap.dedent(
             """
             #include <H5public.h>
@@ -205,9 +232,12 @@ def detect_hdf5_version(tmpdir: pathlib.Path) -> str:
         tmpdir=tmpdir,
     )
 
+    assert res != ""
+    return res
+
 
 def detect_zlib_version(tmpdir: pathlib.Path) -> str:
-    compile_and_check_output(
+    res = compile_and_check_output(
         source=textwrap.dedent(
             """
             #include <cstdio>
@@ -222,16 +252,21 @@ def detect_zlib_version(tmpdir: pathlib.Path) -> str:
         ),
         tmpdir=tmpdir,
     )
+    assert res != ""
+    return res
 
 
 def run_conan_profile_detect_windows(tmpdir: pathlib.Path, env: EnvDict):
     assert platform.system() == "Windows"
 
-    env["PATH"] = str(get_path_as_r())
+    env = env.copy()
+    env["PATH"] = str(get_path_as_r()) + ";" + env["PATH"]
 
     arch = get_arch()
     cc_version = get_cc_version(env["CC"])
     cmake_version = get_cmake_version(env)
+    b2_version = get_b2_version(env)
+    path = env["PATH"]
 
     # HDF5 and zlib come with Rtools, and using the version from Conan causes
     # weird link errors that are difficult to address.
@@ -245,15 +280,16 @@ def run_conan_profile_detect_windows(tmpdir: pathlib.Path, env: EnvDict):
         f"compiler.version={cc_version}",
         "os=Windows",
         "[buildenv]",
-        "PATH='" + env["PATH"] + "'",
+        f"PATH='{path}'",
         "[platform_requires]",
         f"hdf5/{detect_hdf5_version(tmpdir)}",
-        f"zlib/{detect_zlib_version(tmpdir)}",
+        # f"zlib/{detect_zlib_version(tmpdir)}",
         "[platform_tool_requires]",
+        f"b2/{b2_version}",
         f"cmake/{cmake_version}",
         "[replace_requires]",
         f"hdf5/*: hdf5/{detect_hdf5_version(tmpdir)}",
-        f"zlib/*: zlib/{detect_zlib_version(tmpdir)}",
+        # f"zlib/*: zlib/{detect_zlib_version(tmpdir)}",
     ]
 
     conan_profile = pathlib.Path(env.get("CONAN_HOME")) / "profiles" / "hictkR"
@@ -311,10 +347,29 @@ def run_conan_install(
         "--settings=compiler.cppstd=17",
     ]
 
+    if platform.system() != "Darwin":
+        default_options.append("--settings=compiler.libcxx=libstdc++11")
+
     conan_create_opts = default_options + [
         "--build=missing",
+        "--build=hictk/*",
         "--update",
     ]
+
+    if platform.system() == "Windows":
+        sp.check_call(
+            [
+                "conan",
+                "install",
+                "--profile:all=hictkR",
+                "--settings=os=Linux",
+                "--requires=b2/5.3.3",
+                "--build=b2",
+                "--options=b2/*:toolset=gcc",
+            ],
+            stdout=sys.stderr,
+            env=env,
+        )
 
     conan_install_opts = default_options + [
         f"--requires=hictk/{extract_hictk_version(conanfile)}",
@@ -431,10 +486,10 @@ def generate_makevars(
 
     if platform.system() == "Windows":
         # These libraries come with Rtools, and installing them with Conan leads to link errors that are difficult to address
-        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz\n"
+        # -lole32 is used to workaround linker errors complaining about missing __imp_CoTaskMemFree
+        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz -lole32\n"
     else:
         makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))\n"
-
 
     dest.write_text(makevars, newline="\n")
 
@@ -501,6 +556,7 @@ def main():
         return
 
     with tempfile.TemporaryDirectory() as tmpdir:
+        logging.info("Using %s as tmpdir", tmpdir)
         tmpdir = pathlib.Path(tmpdir)
         if args.no_venv:
             logging.info("skipping venv creation...")

@@ -40,8 +40,6 @@ set -u
 cat << EOF > "$TMPDIR/download-uv.R"
 #!/usr/bin/env Rscript
 
-install_script <- Sys.getenv("UV_INSTALLER_DEST")
-
 download.file(
   Sys.getenv("UV_INSTALLER_URL"),
   dest=Sys.getenv("UV_INSTALLER_DEST"),

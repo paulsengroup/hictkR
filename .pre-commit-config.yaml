@@ -33,6 +33,7 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
+        exclude: (?x)(^src/RcppEigen)
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.18.1
     hooks:
@@ -53,6 +54,7 @@ repos:
     hooks:
       - id: clang-format
         types_or: [c, c++]
+        exclude: (?x)(^src/RcppEigen)
   - repo: https://github.com/BlankSpruce/gersemi
     rev: 0.22.1
     hooks:
@@ -73,9 +75,3 @@ repos:
         types_or: [r]
         language: r
         additional_dependencies: ["roxygen2", "styler"]
-      - id: validate-configure-scripts
-        name: Compare configure.* files
-        entry: python utils/devel/compare_files.py configure configure.win
-        language: python
-        pass_filenames: false
-        files: "^configure.*$"

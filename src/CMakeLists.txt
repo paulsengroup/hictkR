@@ -3,7 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 find_package(Rcpp REQUIRED)
+find_package(RcppEigen REQUIRED)
 find_package(hictk REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(Arrow REQUIRED)
 
 add_library(hictkR)
 target_sources(
@@ -18,7 +21,10 @@ target_sources(
 
 target_link_libraries(
   hictkR
-  PUBLIC
+  PRIVATE
+    Arrow::arrow_static
+    Eigen3::Eigen
     hictk::libhictk
     rcpp
+    rcpp_eigen
 )

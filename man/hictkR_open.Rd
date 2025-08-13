@@ -26,8 +26,8 @@ Open files in .cool, .mcool, .scool, and .hic format
 hictkR_open("interactions.cool")
 hictkR_open("interactions.mcool")
 hictkR_open("interactions.scool")
-hictkR_open("interactions.mcool", resolution=10000)
-hictkR_open("interactions.hic", resolution=10000)
-hictkR_open("interactions.scool", cell="id_0001")
+hictkR_open("interactions.mcool", resolution = 10000)
+hictkR_open("interactions.hic", resolution = 10000)
+hictkR_open("interactions.scool", cell = "id_0001")
 }
 }
