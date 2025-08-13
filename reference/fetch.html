@@ -44,8 +44,8 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fetch</span><span class="op">(</span></span>
 <span>  <span class="va">file</span>,</span>
-<span>  range1 <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  range2 <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  range1 <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  range2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  normalization <span class="op">=</span> <span class="st">"NONE"</span>,</span>
 <span>  count_type <span class="op">=</span> <span class="st">"int"</span>,</span>
 <span>  join <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -108,19 +108,24 @@ Supported formats: "df", "dense".</p></dd>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="File.html">File</a></span><span class="op">(</span><span class="st">"interactions.hic"</span>,</span></span>
-<span class="r-in"><span>          <span class="fl">1000000</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span><span class="op">)</span>                             <span class="co"># Fetch genome-wide interactions</span></span></span>
-<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, <span class="st">"chr2L"</span><span class="op">)</span>                    <span class="co"># Fetch interactions overlapping a symmetric query</span></span></span>
+<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="File.html">File</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"interactions.hic"</span>,</span></span>
+<span class="r-in"><span>  <span class="fl">1000000</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="co"># Fetch genome-wide interactions</span></span></span>
+<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, <span class="st">"chr2L"</span><span class="op">)</span> <span class="co"># Fetch interactions overlapping a symmetric query</span></span></span>
+<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">f</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"chr2L:0-10,000,000"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"chr3L:10,000,000-20,000,000"</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="co"># Fetch interactions overlapping an asymmetric query</span></span></span>
+<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, normalization <span class="op">=</span> <span class="st">"ICE"</span><span class="op">)</span> <span class="co"># Fetch ICE-normalized interactions</span></span></span>
+<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, join <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># Fetch interactions together with their genomic coordinates</span></span></span>
 <span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"chr2L:0-10,000,000"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"chr3L:10,000,000-20,000,000"</span><span class="op">)</span> <span class="co"># Fetch interactions overlapping an asymmetric query</span></span></span>
-<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, normalization<span class="op">=</span><span class="st">"ICE"</span><span class="op">)</span>        <span class="co"># Fetch ICE-normalized interactions</span></span></span>
-<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, join<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>                  <span class="co"># Fetch interactions together with their genomic coordinates</span></span></span>
-<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"chr1\t0\t10000000"</span>,</span></span>
-<span class="r-in"><span>      query_type<span class="op">=</span><span class="st">"BED"</span><span class="op">)</span>              <span class="co"># Fetch interactions given a query in BED format</span></span></span>
-<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, type<span class="op">=</span><span class="st">"dense"</span><span class="op">)</span>               <span class="co"># Fetch interactions in dense format (i.e. as a Matrix)</span></span></span>
+<span class="r-in"><span>  <span class="st">"chr1\t0\t10000000"</span>,</span></span>
+<span class="r-in"><span>  query_type <span class="op">=</span> <span class="st">"BED"</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="co"># Fetch interactions given a query in BED format</span></span></span>
+<span class="r-in"><span><span class="fu">fetch</span><span class="op">(</span><span class="va">f</span>, type <span class="op">=</span> <span class="st">"dense"</span><span class="op">)</span> <span class="co"># Fetch interactions in dense format (i.e. as a Matrix)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
