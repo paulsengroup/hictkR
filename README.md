@@ -25,12 +25,7 @@ Installing hictkR requires a compiler toolchain supporting C++17, such as:
 
 On Windows a suitable compiler toolchain can be installed using [Rtools](https://cran.r-project.org/bin/windows/Rtools/).
 
-Furthermore, the following tools are required:
-
-- CMake 3.25+
-- Conan 2+
-
-Once all the build dependencies have been installed, the package can be installed as follows (note that this may require some time, as this involves the compilation of several packages):
+To install `hictkR` run the following command inside an `R` prompt:
 
 ```r
 install.packages("devtools")
