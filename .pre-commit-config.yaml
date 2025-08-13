@@ -5,6 +5,18 @@
 default_language_version:
   python: python3 # Defaults to python2, so override it.
 
+ci:
+  skip:
+    - lintr
+    - style-files
+    - readme-rmd-rendered
+    - parsable-R
+    - no-browser-statement
+    - no-print-statement
+    - no-debug-statement
+    - deps-in-desc
+    - use-tidy-description
+
 exclude: ^tests/data
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
