@@ -9,7 +9,7 @@ File(path, resolution = NULL, matrix_type = "observed", matrix_unit = "BP")
 \arguments{
 \item{path}{path to the file to be opened (Cooler URI syntax is supported).}
 
-\item{resolution}{matrix resolution. Required when file is in .hic format.}
+\item{resolution}{matrix resolution. Required when file is multi-resolution (e.g., .hic or .mcool).}
 
 \item{matrix_type}{type of the matrix to be opened. Should be one of "observed", "oe" or "expected".}
 

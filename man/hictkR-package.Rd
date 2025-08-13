@@ -4,15 +4,15 @@
 \name{hictkR-package}
 \alias{hictkR}
 \alias{hictkR-package}
-\title{hictkR: R bindings for hictk}
+\title{hictkR: R bindings for 'hictk': read .cool and .hic files directly from R}
 \description{
-This package provides R binding for hictk: a blazing fast toolkit to work with .hic and .cool files
+R bindings for 'hictk': a blazing fast toolkit to work with '.hic' and '.cool' files
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/paulsengroup/hictkR}
-  \item \url{https://paulsengroup.github.io/hictkR}
+  \item \url{https://paulsengroup.github.io/hictkR/}
   \item Report bugs at \url{https://github.com/paulsengroup/hictkR/issues}
 }
 

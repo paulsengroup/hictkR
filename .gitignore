@@ -19,6 +19,7 @@ venv/
 *.bak
 *.html
 *.tar.*
+Makevars
 gmon.out
 perf.*
 *.o

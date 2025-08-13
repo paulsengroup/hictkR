@@ -8,7 +8,13 @@ from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import copy, get, rmdir
+from conan.tools.files import (
+    apply_conandata_patches,
+    copy,
+    export_conandata_patches,
+    get,
+    rmdir,
+)
 from conan.tools.scm import Version
 
 required_conan_version = ">=2.0"
@@ -33,15 +39,24 @@ class HictkConan(ConanFile):
                     "url": f"https://github.com/paulsengroup/hictk/archive/refs/tags/v{HictkConan.version}.tar.gz",
                     "sha256": "3a0030425176dacc25c20afc6fedb5dfbbc3c1a67f773be11ac77d7fa6b7efde",
                 },
-            }
+            },
+            "patches": {
+                "2.1.4": [
+                    {
+                        "patch_file": "patches/hictk_v2.1.4_eigen_include.patch",
+                        "patch_type": "portabiliy",
+                        "patch_description": "Support including Eigen headers located under eigen3/",
+                    }
+                ]
+            },
         }
 
     def layout(self):
         cmake_layout(self, src_folder="src")
 
     def requirements(self):
-        # self.requires("arrow/19.0.1#f6937fd566ecbec1eab37b40e292dfec")
-        # self.requires("boost/1.87.0#0c087f18c4e6487235dd10480613cbb5", force=True)
+        self.requires("arrow/21.0.0#228b4b648a5100809cd7d17451d87233")
+        self.requires("boost/1.88.0#14ecfc01dd5a690f15e1318e56a6b78c", force=True)  # required by arrow
         self.requires("bshoshany-thread-pool/5.0.0#d94da300363f0c35b8f41b2c5490c94d")
         self.requires("concurrentqueue/1.0.4#1e48e1c712bcfd892087c9c622a51502")
         self.requires("eigen/3.4.0#2e192482a8acff96fe34766adca2b24c")
@@ -58,6 +73,9 @@ class HictkConan(ConanFile):
 
     def package_id(self):
         self.info.clear()
+
+    def export_sources(self):
+        export_conandata_patches(self)
 
     def validate(self):
         check_min_cppstd(self, 17)
@@ -77,7 +95,7 @@ class HictkConan(ConanFile):
         tc.variables["HICTK_ENABLE_TELEMETRY"] = "OFF"
         tc.variables["HICTK_ENABLE_TESTING"] = "OFF"
         tc.variables["HICTK_ENABLE_FUZZY_TESTING"] = "OFF"
-        tc.variables["HICTK_WITH_ARROW"] = "OFF"
+        tc.variables["HICTK_WITH_ARROW"] = "ON"
         tc.variables["HICTK_WITH_EIGEN"] = "ON"
         tc.generate()
 
@@ -85,6 +103,8 @@ class HictkConan(ConanFile):
         cmakedeps.generate()
 
     def build(self):
+        apply_conandata_patches(self)
+
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
@@ -108,10 +128,60 @@ class HictkConan(ConanFile):
         self.cpp_info.set_property("cmake_file_name", "hictk")
         self.cpp_info.set_property("cmake_target_name", "hictk::libhictk")
 
-        # self.cpp_info.defines.append("HICTK_WITH_ARROW")
+        self.cpp_info.defines.append("HICTK_WITH_ARROW")
         self.cpp_info.defines.append("HICTK_WITH_EIGEN")
 
     def configure(self):
+        self.options["arrow"].compute = True
+        self.options["arrow"].filesystem_layer = False
+        self.options["arrow"].parquet = False
+        self.options["arrow"].with_boost = True
+        self.options["arrow"].with_re2 = True
+        self.options["arrow"].with_thrift = False
+        self.options["boost"].system_no_deprecated = True
+        self.options["boost"].asio_no_deprecated = True
+        self.options["boost"].filesystem_no_deprecated = True
+        self.options["boost"].filesystem_version = 4
+        self.options["boost"].zlib = False
+        self.options["boost"].bzip2 = False
+        self.options["boost"].lzma = False
+        self.options["boost"].zstd = False
+        self.options["boost"].without_atomic = False
+        self.options["boost"].without_charconv = True
+        self.options["boost"].without_chrono = True
+        self.options["boost"].without_cobalt = True
+        self.options["boost"].without_container = True
+        self.options["boost"].without_context = False
+        self.options["boost"].without_contract = True
+        self.options["boost"].without_coroutine = True
+        # without_date_time is set to False to workaround https://github.com/conan-io/conan-center-index/issues/26890
+        self.options["boost"].without_date_time = False
+        self.options["boost"].without_exception = True
+        self.options["boost"].without_fiber = True
+        self.options["boost"].without_filesystem = False
+        self.options["boost"].without_graph = True
+        self.options["boost"].without_graph_parallel = True
+        self.options["boost"].without_iostreams = True
+        self.options["boost"].without_json = True
+        self.options["boost"].without_locale = True
+        self.options["boost"].without_log = True
+        self.options["boost"].without_math = True
+        self.options["boost"].without_mpi = True
+        self.options["boost"].without_nowide = True
+        self.options["boost"].without_process = True
+        self.options["boost"].without_program_options = True
+        self.options["boost"].without_python = True
+        self.options["boost"].without_random = True
+        self.options["boost"].without_regex = True
+        self.options["boost"].without_serialization = True
+        self.options["boost"].without_stacktrace = True
+        self.options["boost"].without_system = False
+        self.options["boost"].without_test = True
+        self.options["boost"].without_thread = True
+        self.options["boost"].without_timer = True
+        self.options["boost"].without_type_erasure = True
+        self.options["boost"].without_url = True
+        self.options["boost"].without_wave = True
         self.options["fmt"].header_only = True
         self.options["hdf5"].enable_cxx = False
         self.options["hdf5"].hl = False

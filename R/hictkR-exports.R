@@ -110,8 +110,8 @@ SingleCellFile <- function(path) {
 #' }
 fetch <-
   function(file,
-           range1 = "",
-           range2 = "",
+           range1 = NULL,
+           range2 = NULL,
            normalization = "NONE",
            count_type = "int",
            join = FALSE,
