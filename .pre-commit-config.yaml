@@ -21,6 +21,20 @@ repos:
         args:
           - --fix=lf
       - id: trailing-whitespace
+  - repo: https://github.com/lorenzwalthert/precommit
+    rev: v0.4.3.9013
+    hooks:
+      - id: lintr
+        args: [--warn_only]
+      - id: style-files
+        args: [--cache-root=styler]
+      - id: readme-rmd-rendered
+      - id: parsable-R
+      - id: no-browser-statement
+      - id: no-print-statement
+      - id: no-debug-statement
+      - id: deps-in-desc
+      - id: use-tidy-description
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
     hooks:
@@ -69,9 +83,3 @@ repos:
         additional_dependencies: [prettier@3.6.2]
         types_or: [json, markdown, yaml]
         args: ["--write", "--ignore-unknown"]
-      - id: styler
-        name: styler
-        entry: Rscript utils/devel/run_styler
-        types_or: [r]
-        language: r
-        additional_dependencies: ["roxygen2", "styler"]
