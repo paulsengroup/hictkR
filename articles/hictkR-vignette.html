@@ -74,8 +74,8 @@
 <p>When opening files in .hic format, <code>resolution</code> is a
 mandatory parameter.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"interactions.hic"</span>, package<span class="op">=</span><span class="st">"hictkR"</span><span class="op">)</span></span>
-<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/File.html">File</a></span><span class="op">(</span><span class="va">path</span>, resolution<span class="op">=</span><span class="fl">100000</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"interactions.hic"</span>, package <span class="op">=</span> <span class="st">"hictkR"</span><span class="op">)</span></span>
+<span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/File.html">File</a></span><span class="op">(</span><span class="va">path</span>, resolution <span class="op">=</span> <span class="fl">100000</span><span class="op">)</span></span></code></pre></div>
 <p>hictkR file handles returned by <code><a href="../reference/File.html">File()</a></code> provide several
 attributes storing static properties of the opened file</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -83,11 +83,12 @@ attributes storing static properties of the opened file</p>
 <span><span class="va">resolution</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">f</span><span class="op">$</span><span class="va">resolution</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"File \""</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>,</span>
-<span>      <span class="st">"\" has the following resolution: "</span>,</span>
-<span>      <span class="va">resolution</span>,</span>
-<span>      <span class="st">"bp"</span>,</span>
-<span>      sep<span class="op">=</span><span class="st">""</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>,</span>
+<span>  <span class="st">"\" has the following resolution: "</span>,</span>
+<span>  <span class="va">resolution</span>,</span>
+<span>  <span class="st">"bp"</span>,</span>
+<span>  sep <span class="op">=</span> <span class="st">""</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><strong>File “interactions.hic” has the following resolution: 100000
 bp</strong></p>
 </div>
@@ -270,7 +271,7 @@ function.</p>
 <h4 id="fetch-genome-wide-interactions-with-genomic-coordinates">Fetch genome-wide interactions with genomic coordinates<a class="anchor" aria-label="anchor" href="#fetch-genome-wide-interactions-with-genomic-coordinates"></a>
 </h4>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, join<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, join <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
@@ -439,7 +440,7 @@ chr2L
 <p>Interactions can also be normalized using one of the available
 normalization methods (see <code>f$normalizations</code>).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, join<span class="op">=</span><span class="cn">TRUE</span>, normalization<span class="op">=</span><span class="st">"ICE"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, join <span class="op">=</span> <span class="cn">TRUE</span>, normalization <span class="op">=</span> <span class="st">"ICE"</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
@@ -614,7 +615,7 @@ interest.</p>
 <p>This is much more efficient than fetching genome-wide interactions
 and then filtering interactions using R.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, <span class="st">"chr2L"</span>, join<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, <span class="st">"chr2L"</span>, join <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
@@ -782,9 +783,10 @@ chr2L
 </table>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>,</span>
-<span>      <span class="st">"chr2L:0-10,000,000"</span>,</span>
-<span>      <span class="st">"chr3R:10,000,000-20,000,000"</span>,</span>
-<span>      join<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="st">"chr2L:0-10,000,000"</span>,</span>
+<span>  <span class="st">"chr3R:10,000,000-20,000,000"</span>,</span>
+<span>  join <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr>
 <th style="text-align:left;">
@@ -958,9 +960,10 @@ chr3R
 specifying <code>type="dense"</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>,</span>
-<span>      <span class="st">"chr2L:0-1,000,000"</span>,</span>
-<span>      <span class="st">"chr3R:1,000,000-2,000,000"</span>,</span>
-<span>      type<span class="op">=</span><span class="st">"dense"</span><span class="op">)</span></span>
+<span>  <span class="st">"chr2L:0-1,000,000"</span>,</span>
+<span>  <span class="st">"chr3R:1,000,000-2,000,000"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"dense"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt;       [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span></span>
 <span><span class="co">#&gt;  [1,]   11    4    9    7   10    1   15    3    5    29</span></span>
 <span><span class="co">#&gt;  [2,]   11   10   15    4   14    7    5    2   12    44</span></span>
@@ -975,8 +978,8 @@ specifying <code>type="dense"</code>.</p>
 <p>This can be very useful to visualize interaction matrices as
 heatmaps.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, <span class="st">"chr3R:0-20,000,000"</span>, normalization<span class="op">=</span><span class="st">"ICE"</span>, type<span class="op">=</span><span class="st">"dense"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>, axes<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, <span class="st">"chr3R:0-20,000,000"</span>, normalization <span class="op">=</span> <span class="st">"ICE"</span>, type <span class="op">=</span> <span class="st">"dense"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hictkR-vignette_files/figure-html/show_figure-1.png" width="720"></p>
 </div>
 </div>
