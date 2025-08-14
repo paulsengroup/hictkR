@@ -64,78 +64,30 @@
 
     
     
-<div class="section level2">
-<h2 id="copyright-c-2025-roberto-rossini-roberrosuio-no">Copyright (C) 2025 Roberto Rossini <a href="mailto:roberros@uio.no" class="email">roberros@uio.no</a><a class="anchor" aria-label="anchor" href="#copyright-c-2025-roberto-rossini-roberrosuio-no"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="section"></h2>
-</div>
-<div class="section level2">
-<h2 id="spdx-license-identifier-gpl-2-0-or-later">SPDX-License-Identifier: GPL-2.0-or-later<a class="anchor" aria-label="anchor" href="#spdx-license-identifier-gpl-2-0-or-later"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="section-1"></h2>
-</div>
-<div class="section level2">
-<h2 id="this-library-is-free-software-you-can-redistribute-it-andor">This library is free software: you can redistribute it and/or<a class="anchor" aria-label="anchor" href="#this-library-is-free-software-you-can-redistribute-it-andor"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="modify-it-under-the-terms-of-the-gnu-public-license-as-published">modify it under the terms of the GNU Public License as
-published<a class="anchor" aria-label="anchor" href="#modify-it-under-the-terms-of-the-gnu-public-license-as-published"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="by-the-free-software-foundation-either-version-3-of-the-license">by the Free Software Foundation; either version 3 of the
-License,<a class="anchor" aria-label="anchor" href="#by-the-free-software-foundation-either-version-3-of-the-license"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="or-at-your-option-any-later-version-">or (at your option) any later version.<a class="anchor" aria-label="anchor" href="#or-at-your-option-any-later-version-"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="section-2"></h2>
-</div>
-<div class="section level2">
-<h2 id="this-library-is-distributed-in-the-hope-that-it-will-be-useful">This library is distributed in the hope that it will be useful,<a class="anchor" aria-label="anchor" href="#this-library-is-distributed-in-the-hope-that-it-will-be-useful"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="but-without-any-warranty-without-even-the-implied-warranty-of">but WITHOUT ANY WARRANTY; without even the implied warranty of<a class="anchor" aria-label="anchor" href="#but-without-any-warranty-without-even-the-implied-warranty-of"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="merchantability-or-fitness-for-a-particular-purpose--see-the-gnu">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU<a class="anchor" aria-label="anchor" href="#merchantability-or-fitness-for-a-particular-purpose--see-the-gnu"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="library-general-public-license-for-more-details-">Library General Public License for more details.<a class="anchor" aria-label="anchor" href="#library-general-public-license-for-more-details-"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="section-3"></h2>
-</div>
-<div class="section level2">
-<h2 id="you-should-have-received-a-copy-of-the-gnu-public-license-along">You should have received a copy of the GNU Public License along<a class="anchor" aria-label="anchor" href="#you-should-have-received-a-copy-of-the-gnu-public-license-along"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="with-this-library--if-not-see">with this library. If not, see<a class="anchor" aria-label="anchor" href="#with-this-library--if-not-see"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 id="httpswww-gnu-orglicenses-">
-<a href="https://www.gnu.org/licenses/" class="external-link uri">https://www.gnu.org/licenses/</a>.<a class="anchor" aria-label="anchor" href="#httpswww-gnu-orglicenses-"></a>
-</h2>
+<!--
+Copyright (C) 2025 Roberto Rossini <roberros@uio.no>
+
+SPDX-License-Identifier: GPL-2.0-or-later
+
+This library is free software: you can redistribute it and/or
+modify it under the terms of the GNU Public License as published
+by the Free Software Foundation; either version 3 of the License,
+or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Public License along
+with this library.  If not, see
+<https://www.gnu.org/licenses/>.
+-->
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/paulsengroup/hictkR" class="external-link">hictkR</a></span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="opening-files">Opening files<a class="anchor" aria-label="anchor" href="#opening-files"></a>
-</h3>
+<div class="section level2">
+<h2 id="opening-files">Opening files<a class="anchor" aria-label="anchor" href="#opening-files"></a>
+</h2>
 <p>hictkR supports opening .hic and .cool files using the
 <code><a href="../reference/File.html">File()</a></code> function.</p>
 <p>When opening files in .hic format, <code>resolution</code> is a
@@ -159,9 +111,9 @@ attributes storing static properties of the opened file</p>
 <p><strong>File “interactions.hic” has the following resolution: 100000
 bp</strong></p>
 </div>
-<div class="section level3">
-<h3 id="accessing-chromosomes-and-bins">Accessing chromosomes and bins<a class="anchor" aria-label="anchor" href="#accessing-chromosomes-and-bins"></a>
-</h3>
+<div class="section level2">
+<h2 id="accessing-chromosomes-and-bins">Accessing chromosomes and bins<a class="anchor" aria-label="anchor" href="#accessing-chromosomes-and-bins"></a>
+</h2>
 <p>Some of these properties store the list of chromosomes as well as the
 bin table associated with the opened file.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -329,14 +281,14 @@ ICE
 </tr></tbody>
 </table>
 </div>
-<div class="section level3">
-<h3 id="fetching-interactions">Fetching interactions<a class="anchor" aria-label="anchor" href="#fetching-interactions"></a>
-</h3>
+<div class="section level2">
+<h2 id="fetching-interactions">Fetching interactions<a class="anchor" aria-label="anchor" href="#fetching-interactions"></a>
+</h2>
 <p>hictkR support fetching interactions through the <code><a href="../reference/fetch.html">fetch()</a></code>
 function.</p>
-<div class="section level5">
-<h5 id="fetch-genome-wide-interactions-with-genomic-coordinates">Fetch genome-wide interactions with genomic coordinates<a class="anchor" aria-label="anchor" href="#fetch-genome-wide-interactions-with-genomic-coordinates"></a>
-</h5>
+<div class="section level4">
+<h4 id="fetch-genome-wide-interactions-with-genomic-coordinates">Fetch genome-wide interactions with genomic coordinates<a class="anchor" aria-label="anchor" href="#fetch-genome-wide-interactions-with-genomic-coordinates"></a>
+</h4>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, join <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -674,9 +626,9 @@ chr2L
 </tbody>
 </table>
 </div>
-<div class="section level5">
-<h5 id="fetch-interactions-for-a-region-of-interest">Fetch interactions for a region of interest<a class="anchor" aria-label="anchor" href="#fetch-interactions-for-a-region-of-interest"></a>
-</h5>
+<div class="section level4">
+<h4 id="fetch-interactions-for-a-region-of-interest">Fetch interactions for a region of interest<a class="anchor" aria-label="anchor" href="#fetch-interactions-for-a-region-of-interest"></a>
+</h4>
 <p>hictkR can be instructed to fetch interactions for a region of
 interest.</p>
 <p>This is much more efficient than fetching genome-wide interactions
@@ -1020,9 +972,9 @@ chr3R
 </tbody>
 </table>
 </div>
-<div class="section level5">
-<h5 id="fetch-interactions-as-a-dense-matrix">Fetch interactions as a dense matrix<a class="anchor" aria-label="anchor" href="#fetch-interactions-as-a-dense-matrix"></a>
-</h5>
+<div class="section level4">
+<h4 id="fetch-interactions-as-a-dense-matrix">Fetch interactions as a dense matrix<a class="anchor" aria-label="anchor" href="#fetch-interactions-as-a-dense-matrix"></a>
+</h4>
 <p>hictkR can return interactions as a <code>Matrix</code> when
 specifying <code>type="dense"</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -1048,7 +1000,6 @@ heatmaps.</p>
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fetch.html">fetch</a></span><span class="op">(</span><span class="va">f</span>, <span class="st">"chr3R:0-20,000,000"</span>, normalization <span class="op">=</span> <span class="st">"ICE"</span>, type <span class="op">=</span> <span class="st">"dense"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hictkR-vignette_files/figure-html/show_figure-1.png" width="720"></p>
-</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
