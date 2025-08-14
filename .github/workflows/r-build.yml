@@ -84,7 +84,7 @@ jobs:
       - name: Add requirements
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: any::rcmdcheck, any::devtools
           needs: check
 
       - name: Setup Latex
@@ -119,6 +119,11 @@ jobs:
           conan cache clean "*" --build
           conan cache clean "*" --download
           conan cache clean "*" --source
+
+      - name: Ensure the documentation is up-to-date
+        run: |
+          Rscript -e 'devtools::document()'
+          git diff --exit-code man/
 
       - uses: actions/upload-artifact@v4
         with:
