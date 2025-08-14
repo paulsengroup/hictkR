@@ -20,7 +20,7 @@ with this library.  If not, see
 
 # hictkR
 
-[![License](https://img.shields.io/github/license/paulsengroup/hictkR)](./LICENSE)
+[![License](https://img.shields.io/github/license/paulsengroup/hictkR)](https://github.com/paulsengroup/hictkR/blob/5d250b4900d25dc94bc895819d5b85de37e2dc5e/LICENSE)
 [![CI](https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml/badge.svg)](https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml)
 
 ---
