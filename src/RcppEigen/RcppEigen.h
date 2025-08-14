@@ -3,6 +3,9 @@
 // RcppEigen.h: Rcpp/Eigen glue
 //
 // Copyright (C)      2011 Douglas Bates, Dirk Eddelbuettel and Romain Francois
+// Copyright (C)      2025 Roberto Rossini <roberros@uio.no>
+//
+// SPDX-License-Identifier: GPL-2.0-or-later
 //
 // This file is part of RcppEigen.
 //

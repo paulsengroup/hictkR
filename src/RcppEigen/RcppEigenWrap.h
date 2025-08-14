@@ -3,6 +3,9 @@
 // RcppEigenWrap.h: Rcpp wrap methods for Eigen matrices, vectors and arrays
 //
 // Copyright (C) 2011 - 2022   Douglas Bates, Dirk Eddelbuettel and Romain Francois
+// Copyright (C) 2025 Roberto Rossini <roberros@uio.no>
+//
+// SPDX-License-Identifier: GPL-2.0-or-later
 //
 // This file is part of RcppEigen.
 //
