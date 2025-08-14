@@ -1,12 +1,26 @@
 <!--
-Copyright (C) 2024 Roberto Rossini <roberros@uio.no>
+Copyright (C) 2025 Roberto Rossini <roberros@uio.no>
 
-SPDX-License-Identifier: MIT
+SPDX-License-Identifier: GPL-2.0-or-later
+
+This library is free software: you can redistribute it and/or
+modify it under the terms of the GNU Public License as published
+by the Free Software Foundation; either version 3 of the License,
+or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Public License along
+with this library.  If not, see
+<https://www.gnu.org/licenses/>.
 -->
 
 # hictkR
 
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![License](https://img.shields.io/github/license/paulsengroup/hictkR)](https://github.com/paulsengroup/hictkR/blob/5d250b4900d25dc94bc895819d5b85de37e2dc5e/LICENSE)
 [![CI](https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml/badge.svg)](https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml)
 
 ---
