@@ -20,7 +20,7 @@
 # Excluded folders
 __pycache__$
 # required by the CI
-\.conan2$
+^\.conan2$
 conan-staging$
 venv$
 ^cmake$
