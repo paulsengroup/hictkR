@@ -23,9 +23,43 @@ set -e
 set -u
 
 wd="$PWD"
+pkg_src_dir="$(dirname "$0")"
+pkg_src_dir="$(cygpath -a -w "$pkg_src_dir")"
 
-export TMPDIR="$wd/tmp/"
+# shellcheck disable=SC2064
+trap "cd '$PWD'" EXIT
+
+set +u
+if [ -z "$HICTKR_TMPDIR" ]; then
+  # HICTKR_TMPDIR="$(Rscript -e 'cat(normalizePath(tempdir(), winslash="/"))' 2> /dev/null)"
+  HICTKR_TMPDIR="$wd/scratch/tmp/"
+fi
+set -u
+
+TMPDIR="$HICTKR_TMPDIR"
+
+export HICTKR_TMPDIR
+export TMPDIR
+
+cleanup_script="$pkg_src_dir/cleanup.win"
+makevars="$pkg_src_dir/src/Makevars"
+
+if [ -f "$cleanup_script" ]; then
+  1>&2 echo "Found existing cleanup script \"$cleanup_script\""
+  1>&2 echo "Please manually remove it before continuing"
+  exit 1
+fi
+
+# shellcheck disable=SC2016
+printf '%s\nset -x\nrm -f "$0" "%s"\n' '#!/bin/sh' "$makevars" > "$cleanup_script"
+chmod 700 "$cleanup_script"
+
 mkdir -p "$TMPDIR"
+1>&2 echo "TMPDIR='$TMPDIR'"
+
+1>&2 echo "### BEGIN $(basename "$cleanup_script")"
+1>&2 cat "$cleanup_script"
+1>&2 echo "### END $(basename "$cleanup_script")"
 
 # The version of b2 built by Conan is not suitable for use with the toolchain shipped as part of Rtools,
 # so we have to manually build b2 and tell Conan to use this version instead of the built by Conan.
@@ -35,28 +69,8 @@ export B2_TAR_SHA256='7eb278af94c3800d2369e7e6fdce733cd39736808c5bc0cec5c51a3433
 # shellcheck disable=SC2155
 export B2_TAR_DEST="$TMPDIR/$(basename "$B2_TAR_URL")"
 
-# shellcheck disable=SC2064
-trap "rm -rf '$TMPDIR' && cd '$PWD'" EXIT
-
-set +u
-if [ -n "$R_HOME" ]; then
-  Rscript="$R_HOME/bin/Rscript"
-else
-  Rscript="$(which Rscript)"
-fi
-set -u
-
-cat << EOF > "$TMPDIR/download-b2.R"
-#!/usr/bin/env Rscript
-
-download.file(
-  Sys.getenv("B2_TAR_URL"),
-  dest=Sys.getenv("B2_TAR_DEST"),
-  mode="wb"
-)
-EOF
-
-"$Rscript" "$TMPDIR/download-b2.R"
+# curl should be available on Rtools 4+
+curl -L "$B2_TAR_URL" -o "$B2_TAR_DEST"
 
 if command -v sha256sum >/dev/null 2>&1; then
   checksum="$(sha256sum "$B2_TAR_DEST")"
@@ -70,23 +84,26 @@ else
   checksum="$B2_TAR_SHA256"
 fi
 
-checksum="$(echo "$checksum" | cut -f 1 -d ' ')"
-
+checksum="$(echo "$checksum" | tr -d \\ 2>/dev/null |  cut -f 1 -d ' ')"
 if [ "$checksum" != "$B2_TAR_SHA256" ]; then
   1>&2 echo "FAILURE: Checksum verification for $(basename "$B2_TAR_URL") file failed!"
+  1>&2 echo "Expected $B2_TAR_SHA256, found $checksum"
   exit 1
 fi
 
 B2_WD="$TMPDIR/b2"
 mkdir -p "$B2_WD"
 
-tar -C "$B2_WD" --strip-components=1 -xf "$B2_TAR_DEST"
+tar -C "$(cygpath -a -u "$B2_WD")" --strip-components=1 -xf "$(cygpath -a -u "$B2_TAR_DEST")"
 
 cd "$B2_WD"
 ./bootstrap.sh gcc
-mkdir b2-install
-./b2 install --prefix="$TMPDIR/b2-install" --toolset=gcc
-PATH="$PATH:$TMPDIR/b2-install/"
+
+B2_INSTALL_DIR="$TMPDIR/b2-install"
+mkdir -p "$B2_INSTALL_DIR"
+./b2 install --prefix="$B2_INSTALL_DIR" --toolset=gcc
+
+PATH="$(cygpath -a -u "$B2_INSTALL_DIR"):$PATH"
 
 cd "$wd"
 rm -rf "$B2_WD"
@@ -94,4 +111,7 @@ rm -rf "$B2_WD"
 which b2
 b2 --version
 
-"$(dirname "$0")/configure"
+HICTKR_TMPDIR="$(cygpath -a -w "$HICTKR_TMPDIR")"
+export HICTKR_TMPDIR
+
+"$pkg_src_dir/configure"

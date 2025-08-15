@@ -21,7 +21,6 @@
 __pycache__$
 # required by the CI
 ^\.conan2$
-conan-staging$
 venv$
 ^cmake$
 ^cmake-build-.*
@@ -42,6 +41,7 @@ venv$
 .*\.tar\.gz$
 ^CITATION.cff$
 CMakeLists.txt$
+^cleanup$
 ^src/Makevars*$
 ^\.RData$
 ^\.clang-format$
