@@ -90,7 +90,7 @@ uv venv \
   --link-mode=copy \
   "$VIRTUAL_ENV"
 
-uv pip install 'conan>=2.15,<3' 'cmake>=3.25,<4'
+uv pip install 'cmake>=3.25,<4' 'conan>=2.15,<3' ninja
 
 
 if [ -d "$VIRTUAL_ENV/bin" ]; then

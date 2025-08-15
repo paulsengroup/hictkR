@@ -360,6 +360,7 @@ def run_conan_install(
         "--profile:all=hictkR",
         "--settings=build_type=Release",
         "--settings=compiler.cppstd=17",
+        "--conf=tools.cmake.cmaketoolchain:generator=Ninja",
     ]
 
     if platform.system() != "Darwin":
