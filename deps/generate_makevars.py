@@ -372,20 +372,8 @@ def run_conan_install(
         "--update",
     ]
 
-    if platform.system() == "Windows":
-        sp.check_call(
-            [
-                "conan",
-                "install",
-                "--profile:all=hictkR",
-                "--settings=os=Linux",
-                "--requires=b2/5.3.3",
-                "--build=b2",
-                "--options=b2/*:toolset=gcc",
-            ],
-            stdout=sys.stderr,
-            env=env,
-        )
+    if platform.system() != "Windows":
+        conan_create_opts.append("--build=b2/*")
 
     conan_install_opts = default_options + [
         f"--requires=hictk/{extract_hictk_version(conanfile)}",
