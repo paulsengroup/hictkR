@@ -23,9 +23,55 @@ set -e
 set -u
 
 wd="$PWD"
+pkg_src_dir="$(dirname "$0")"
 
-export TMPDIR="$wd/tmp/"
+if command -v cygpath; then
+  pkg_src_dir="$(cygpath -a -w "$pkg_src_dir")"
+else
+  pkg_src_dir="$(readlink -f "$pkg_src_dir")"
+fi
+
+# shellcheck disable=SC2064
+trap "cd '$PWD'" EXIT
+
+set +u
+if [ -z "$HICTKR_TMPDIR" ]; then
+  HICTKR_TMPDIR="$wd/scratch/tmp/"
+fi
+set -u
+
+TMPDIR="$HICTKR_TMPDIR"
+
+export HICTKR_TMPDIR
+export TMPDIR
+
+cleanup_script="$pkg_src_dir/cleanup"
+
+if [ -f "$cleanup_script.win" ]; then
+  # script has been called by configure.win which should've already initialized the cleanup script
+  mv "$cleanup_script.win" "$cleanup_script"
+elif [ -f "$cleanup_script" ]; then
+  1>&2 echo "Found existing cleanup script \"$cleanup_script\""
+  1>&2 echo "Please manually remove it before continuing"
+  exit 1
+else
+  makevars="$pkg_src_dir/src/Makevars"
+
+  # shellcheck disable=SC2016
+  printf '%s\nset -x\nrm -f "$0" "%s"\n' '#!/bin/sh' "$makevars" > "$cleanup_script"
+fi
+
+echo "find \"$pkg_src_dir/src\" -type f -name '*.o' -delete -print" >> "$cleanup_script"
+echo "find \"$pkg_src_dir/src\" -type f -name '*.so' -delete -print" >> "$cleanup_script"
+
+chmod 700 "$cleanup_script"
+
 mkdir -p "$TMPDIR"
+1>&2 echo "TMPDIR='$TMPDIR'"
+
+1>&2 echo "### BEGIN $(basename "$cleanup_script")"
+1>&2 cat "$cleanup_script"
+1>&2 echo "### END $(basename "$cleanup_script")"
 
 UV_VERSION='0.8.5'
 export UV_INSTALLER_URL="https://astral.sh/uv/$UV_VERSION/install.sh"
@@ -40,28 +86,15 @@ export UV_NO_MODIFY_PATH=1
 export VIRTUAL_ENV="$TMPDIR/venv/"
 
 
-# shellcheck disable=SC2064
-trap "rm -rf '$TMPDIR' && cd '$PWD'" EXIT
-
-set +u
-if [ -n "$R_HOME" ]; then
-  Rscript="$R_HOME/bin/Rscript"
+if command -v curl >/dev/null 2>&1; then
+  curl -L "$UV_INSTALLER_URL" -o "$UV_INSTALLER_DEST"
+elif command -v wget >/dev/null 2>&1; then
+  wget -O "$UV_INSTALLER_DEST" "$UV_INSTALLER_URL"
 else
-  Rscript="$(which Rscript)"
+  1>&2 echo "Unable to download file using curl or wget"
+  1>&2 echo "Please install either tools an try again"
+  exit 1
 fi
-set -u
-
-cat << EOF > "$TMPDIR/download-uv.R"
-#!/usr/bin/env Rscript
-
-download.file(
-  Sys.getenv("UV_INSTALLER_URL"),
-  dest=Sys.getenv("UV_INSTALLER_DEST"),
-  mode="wb"
-)
-EOF
-
-"$Rscript" "$TMPDIR/download-uv.R"
 
 if command -v sha256sum >/dev/null 2>&1; then
   checksum="$(sha256sum "$UV_INSTALLER_DEST")"
@@ -75,9 +108,10 @@ else
   checksum="$UV_INSTALLER_SHA256"
 fi
 
-checksum="$(echo "$checksum" | cut -f 1 -d ' ')"
+checksum="$(echo "$checksum" | tr -d \\ 2>/dev/null |  cut -f 1 -d ' ')"
 if [ "$checksum" != "$UV_INSTALLER_SHA256" ]; then
   1>&2 echo "FAILURE: Checksum verification for uv's install script failed!"
+  1>&2 echo "Expected $UV_INSTALLER_SHA256, found $checksum"
   exit 1
 fi
 
@@ -90,7 +124,7 @@ uv venv \
   --link-mode=copy \
   "$VIRTUAL_ENV"
 
-uv pip install 'conan>=2.15,<3' 'cmake>=3.25,<4'
+uv pip install 'cmake>=3.25,<4' 'conan>=2.15,<3' ninja
 
 
 if [ -d "$VIRTUAL_ENV/bin" ]; then
@@ -102,13 +136,15 @@ else
   exit 1
 fi
 
-which conan
-conan --version
-
 set +u
 if [ -z "$HICTKR_CONAN_HOME" ]; then
-  export HICTKR_CONAN_HOME="$wd/conan-staging/.conan2"
+  export HICTKR_CONAN_HOME="$TMPDIR/.conan2"
 fi
 set -u
 
-python "$(dirname "$0")/deps/generate_makevars.py" --no-venv --workdir "$(dirname "$0")"
+export CONAN_HOME="$HICTKR_CONAN_HOME"
+
+which conan
+conan --version
+
+python "$pkg_src_dir/deps/generate_makevars.py" --no-venv --workdir "$pkg_src_dir"

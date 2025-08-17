@@ -21,27 +21,29 @@
 __pycache__$
 # required by the CI
 ^\.conan2$
-conan-staging$
 venv$
 ^cmake$
 ^cmake-build-.*
 ^docs$
+^external$
 ^pkgdown$
 ^scratch$
 ^staging$
 ^utils$
+^.*scratch$
+.*\.Rcheck*$
 ^\.github$
 ^\.idea$
 ^\.run$
 ^\.vscode$
 
 # Excluded files
-.*\.Rcheck$
 .*\.o$
 .*\.so$
 .*\.tar\.gz$
-^CITATION.cff$
-CMakeLists.txt$
+^CITATION\.cff$
+CMakeLists\.txt$
+^cleanup$
 ^src/Makevars*$
 ^\.RData$
 ^\.clang-format$
@@ -49,6 +51,6 @@ CMakeLists.txt$
 ^\.editorconfig$
 ^\.gersemirc$
 ^\.gitignore$
-^\.markdownlint.yaml$
-^\.pre-commit-config.yaml$
+^\.markdownlint\.yaml$
+^\.pre-commit-config\.yaml$
 ^_pkgdown\.yml$
