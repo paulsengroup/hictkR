@@ -478,7 +478,6 @@ def generate_makevars(
         PKG_LIBS += $(addprefix -L ,$(CONAN_LIB_DIRS))
         PKG_LIBS += $(addprefix -l ,$(CONAN_LIBS))
         PKG_LIBS += $(addprefix -l ,$(CONAN_SYSTEM_LIBS))
-        PKG_LIBS += -s
         """
     )
 
@@ -492,6 +491,11 @@ def generate_makevars(
         makevars += "PKG_LIBS += -lhdf5 -lz -lsz -lole32\n"
     else:
         makevars += "PKG_CPPFLAGS += $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))\n"
+
+    if platform.system() == "Darwin":
+        makevars += "PKG_LIBS += -Wl,-x\n"
+    else:
+        makevars += "PKG_LIBS += -Wl,--strip-debug\n"
 
     dest.write_text(makevars, newline="\n")
 
