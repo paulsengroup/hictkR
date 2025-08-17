@@ -478,6 +478,7 @@ def generate_makevars(
         PKG_LIBS += $(addprefix -L ,$(CONAN_LIB_DIRS))
         PKG_LIBS += $(addprefix -l ,$(CONAN_LIBS))
         PKG_LIBS += $(addprefix -l ,$(CONAN_SYSTEM_LIBS))
+        PKG_LIBS += -s
         """
     )
 
