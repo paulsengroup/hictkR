@@ -71,20 +71,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: windows-latest, r-version: 4.5, cc: "gcc", cxx: "g++" }
-          - { os: macos-latest, r-version: 4.5, cc: "clang", cxx: "clang++" }
-          - { os: ubuntu-latest, r-version: 4.0, cc: "gcc", cxx: "g++" }
-          - { os: ubuntu-latest, r-version: 4.1, cc: "gcc", cxx: "g++" }
-          - { os: ubuntu-latest, r-version: 4.2, cc: "gcc", cxx: "g++" }
-          - { os: ubuntu-latest, r-version: 4.3, cc: "gcc", cxx: "g++" }
-          - { os: ubuntu-latest, r-version: 4.4, cc: "gcc", cxx: "g++" }
-          - { os: ubuntu-latest, r-version: 4.5, cc: "gcc", cxx: "g++" }
-          - { os: ubuntu-latest, r-version: 4.0, cc: "clang", cxx: "clang++" }
-          - { os: ubuntu-latest, r-version: 4.1, cc: "clang", cxx: "clang++" }
-          - { os: ubuntu-latest, r-version: 4.2, cc: "clang", cxx: "clang++" }
-          - { os: ubuntu-latest, r-version: 4.3, cc: "clang", cxx: "clang++" }
-          - { os: ubuntu-latest, r-version: 4.4, cc: "clang", cxx: "clang++" }
-          - { os: ubuntu-latest, r-version: 4.5, cc: "clang", cxx: "clang++" }
+          - { os: windows-2025, r-version: 4.5, cc: "gcc", cxx: "g++" }
+          - { os: macos-15, r-version: 4.5, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-24.04, r-version: 4.0, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-24.04, r-version: 4.1, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-24.04, r-version: 4.2, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-24.04, r-version: 4.3, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-24.04, r-version: 4.4, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-24.04, r-version: 4.5, cc: "gcc", cxx: "g++" }
+          - { os: ubuntu-24.04, r-version: 4.0, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-24.04, r-version: 4.1, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-24.04, r-version: 4.2, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-24.04, r-version: 4.3, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-24.04, r-version: 4.4, cc: "clang", cxx: "clang++" }
+          - { os: ubuntu-24.04, r-version: 4.5, cc: "clang", cxx: "clang++" }
 
     runs-on: ${{ matrix.os }}
 
