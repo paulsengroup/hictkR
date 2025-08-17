@@ -461,9 +461,6 @@ def generate_makevars(
 
     makevars = textwrap.dedent(
         f"""
-        PWD := $(shell pwd)
-        TMPDIR := PWD
-
         export CC := {cc}
         export CXX := {cxx}
         export CXX17 := {cxx}
@@ -472,28 +469,28 @@ def generate_makevars(
         {conandeps_mk}
         ### END OF conandeps.mk
 
-        CXX_STD := CXX17
+        CXX_STD = CXX17
 
-        PKG_CPPFLAGS := $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
-        PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -D ,$(CONAN_DEFINES))
-        PKG_CPPFLAGS := $(PKG_CPPFLAGS) {cxx_flags}
+        PKG_CPPFLAGS += $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
+        PKG_CPPFLAGS += $(addprefix -D ,$(CONAN_DEFINES))
+        PKG_CPPFLAGS += {cxx_flags}
 
-        PKG_LIBS := $(addprefix -L ,$(CONAN_LIB_DIRS))
-        PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_LIBS))
-        PKG_LIBS := $(PKG_LIBS) $(addprefix -l,$(CONAN_SYSTEM_LIBS))
+        PKG_LIBS += $(addprefix -L ,$(CONAN_LIB_DIRS))
+        PKG_LIBS += $(addprefix -l ,$(CONAN_LIBS))
+        PKG_LIBS += $(addprefix -l ,$(CONAN_SYSTEM_LIBS))
         """
     )
 
     filesystem_link_flags = detect_filesystem_link_flag(tmpdir)
     if filesystem_link_flags is not None:
-        makevars += f"PKG_LIBS := $(PKG_LIBS) {filesystem_link_flags}\n"
+        makevars += f"PKG_LIBS += {filesystem_link_flags}\n"
 
     if platform.system() == "Windows":
         # These libraries come with Rtools, and installing them with Conan leads to link errors that are difficult to address
         # -lole32 is used to workaround linker errors complaining about missing __imp_CoTaskMemFree
-        makevars += "PKG_LIBS := $(PKG_LIBS) -lhdf5 -lz -lsz -lole32\n"
+        makevars += "PKG_LIBS += -lhdf5 -lz -lsz -lole32\n"
     else:
-        makevars += "PKG_CPPFLAGS := $(PKG_CPPFLAGS) $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))\n"
+        makevars += "PKG_CPPFLAGS += $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS_HDF5_HDF5_C))\n"
 
     dest.write_text(makevars, newline="\n")
 
