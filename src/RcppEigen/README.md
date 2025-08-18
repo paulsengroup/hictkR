@@ -28,7 +28,7 @@ The files were originally located under `inst/include/`.
 
 The original header files required some patching to build using the toolchain provided by `Rtools4*`.
 
-In brief:
+In brief, these are the changes applied to the original files:
 
 - Remove `RcppEigenForward.h` and move relevant `#include` statements in `RcppEigenWrap.h`.
 - Fix `#include` statements
