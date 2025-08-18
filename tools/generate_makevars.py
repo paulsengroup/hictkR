@@ -80,14 +80,23 @@ def find_conan() -> pathlib.Path:
 
 @functools.cache
 def get_rtools_home() -> pathlib.Path:
-    major = sp.check_output(["Rscript", "-e", "cat(getRversion()$major)"], stderr=sp.DEVNULL).decode("utf-8")
-    minor = sp.check_output(["Rscript", "-e", "cat(getRversion()$minor)"], stderr=sp.DEVNULL).decode("utf-8")
+    major = sp.check_output(
+        ["Rscript", "-e", "suppressWarnings(cat(getRversion()$major))"],
+        stderr=sp.DEVNULL,
+    ).decode("utf-8")
+    minor = sp.check_output(
+        ["Rscript", "-e", "suppressWarnings(cat(getRversion()$minor))"],
+        stderr=sp.DEVNULL,
+    ).decode("utf-8")
 
     rtools_home = pathlib.Path("C:\\") / f"rtools{major}{minor}"
 
     if not rtools_home.exists():
         logging.warning("Unable to find RTOOLS_HOME at: %s (major=%s, minor=%s)", rtools_home, major, minor)
-        status = sp.check_output(["Rscript", "-e", "cat(R.version$status)"], stderr=sp.DEVNULL).decode("utf-8")
+        status = sp.check_output(
+            ["Rscript", "-e", "suppressWarnings(cat(R.version$status))"],
+            stderr=sp.DEVNULL,
+        ).decode("utf-8")
         if status != "" and minor != "0":
             try:
                 minor = str(int(minor) - 1)
@@ -111,7 +120,10 @@ def get_rtools_home() -> pathlib.Path:
 
 @functools.cache
 def get_path_as_r(add_rtools: bool = True) -> str:
-    res = sp.check_output(["Rscript", "-e", "Sys.getenv('PATH')"], stderr=sp.DEVNULL).decode("utf-8")
+    res = sp.check_output(
+        ["Rscript", "-e", "suppressWarnings(Sys.getenv('PATH'))"],
+        stderr=sp.DEVNULL,
+    ).decode("utf-8")
     matches = re.search(r"\"(.*)\"", res, re.MULTILINE)
     if not matches:
         return ""
@@ -131,7 +143,10 @@ def get_path_as_r(add_rtools: bool = True) -> str:
 
 @functools.cache
 def r_which(program: str, resolve: bool = True) -> pathlib.Path | None:
-    res = sp.check_output(["Rscript", "-e", f'Sys.which("{program}")'], stderr=sp.DEVNULL).decode("utf-8")
+    res = sp.check_output(
+        ["Rscript", "-e", f'suppressWarnings(Sys.which("{program}"))'],
+        stderr=sp.DEVNULL,
+    ).decode("utf-8")
 
     matches = re.search(r"\n\"(.*)\"", res, re.MULTILINE)
     if not matches:
@@ -166,7 +181,10 @@ def find_cxx() -> pathlib.Path:
 
 @functools.cache
 def cxx_flags_rcpp() -> str:
-    return sp.check_output(["Rscript", "-e", "Rcpp:::CxxFlags()"], stderr=sp.DEVNULL).decode("utf-8")
+    return sp.check_output(
+        ["Rscript", "-e", "suppressWarnings(Rcpp:::CxxFlags())"],
+        stderr=sp.DEVNULL,
+    ).decode("utf-8")
 
 
 @functools.cache

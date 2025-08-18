@@ -148,3 +148,7 @@ which conan
 conan --version
 
 python "$pkg_src_dir/tools/generate_makevars.py" --no-venv --workdir "$pkg_src_dir"
+
+1>&2 echo '### BEGIN Makevars'
+1>&2 cat "$pkg_src_dir/src/Makevars"
+1>&2 echo '### END Makevars'
