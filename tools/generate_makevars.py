@@ -577,7 +577,7 @@ def main():
         env["TMPDIR"] = str(tmpdir.absolute())
 
         run_conan_profile_detect(tmpdir, env)
-        conandeps_mk = run_conan_install(workdir / "deps" / "conanfile.py", tmpdir, env)
+        conandeps_mk = run_conan_install(workdir / "tools" / "conanfile.py", tmpdir, env)
 
         generate_makevars(makevars_file, tmpdir, conandeps_mk)
 

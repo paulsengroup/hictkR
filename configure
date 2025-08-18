@@ -147,4 +147,4 @@ export CONAN_HOME="$HICTKR_CONAN_HOME"
 which conan
 conan --version
 
-python "$pkg_src_dir/deps/generate_makevars.py" --no-venv --workdir "$pkg_src_dir"
+python "$pkg_src_dir/tools/generate_makevars.py" --no-venv --workdir "$pkg_src_dir"
