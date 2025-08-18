@@ -80,21 +80,26 @@ def find_conan() -> pathlib.Path:
 
 @functools.cache
 def get_rtools_home() -> pathlib.Path:
-    res = sp.check_output(["Rscript", "-e", "package_version(R.version)"], stderr=sp.DEVNULL).decode("utf-8")
-    matches = re.search(r"(\d+\.\d+).\d+", res)
-    if not matches:
-        raise RuntimeError("Unable to infer R version")
+    major = sp.check_output(["Rscript", "-e", "cat(getRversion()$major)"], stderr=sp.DEVNULL).decode("utf-8")
+    minor = sp.check_output(["Rscript", "-e", "cat(getRversion()$minor)"], stderr=sp.DEVNULL).decode("utf-8")
 
-    r_version = matches.group(1).replace(".", "")
-    rtools_string = f"rtools{r_version}"
+    rtools_home = pathlib.Path("C:\\") / f"rtools{major}{minor}"
 
-    rtools_home = pathlib.Path("C:\\") / rtools_string
-    for p in get_path_as_r(add_rtools=False).split(";"):
-        if rtools_string in p:
-            matches = re.search(rf"^(.*{rtools_string})", p)
-            if matches:
-                rtools_home = pathlib.Path(matches.group(1))
-                break
+    if not rtools_home.exists():
+        logging.warning("Unable to find RTOOLS_HOME at: %s (major=%s, minor=%s)", rtools_home, major, minor)
+        status = sp.check_output(["Rscript", "-e", "cat(R.version$status)"], stderr=sp.DEVNULL).decode("utf-8")
+        if status != "" and minor != "0":
+            try:
+                minor = str(int(minor) - 1)
+                rtools_home = pathlib.Path("C:\\") / f"rtools{major}{minor}"
+            except Exception as e:
+                logging.warning(
+                    "Unable to find RTOOLS_HOME at: %s (major=%s, minor=%s): %s",
+                    rtools_home,
+                    major,
+                    minor,
+                    e,
+                )
 
     if not rtools_home.exists():
         raise RuntimeError(f"Unable to find RTOOLS_HOME at: {rtools_home}")
