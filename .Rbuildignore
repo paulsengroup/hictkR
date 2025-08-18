@@ -44,7 +44,7 @@ venv$
 ^CITATION\.cff$
 CMakeLists\.txt$
 ^cleanup$
-^src/Makevars*$
+^src/Makevars$
 ^\.RData$
 ^\.clang-format$
 ^\.codespellrc$
