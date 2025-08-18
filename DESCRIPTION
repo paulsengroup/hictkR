@@ -1,13 +1,20 @@
 Package: hictkR
 Type: Package
-Title: R bindings for 'hictk': read .cool and .hic files directly from R
+Title: R Bindings for 'hictk': Read .cool and .hic Files Directly from R
 Version: 0.0.3
 Authors@R:
-  c(person("Roberto", "Rossini", email = "roberros@uio.no", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-3096-1470")))
+  person(
+    "Roberto",
+    "Rossini",
+    email = "roberros@uio.no",
+    role = c("aut", "cre", "cph"),
+    comment = c(ORCID = "0000-0003-3096-1470")
+  )
 Maintainer: Roberto Rossini <roberros@uio.no>
-Description: R bindings for 'hictk': a blazing fast toolkit to work with '.hic' and '.cool' files
-License: GPL (>= 2) + file LICENSE
+Description:
+    Provides an R interface for 'hictk', enabling users to fetch various types of information,
+    including interactions, from files in .cool, .mcool, and .hic format.
+License: GPL (>= 2) | file LICENSE
 URL: https://github.com/paulsengroup/hictkR, https://paulsengroup.github.io/hictkR/
 BugReports: https://github.com/paulsengroup/hictkR/issues
 Encoding: UTF-8
