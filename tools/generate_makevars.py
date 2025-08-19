@@ -94,6 +94,14 @@ def run_rscript(
     return "".join(line for line in lines if not pattern.match(line))
 
 
+def guess_rtools_home(major_version: str) -> pathlib.Path:
+    paths = list(pathlib.Path("C:\\").glob(f"rtools{major_version}*"))
+    if len(paths) == 0:
+        raise RuntimeError(f"Unable to find Rtools for R {major_version}.x.x under C:\\")
+
+    return max(paths)
+
+
 @functools.cache
 def get_rtools_home() -> pathlib.Path:
     major = run_rscript("suppressWarnings(cat(getRversion()$major))")
@@ -103,22 +111,9 @@ def get_rtools_home() -> pathlib.Path:
 
     if not rtools_home.exists():
         logging.warning("Unable to find RTOOLS_HOME at: %s (major=%s, minor=%s)", rtools_home, major, minor)
-        status = run_rscript("suppressWarnings(cat(R.version$status))")
-        if status != "" and minor != "0":
-            try:
-                minor = str(int(minor) - 1)
-                rtools_home = pathlib.Path("C:\\") / f"rtools{major}{minor}"
-            except Exception as e:
-                logging.warning(
-                    "Unable to find RTOOLS_HOME at: %s (major=%s, minor=%s): %s",
-                    rtools_home,
-                    major,
-                    minor,
-                    e,
-                )
+        rtools_home = guess_rtools_home(major)
 
-    if not rtools_home.exists():
-        raise RuntimeError(f"Unable to find RTOOLS_HOME at: {rtools_home}")
+    assert rtools_home.exists()
 
     logging.info('Found Rtools at "%s"', rtools_home)
 
