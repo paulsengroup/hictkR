@@ -78,25 +78,32 @@ def find_conan() -> pathlib.Path:
     return conan
 
 
+def run_rscript(
+    args: str,
+    env: EnvDict | None = None,
+    strip_warnings: bool = True,
+) -> str:
+    data = sp.check_output(["Rscript", "-e", args], stderr=sp.DEVNULL, env=env).decode("utf-8")
+
+    if not strip_warnings:
+        return data
+
+    pattern = re.compile(r"^\s*WARNING", re.IGNORECASE)
+    lines = data.splitlines()
+
+    return "".join(line for line in lines if not pattern.match(line))
+
+
 @functools.cache
 def get_rtools_home() -> pathlib.Path:
-    major = sp.check_output(
-        ["Rscript", "-e", "suppressWarnings(cat(getRversion()$major))"],
-        stderr=sp.DEVNULL,
-    ).decode("utf-8")
-    minor = sp.check_output(
-        ["Rscript", "-e", "suppressWarnings(cat(getRversion()$minor))"],
-        stderr=sp.DEVNULL,
-    ).decode("utf-8")
+    major = run_rscript("suppressWarnings(cat(getRversion()$major))")
+    minor = run_rscript("suppressWarnings(cat(getRversion()$minor))")
 
     rtools_home = pathlib.Path("C:\\") / f"rtools{major}{minor}"
 
     if not rtools_home.exists():
         logging.warning("Unable to find RTOOLS_HOME at: %s (major=%s, minor=%s)", rtools_home, major, minor)
-        status = sp.check_output(
-            ["Rscript", "-e", "suppressWarnings(cat(R.version$status))"],
-            stderr=sp.DEVNULL,
-        ).decode("utf-8")
+        status = run_rscript("suppressWarnings(cat(R.version$status))")
         if status != "" and minor != "0":
             try:
                 minor = str(int(minor) - 1)
@@ -120,39 +127,38 @@ def get_rtools_home() -> pathlib.Path:
 
 @functools.cache
 def get_path_as_r(add_rtools: bool = True) -> str:
-    res = sp.check_output(
-        ["Rscript", "-e", "suppressWarnings(Sys.getenv('PATH'))"],
-        stderr=sp.DEVNULL,
-    ).decode("utf-8")
-    matches = re.search(r"\"(.*)\"", res, re.MULTILINE)
-    if not matches:
-        return ""
+    res = run_rscript("suppressWarnings(cat(Sys.getenv('PATH')))")
 
-    path = [pathlib.Path(p).resolve() for p in matches.group(1).split(";")]
+    if res == "":
+        raise RuntimeError("Failed to find the PATH environment variable")
 
-    if add_rtools:
-        rtools_home = get_rtools_home()
+    if not add_rtools:
+        return res
 
-        path = [
-            rtools_home / "usr" / "bin",
-            rtools_home / "mingw64" / "bin",
-        ] + path
+    path = [pathlib.Path(p).resolve() for p in res.split(";")]
+
+    rtools_home = get_rtools_home()
+
+    path.insert(0, rtools_home / "mingw64" / "bin")
+    path.insert(0, rtools_home / "usr" / "bin")
 
     return ";".join(str(p) for p in path)
 
 
 @functools.cache
-def r_which(program: str, resolve: bool = True) -> pathlib.Path | None:
-    res = sp.check_output(
-        ["Rscript", "-e", f'suppressWarnings(Sys.which("{program}"))'],
-        stderr=sp.DEVNULL,
-    ).decode("utf-8")
+def r_which(
+    program: str,
+    resolve: bool = True,
+    raise_if_not_found: bool = True,
+) -> pathlib.Path | None:
+    res = run_rscript(f'suppressWarnings(cat(Sys.which("{program}")))')
 
-    matches = re.search(r"\n\"(.*)\"", res, re.MULTILINE)
-    if not matches:
+    if res == "":
+        if raise_if_not_found:
+            raise RuntimeError(f'Unable to find "{program}" in PATH')
         return None
 
-    exe = pathlib.Path(matches.group(1))
+    exe = pathlib.Path(res)
     if resolve:
         exe = exe.resolve()
 
@@ -162,7 +168,7 @@ def r_which(program: str, resolve: bool = True) -> pathlib.Path | None:
 @functools.cache
 def find_cc() -> pathlib.Path:
     for name in (os.getenv("CC", "clang"), "clang", "gcc", "cc"):
-        cc = r_which(name, resolve=False)
+        cc = r_which(name, resolve=False, raise_if_not_found=False)
         if cc is not None:
             return cc
 
@@ -172,7 +178,7 @@ def find_cc() -> pathlib.Path:
 @functools.cache
 def find_cxx() -> pathlib.Path:
     for name in (os.getenv("CXX", "clang++"), "clang++", "g++", "c++"):
-        cxx = r_which(name, resolve=False)
+        cxx = r_which(name, resolve=False, raise_if_not_found=False)
         if cxx is not None:
             return cxx
 
@@ -181,10 +187,7 @@ def find_cxx() -> pathlib.Path:
 
 @functools.cache
 def cxx_flags_rcpp() -> str:
-    return sp.check_output(
-        ["Rscript", "-e", "suppressWarnings(Rcpp:::CxxFlags())"],
-        stderr=sp.DEVNULL,
-    ).decode("utf-8")
+    return run_rscript("suppressWarnings(Rcpp:::CxxFlags())")
 
 
 @functools.cache
