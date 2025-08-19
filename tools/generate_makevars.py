@@ -89,7 +89,7 @@ def run_rscript(
         return data
 
     pattern = re.compile(r"^\s*WARNING", re.IGNORECASE)
-    lines = data.splitlines()
+    lines = data.splitlines(keepends=True)
 
     return "".join(line for line in lines if not pattern.match(line))
 
