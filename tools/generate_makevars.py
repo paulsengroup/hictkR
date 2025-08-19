@@ -498,12 +498,12 @@ def generate_makevars(
         CXX_STD = CXX17
 
         PKG_CPPFLAGS += $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
-        PKG_CPPFLAGS += $(addprefix -D ,$(CONAN_DEFINES))
+        PKG_CPPFLAGS += $(addprefix -D,$(CONAN_DEFINES))
         PKG_CPPFLAGS += {cxx_flags}
 
         PKG_LIBS += $(addprefix -L ,$(CONAN_LIB_DIRS))
-        PKG_LIBS += $(addprefix -l ,$(CONAN_LIBS))
-        PKG_LIBS += $(addprefix -l ,$(CONAN_SYSTEM_LIBS))
+        PKG_LIBS += $(addprefix -l,$(CONAN_LIBS))
+        PKG_LIBS += $(addprefix -l,$(CONAN_SYSTEM_LIBS))
         """
     )
 
