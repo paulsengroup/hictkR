@@ -121,23 +121,36 @@ def get_rtools_home() -> pathlib.Path:
 
 
 @functools.cache
-def get_path_as_r(add_rtools: bool = True) -> str:
+def get_path_as_r(try_add_rtools: bool = True) -> str:
     res = run_rscript("suppressWarnings(cat(Sys.getenv('PATH')))")
 
     if res == "":
         raise RuntimeError("Failed to find the PATH environment variable")
 
-    if not add_rtools:
+    if not try_add_rtools:
         return res
 
-    path = [pathlib.Path(p).resolve() for p in res.split(";")]
+    try:
+        rtools_home = get_rtools_home()
 
-    rtools_home = get_rtools_home()
+        path = [pathlib.Path(p).resolve() for p in res.split(";")]
 
-    path.insert(0, rtools_home / "mingw64" / "bin")
-    path.insert(0, rtools_home / "usr" / "bin")
+        def add_dir_to_path(directory: pathlib.Path):
+            try:
+                path.insert(0, directory.resolve(strict=True))
+            except OSError as e:
+                logging.warning(f"{e}: continuing anyway...")
 
-    return ";".join(str(p) for p in path)
+        add_dir_to_path(rtools_home / "mingw64" / "bin")
+        add_dir_to_path(rtools_home / "usr" / "bin")
+
+        return ";".join(str(p) for p in path)
+    except RuntimeError as e:
+        if str(e).startswith("Unable to find Rtools"):
+            logging.warning(f"{e}: continuing anyway...")
+            return res
+
+        raise
 
 
 @functools.cache
