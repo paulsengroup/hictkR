@@ -40,7 +40,7 @@ venv$
 # Excluded files
 .*\.o$
 .*\.so$
-.*\.tar\.gz$
+.*\.tar\..*$
 ^CITATION\.cff$
 CMakeLists\.txt$
 ^cleanup$
