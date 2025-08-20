@@ -11,7 +11,7 @@ Provides an R interface for 'hictk', enabling users to fetch various types of in
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/paulsengroup/hictkR}
+  \item \url{https://github.com/paulsengroup/hictkR/}
   \item \url{https://paulsengroup.github.io/hictkR/}
   \item Report bugs at \url{https://github.com/paulsengroup/hictkR/issues}
 }

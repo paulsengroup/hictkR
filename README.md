@@ -36,7 +36,7 @@ with this library.  If not, see
     <tr>
       <td>Documentation</td>
       <td>
-        <a href="https://paulsengroup.github.io/hictkR">
+        <a href="https://paulsengroup.github.io/hictkR/">
           <img src="https://img.shields.io/badge/docs-passing-green" alt="Documentation">
         </a>
       </td>
