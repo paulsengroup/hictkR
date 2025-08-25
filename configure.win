@@ -32,7 +32,7 @@ trap "cd '$PWD'" EXIT
 set +u
 if [ -z "$HICTKR_TMPDIR" ]; then
   # HICTKR_TMPDIR="$(Rscript -e 'cat(normalizePath(tempdir(), winslash="/"))' 2> /dev/null)"
-  HICTKR_TMPDIR="$wd/scratch/tmp/"
+  HICTKR_TMPDIR="$wd/build/tmp/"
 fi
 set -u
 

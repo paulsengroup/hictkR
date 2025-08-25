@@ -36,7 +36,7 @@ trap "cd '$PWD'" EXIT
 
 set +u
 if [ -z "$HICTKR_TMPDIR" ]; then
-  HICTKR_TMPDIR="$wd/scratch/tmp/"
+  HICTKR_TMPDIR="$wd/build/tmp/"
 fi
 set -u
 
@@ -68,10 +68,6 @@ chmod 700 "$cleanup_script"
 
 mkdir -p "$TMPDIR"
 1>&2 echo "TMPDIR='$TMPDIR'"
-
-1>&2 echo "### BEGIN $(basename "$cleanup_script")"
-1>&2 cat "$cleanup_script"
-1>&2 echo "### END $(basename "$cleanup_script")"
 
 UV_VERSION='0.8.5'
 export UV_INSTALLER_URL="https://astral.sh/uv/$UV_VERSION/install.sh"
@@ -147,8 +143,16 @@ export CONAN_HOME="$HICTKR_CONAN_HOME"
 which conan
 conan --version
 
-python "$pkg_src_dir/tools/generate_makevars.py" --no-venv --workdir "$pkg_src_dir"
+# shellcheck disable=SC2086
+python "$pkg_src_dir/tools/generate_makevars.py" \
+  --no-venv \
+  --workdir "$pkg_src_dir"
+
 
 1>&2 echo '### BEGIN Makevars'
 1>&2 cat "$pkg_src_dir/src/Makevars"
 1>&2 echo '### END Makevars'
+
+1>&2 echo '### BEGIN cleanup'
+1>&2 cat "$cleanup_script"
+1>&2 echo '### END cleanup'

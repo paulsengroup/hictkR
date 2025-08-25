@@ -22,6 +22,7 @@ __pycache__$
 # required by the CI
 ^\.conan2$
 venv$
+^build$
 ^cmake$
 ^cmake-build-.*
 ^docs$
@@ -38,6 +39,7 @@ venv$
 ^\.vscode$
 
 # Excluded files
+.*\.bak$
 .*\.o$
 .*\.so$
 .*\.tar\..*$
