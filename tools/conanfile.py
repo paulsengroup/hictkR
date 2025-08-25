@@ -59,7 +59,7 @@ class HictkConan(ConanFile):
                 "2.1.4": [
                     {
                         "patch_file": "patches/hictk_v2.1.4_eigen_include.patch",
-                        "patch_type": "portabiliy",
+                        "patch_type": "portability",
                         "patch_description": "Support including Eigen headers located under eigen3/",
                     }
                 ]
