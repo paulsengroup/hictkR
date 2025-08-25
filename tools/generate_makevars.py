@@ -44,12 +44,6 @@ def make_cli() -> argparse.ArgumentParser:
     )
 
     cli.add_argument(
-        "--force",
-        action="store_true",
-        default=False,
-        help="Run the script even if Makevars already exists (default: %(default)s).",
-    )
-    cli.add_argument(
         "--workdir",
         type=pathlib.Path,
         default=pathlib.Path().cwd(),
@@ -586,14 +580,7 @@ def main():
     workdir = args.workdir
 
     makevars_file = workdir / "src" / "Makevars"
-
-    if args.force:
-        makevars_file.unlink(missing_ok=True)
-
-    if makevars_file.exists():
-        logging.debug("\n%s", makevars_file.read_text())
-        logging.info('found existing Makevars file at "%s"!', makevars_file.resolve())
-        return
+    makevars_file.unlink(missing_ok=True)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         logging.info("Using %s as tmpdir", tmpdir)
