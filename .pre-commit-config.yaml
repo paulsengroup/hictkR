@@ -48,7 +48,7 @@ repos:
           - --fix=lf
       - id: trailing-whitespace
   - repo: https://github.com/lorenzwalthert/precommit
-    rev: v0.4.3.9013
+    rev: v0.4.3.9014
     hooks:
       - id: lintr
         args: [--warn_only]
