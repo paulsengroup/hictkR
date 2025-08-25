@@ -118,6 +118,7 @@ PATH="$UV_INSTALL_DIR:$PATH"
 uv venv \
   --python 3.13 \
   --link-mode=copy \
+  --managed-python \
   "$VIRTUAL_ENV"
 
 uv pip install 'cmake>=3.25,<4' 'conan>=2.15,<3' ninja
