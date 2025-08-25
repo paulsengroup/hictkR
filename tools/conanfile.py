@@ -71,10 +71,9 @@ class HictkConan(ConanFile):
 
     def requirements(self):
         self.requires("arrow/21.0.0#228b4b648a5100809cd7d17451d87233")
-        self.requires("boost/1.88.0#14ecfc01dd5a690f15e1318e56a6b78c", force=True)  # required by arrow
         self.requires("bshoshany-thread-pool/5.0.0#d94da300363f0c35b8f41b2c5490c94d")
         self.requires("concurrentqueue/1.0.4#1e48e1c712bcfd892087c9c622a51502")
-        self.requires("eigen/3.4.0#2e192482a8acff96fe34766adca2b24c")
+        self.requires("eigen/3.4.90-unstable git.2025.08.15#b407f03f085cdb246f6bcbadd84fe9db")
         self.requires("fast_float/8.0.2#846ad0ebab16bc265c511095c3b490e9")
         self.requires("fmt/11.2.0#579bb2cdf4a7607621beea4eb4651e0f", force=True)
         self.requires("hdf5/1.14.6#6f1acd01d23d00735fe97300f4d5980c", force=True)
@@ -150,53 +149,10 @@ class HictkConan(ConanFile):
         self.options["arrow"].compute = True
         self.options["arrow"].filesystem_layer = False
         self.options["arrow"].parquet = False
-        self.options["arrow"].with_boost = True
-        self.options["arrow"].with_re2 = True
+        self.options["arrow"].with_boost = False
+        self.options["arrow"].with_re2 = False
         self.options["arrow"].with_thrift = False
-        self.options["boost"].system_no_deprecated = True
-        self.options["boost"].asio_no_deprecated = True
-        self.options["boost"].filesystem_no_deprecated = True
-        self.options["boost"].filesystem_version = 4
-        self.options["boost"].zlib = False
-        self.options["boost"].bzip2 = False
-        self.options["boost"].lzma = False
-        self.options["boost"].zstd = False
-        self.options["boost"].without_atomic = False
-        self.options["boost"].without_charconv = True
-        self.options["boost"].without_chrono = True
-        self.options["boost"].without_cobalt = True
-        self.options["boost"].without_container = True
-        self.options["boost"].without_context = False
-        self.options["boost"].without_contract = True
-        self.options["boost"].without_coroutine = True
-        # without_date_time is set to False to workaround https://github.com/conan-io/conan-center-index/issues/26890
-        self.options["boost"].without_date_time = False
-        self.options["boost"].without_exception = True
-        self.options["boost"].without_fiber = True
-        self.options["boost"].without_filesystem = False
-        self.options["boost"].without_graph = True
-        self.options["boost"].without_graph_parallel = True
-        self.options["boost"].without_iostreams = True
-        self.options["boost"].without_json = True
-        self.options["boost"].without_locale = True
-        self.options["boost"].without_log = True
-        self.options["boost"].without_math = True
-        self.options["boost"].without_mpi = True
-        self.options["boost"].without_nowide = True
-        self.options["boost"].without_process = True
-        self.options["boost"].without_program_options = True
-        self.options["boost"].without_python = True
-        self.options["boost"].without_random = True
-        self.options["boost"].without_regex = True
-        self.options["boost"].without_serialization = True
-        self.options["boost"].without_stacktrace = True
-        self.options["boost"].without_system = False
-        self.options["boost"].without_test = True
-        self.options["boost"].without_thread = True
-        self.options["boost"].without_timer = True
-        self.options["boost"].without_type_erasure = True
-        self.options["boost"].without_url = True
-        self.options["boost"].without_wave = True
+        self.options["arrow"].with_zlib = False
         self.options["fmt"].header_only = True
         self.options["hdf5"].enable_cxx = False
         self.options["hdf5"].hl = False
