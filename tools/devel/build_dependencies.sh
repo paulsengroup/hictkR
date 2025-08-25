@@ -30,7 +30,7 @@ trap "cd '$PWD'" EXIT
 
 git_root="$(git rev-parse --show-toplevel)"
 
-conanfile="$git_root/deps/conanfile.py"
+conanfile="$git_root/tools/conanfile.py"
 stage_dir="$git_root/staging/"
 
 tmpdir="$(mktemp -d)"
@@ -56,6 +56,8 @@ for build_type in Release Debug; do
     --build=missing \
     --build='hictk/*' \
     --update
+
+  rm -rf "${stage_dir:?}/$build_type/"
 
   conan install \
     --requires="hictk/$version" \

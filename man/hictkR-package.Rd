@@ -4,20 +4,20 @@
 \name{hictkR-package}
 \alias{hictkR}
 \alias{hictkR-package}
-\title{hictkR: R bindings for 'hictk': read .cool and .hic files directly from R}
+\title{hictkR: R Bindings for 'hictk': Read .cool and .hic Files Directly from R}
 \description{
-R bindings for 'hictk': a blazing fast toolkit to work with '.hic' and '.cool' files
+Provides an R interface for 'hictk', enabling users to fetch various types of information, including interactions, from files in .cool, .mcool, and .hic format.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/paulsengroup/hictkR}
+  \item \url{https://github.com/paulsengroup/hictkR/}
   \item \url{https://paulsengroup.github.io/hictkR/}
   \item Report bugs at \url{https://github.com/paulsengroup/hictkR/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Roberto Rossini \email{roberros@uio.no} (\href{https://orcid.org/0000-0003-3096-1470}{ORCID})
+\strong{Maintainer}: Roberto Rossini \email{roberros@uio.no} (\href{https://orcid.org/0000-0003-3096-1470}{ORCID}) [copyright holder]
 
 }
