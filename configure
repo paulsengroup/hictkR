@@ -78,6 +78,7 @@ export UV_INSTALL_DIR="$TMPDIR/uv-install"
 export UV_CACHE_DIR="$TMPDIR/uv-cache"
 export UV_PYTHON_INSTALL_DIR="$TMPDIR/python-install"
 export UV_NO_MODIFY_PATH=1
+export UV_PYTHON_VERSION='3.13'
 
 export VIRTUAL_ENV="$TMPDIR/venv/"
 
@@ -115,8 +116,10 @@ sh "$UV_INSTALLER_DEST"
 
 PATH="$UV_INSTALL_DIR:$PATH"
 
+uv python install "$UV_PYTHON_VERSION"
+
 uv venv \
-  --python 3.13 \
+  --python "$UV_PYTHON_VERSION" \
   --link-mode=copy \
   --managed-python \
   "$VIRTUAL_ENV"
