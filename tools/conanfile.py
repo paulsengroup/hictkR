@@ -70,7 +70,8 @@ class HictkConan(ConanFile):
         cmake_layout(self, src_folder="src")
 
     def requirements(self):
-        self.requires("arrow/21.0.0#228b4b648a5100809cd7d17451d87233")
+        # Arrow 21.0.0 can't find certain kernels (e.g., sort_indices)
+        self.requires("arrow/20.0.0#6e04404a336dd16f08062f6923e6f8f1")
         self.requires("bshoshany-thread-pool/5.0.0#d94da300363f0c35b8f41b2c5490c94d")
         self.requires("concurrentqueue/1.0.4#1e48e1c712bcfd892087c9c622a51502")
         self.requires("eigen/3.4.90-unstable git.2025.08.15#b407f03f085cdb246f6bcbadd84fe9db")
@@ -150,7 +151,7 @@ class HictkConan(ConanFile):
         self.options["arrow"].filesystem_layer = False
         self.options["arrow"].parquet = False
         self.options["arrow"].with_boost = False
-        self.options["arrow"].with_re2 = False
+        self.options["arrow"].with_re2 = True
         self.options["arrow"].with_thrift = False
         self.options["arrow"].with_zlib = False
         self.options["fmt"].header_only = True
