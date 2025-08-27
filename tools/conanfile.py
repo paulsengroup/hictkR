@@ -74,7 +74,7 @@ class HictkConan(ConanFile):
         self.requires("arrow/20.0.0#6e04404a336dd16f08062f6923e6f8f1")
         self.requires("bshoshany-thread-pool/5.0.0#d94da300363f0c35b8f41b2c5490c94d")
         self.requires("concurrentqueue/1.0.4#1e48e1c712bcfd892087c9c622a51502")
-        self.requires("eigen/3.4.90-unstable git.2025.08.15#b407f03f085cdb246f6bcbadd84fe9db")
+        self.requires("eigen/3.4.90-unstable+git.2025.08.15#b407f03f085cdb246f6bcbadd84fe9db")
         self.requires("fast_float/8.0.2#846ad0ebab16bc265c511095c3b490e9")
         self.requires("fmt/11.2.0#579bb2cdf4a7607621beea4eb4651e0f", force=True)
         self.requires("hdf5/1.14.6#6f1acd01d23d00735fe97300f4d5980c", force=True)
