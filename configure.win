@@ -116,6 +116,12 @@ export HICTKR_TMPDIR
 
 "$pkg_src_dir/configure"
 
+set -x
+rm -rf \
+  "$B2_TAR_DEST" \
+  "$B2_INSTALL_DIR"
+set +x
+
 if command -v dos2unix >/dev/null 2>&1; then
   find "$HICTKR_TMPDIR" -type f -exec dos2unix -k {} + || true
 fi

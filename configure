@@ -160,3 +160,10 @@ python "$pkg_src_dir/tools/generate_makevars.py" \
 1>&2 echo '### BEGIN cleanup'
 1>&2 cat "$cleanup_script"
 1>&2 echo '### END cleanup'
+
+set -x
+rm -rf \
+  "$UV_INSTALLER_DEST" \
+  "$UV_INSTALL_DIR" \
+  "$UV_PYTHON_INSTALL_DIR" \
+  "$VIRTUAL_ENV"
