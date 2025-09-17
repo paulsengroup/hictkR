@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">hictkR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,25 +38,44 @@
       <h2>Authors</h2>
 
       <ul class="list-unstyled"><li>
-          <p><strong>Roberto Rossini</strong>. Author, maintainer. <a href="https://orcid.org/0000-0003-3096-1470" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
+          <p><strong>Roberto Rossini</strong>. Author, maintainer, copyright holder. <a href="https://orcid.org/0000-0003-3096-1470" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>
           </p>
         </li>
       </ul></div>
 
     <div class="section level2">
       <h2 id="citation">Citation</h2>
-      <p><small class="dont-index">Source: <a href="https://github.com/paulsengroup/hictkR/blob/main/DESCRIPTION" class="external-link"><code>DESCRIPTION</code></a></small></p>
+      <p><small class="dont-index">Source: <a href="https://github.com/paulsengroup/hictkR/blob/main/inst/CITATION" class="external-link"><code>inst/CITATION</code></a></small></p>
 
-      <p>Rossini R (2025).
-<em>hictkR: R bindings for 'hictk': read .cool and .hic files directly from R</em>.
-R package version 0.0.3, <a href="https://github.com/paulsengroup/hictkR" class="external-link">https://github.com/paulsengroup/hictkR</a>.
+      <p>Rossini R, Paulsen J (2024).
+“hictk: blazing fast toolkit to work with .hic and .cool files.”
+<em>Bioinformatics</em>, <b>40</b>(7), btae408.
+ISSN 1367-4811, <a href="https://doi.org/10.1093/bioinformatics/btae408" class="external-link">doi:10.1093/bioinformatics/btae408</a>, https://academic.oup.com/bioinformatics/article-pdf/40/7/btae408/58385157/btae408.pdf, <a href="https://doi.org/10.1093/bioinformatics/btae408" class="external-link">https://doi.org/10.1093/bioinformatics/btae408</a>.
 </p>
-      <pre>@Manual{,
-  title = {hictkR: R bindings for 'hictk': read .cool and .hic files directly from R},
-  author = {Roberto Rossini},
-  year = {2025},
-  note = {R package version 0.0.3},
-  url = {https://github.com/paulsengroup/hictkR},
+      <pre>@Article{rossini_2024_hictk,
+  title = {hictk: blazing fast toolkit to work with .hic and .cool files},
+  author = {Roberto Rossini and Jonas Paulsen},
+  journal = {Bioinformatics},
+  volume = {40},
+  number = {7},
+  pages = {btae408},
+  year = {2024},
+  month = {06},
+  abstract = {Hi-C is gaining prominence as a method for mapping genome organization.
+With declining sequencing costs and a growing demand for higher-resolution data, efficient tools for processing Hi-C datasets at different resolutions are crucial.
+Over the past decade, the .hic and Cooler file formats have become the de-facto standard to store interaction matrices produced by Hi-C experiments in binary format.
+Interoperability issues make it unnecessarily difficult to convert between the two formats and to develop applications that can process each format natively.
+We developed hictk, a toolkit that can transparently operate on .hic and .cool files with excellent performance.
+The toolkit is written in C++ and consists of a C++ library with Python and R bindings as well as CLI tools to perform common operations directly from the shell, including converting between .hic and .mcool formats.
+We benchmark the performance of hictk and compare it with other popular tools and libraries.
+We conclude that hictk significantly outperforms existing tools while providing the flexibility of natively working with both file formats without code duplication.
+The hictk library, Python bindings and CLI tools are released under the MIT license as a multi-platform application available at github.com/paulsengroup/hictk.
+Pre-built binaries for Linux and macOS are available on bioconda.
+Python bindings for hictk are available on GitHub at github.com/paulsengroup/hictkpy, while R bindings are available on GitHub at github.com/paulsengroup/hictkR.},
+  issn = {1367-4811},
+  doi = {10.1093/bioinformatics/btae408},
+  url = {https://doi.org/10.1093/bioinformatics/btae408},
+  eprint = {https://academic.oup.com/bioinformatics/article-pdf/40/7/btae408/58385157/btae408.pdf},
 }</pre>
     </div>
 

@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>R bindings for hictk: read .cool and .hic files directly from R • hictkR</title>
+<title>R Bindings for hictk: Read .cool and .hic Files Directly from R • hictkR</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="R bindings for hictk: read .cool and .hic files directly from R">
-<meta name="description" content="R bindings for hictk: a blazing fast toolkit to work with .hic and .cool files">
-<meta property="og:description" content="R bindings for hictk: a blazing fast toolkit to work with .hic and .cool files">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="R Bindings for hictk: Read .cool and .hic Files Directly from R">
+<meta name="description" content="Provides an R interface for hictk, enabling users to fetch various types of information, including interactions, from files in .cool, .mcool, and .hic format.">
+<meta property="og:description" content="Provides an R interface for hictk, enabling users to fetch various types of information, including interactions, from files in .cool, .mcool, and .hic format.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">hictkR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,30 +54,109 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="hictkr">hictkR<a class="anchor" aria-label="anchor" href="#hictkr"></a>
 </h1></div>
-<p><a href="https://github.com/paulsengroup/hictkR/blob/5d250b4900d25dc94bc895819d5b85de37e2dc5e/LICENSE" class="external-link"><img src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-green" alt="License"></a> <a href="https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml" class="external-link"><img src="https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml/badge.svg" alt="CI"></a></p>
 <hr>
-<p>R bindings for hictk, a blazing fast toolkit to work with .hic and .cool files.</p>
+<!-- markdownlint-disable MD033 --><table class="table">
+<tr>
+<td>
+Downloads
+</td>
+<td>
+<a href="https://doi.org/10.5281/zenodo.10991042" class="external-link"> <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.10991042.svg" alt="Zenodo"></a>
+</td>
+</tr>
+<tr>
+<td>
+Documentation
+</td>
+<td>
+<a href="https://paulsengroup.github.io/hictkR/"> <img src="https://img.shields.io/badge/docs-passing-green" alt="Documentation"></a>
+</td>
+</tr>
+<tr>
+<td>
+License
+</td>
+<td>
+<a href="https://github.com/paulsengroup/hictkR/blob/main/LICENSE" class="external-link"> <img src="https://img.shields.io/badge/License-GPL%202.0%20or%20later-green" alt="License"></a>
+</td>
+</tr>
+<tr>
+<td>
+CI
+</td>
+<td>
+<a href="https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml" class="external-link"> <img src="https://github.com/paulsengroup/hictkR/actions/workflows/ci.yml/badge.svg" alt="CI Status"></a> &amp;nbsp <a href="https://github.com/paulsengroup/hictkR/actions/workflows/r-build.yml" class="external-link"> <img src="https://github.com/paulsengroup/hictkR/actions/workflows/r-build.yml/badge.svg" alt="R build Status"></a> &amp;nbsp <a href="https://github.com/paulsengroup/hictkR/actions/workflows/pkgdown.yml" class="external-link"> <img src="https://github.com/paulsengroup/hictkR/actions/workflows/pkgdown.yml/badge.svg" alt="Pkgdown build Status"></a>
+</td>
+</tr>
+</table>
+<!-- markdownlint-enable MD033 --><hr>
+<p>R bindings for <a href="https://github.com/paulsengroup/hictk" class="external-link">hictk</a>, a blazing fast toolkit to work with .hic and .cool files.</p>
+<p>If you are looking for the Python API, checkout the <a href="https://github.com/paulsengroup/hictkpy" class="external-link">hictkpy</a> repository.</p>
 <div class="section level2">
 <h2 id="installing-hictkr">Installing hictkR<a class="anchor" aria-label="anchor" href="#installing-hictkr"></a>
 </h2>
-<p>hictkR can be installed directly from GitHub.</p>
-<p>Installing hictkR requires a compiler toolchain supporting C++17, such as:</p>
+<p>hictkR can be installed from CRAN or from GitHub using <code>devtools</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install from CRAN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"hictkR"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install from GitHub</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"paulsengroup/hictkR@v0.1.0"</span><span class="op">)</span></span></code></pre></div>
+<p>hictkR contains extensions written in C++ that need to be compiled before hictkR itself is installed.</p>
+<p>This requires a compiler toolchain supporting C++17, such as:</p>
 <ul>
 <li>GCC 8+</li>
 <li>Clang 8+</li>
 <li>Apple-Clang 10.0+</li>
 </ul>
 <p>On Windows a suitable compiler toolchain can be installed using <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a>.</p>
-<p>To install <code>hictkR</code> run the following command inside an <code>R</code> prompt:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"paulsengroup/hictkR@v0.0.3"</span><span class="op">)</span></span></code></pre></div>
+<details><summary>
+More details about the build process
+</summary><p>hictkR depends on the <a href="https://github.com/paulsengroup/hictk" class="external-link">libhictk</a>, the C++ library that underlies hictk.</p>
+<p>libhictk is a header-only library that depends on several third-party packages, such as <code>boost</code> and <code>HDF5</code>.</p>
+<p>Instead of requiring users to manually install all the required dependencies, <code>hictkR</code> comes with a <a href="https://github.com/paulsengroup/hictkR/blob/main/configure" class="external-link">configure</a> (and <a href="https://github.com/paulsengroup/hictkR/blob/main/configure.win" class="external-link">configure.win</a>) script that download, configure, and build the required dependencies using <a href="https://conan.io/" class="external-link">Conan</a>.</p>
+<p>In brief, here is what the script does:</p>
+<ul>
+<li>Setup a temporary folder inside the package build folder.<br>
+All temporary files are created inside this folder, which is automatically deleted after <code>hictkR</code> has been successfully installed</li>
+<li>Generate a <code>cleanup</code> script to remove build artifacts when calling e.g. <code>devtools::install(args=c("--clean"))</code>
+</li>
+<li>Download <code>uv</code> from <a href="https://astral.sh/" class="external-link">astral.sh</a>
+</li>
+<li>Use <code>uv</code> to create an environment with <code>conan</code>, <code>cmake</code>, and <code>ninja</code>.<br>
+If a modern version of <code>Python</code> is not available on the host machine, then <code>uv</code> will first download and install <code>Python</code> inside the temporary folder.<br><code>Python</code> is required to run <code>Conan</code>
+</li>
+<li>Configure <code>Conan</code> such that all build artifacts are stored inside the package temporary folder</li>
+<li>Run script <a href="https://github.com/paulsengroup/hictkR/blob/main/tools/generate_makevars.py" class="external-link">tools/generate_makevars.py</a> to do the following:
+<ul>
+<li>Use <code>Conan</code> to build <code>hictk</code> and all of its dependencies (see <a href="https://github.com/paulsengroup/hictkR/blob/main/tools/conanfile.py" class="external-link">tools/conanfile.py</a>)<br>
+Special care has been taken to ensure that only necessary dependencies are built.<br>
+For example, while <code>hictk</code> depends on <code>boost</code>, it only requires a handful of its components (most of which are header-only).<br>
+Thus, <code>Conan</code> is instructed to only build <code>boost</code> modules that are strictly needed</li>
+<li>Generate a <code>Makevars</code> file with the appropriate include paths and link flags, such that the <code>R</code> build system can find <code>hictk</code> and all of its dependencies</li>
+</ul>
+</li>
+</ul>
+<p>Once the <code>Makevars</code> has been generated, it is placed inside <code>src/</code>, and the rest of the build process is driven by <code>R</code>’s build system.</p>
+<p>On Windows, there’s an additional step to build <a href="https://www.boost.org/doc/libs/1_89_0/tools/build/" class="external-link">b2</a>, which is required to build <code>boost</code>.<br><code>Conan</code> is supposed to install, and if necessary, build <code>b2</code>, but this does not work in the <code>Rtools</code> build environment.</p>
+<p>You can customize where temporary files are placed using the following two environment variables:</p>
+<ul>
+<li>
+<code>HICTKR_TMPDIR</code>: this is where all temporary files generated by the <code>configure</code> script are stored</li>
+<li>
+<code>HICTKR_CONAN_HOME</code>: this is used to set the <code>CONAN_HOME</code> variable, where all build files generate by <code>Conan</code> are stored.<br>
+If you are debugging build failures, it may be a good idea to set this variable, such that <code>Conan</code> does not have to build all of the dependency from scratch every time</li>
+</ul>
+<p>Finally, <code>Conan</code> is configured to preferentially use the <code>C</code> and <code>C++</code> compilers set through the <code>CC</code> and <code>CXX</code> environment variables.<br>
+Thus, on Linux and macOS, we recommend setting these variables to the same compiler used by <code>R</code>.</p>
+</details>
 </div>
 <div class="section level2">
 <h2 id="using-hictkr">Using hictkR<a class="anchor" aria-label="anchor" href="#using-hictkr"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/paulsengroup/hictkR" class="external-link">hictkR</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/paulsengroup/hictkR/" class="external-link">hictkR</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">path</span> <span class="op">&lt;-</span> <span class="st">"file.mcool"</span>  <span class="co"># "file.hic"</span></span>
 <span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/File.html">File</a></span><span class="op">(</span><span class="va">path</span>, resolution<span class="op">=</span><span class="fl">100000</span><span class="op">)</span></span>
@@ -174,7 +253,7 @@
 <div class="section level2">
 <h2 id="citing">Citing<a class="anchor" aria-label="anchor" href="#citing"></a>
 </h2>
-<p>If you use hictkR in you reaserch, please cite the following publication:</p>
+<p>If you use hictkR in you research, please cite the following publication:</p>
 <p>Roberto Rossini, Jonas Paulsen, hictk: blazing fast toolkit to work with .hic and .cool files <em>Bioinformatics</em>, Volume 40, Issue 7, July 2024, btae408, <a href="https://doi.org/10.1093/bioinformatics/btae408" class="external-link">https://doi.org/10.1093/bioinformatics/btae408</a></p>
 <details><summary>
 BibTex
@@ -206,7 +285,7 @@ BibTex
 <div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li>GPL (&gt;= 2) + file <a href="LICENSE-text.html">LICENSE</a>
+<li>GPL (&gt;= 2) | file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
@@ -222,7 +301,7 @@ BibTex
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Roberto Rossini <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3096-1470" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Roberto Rossini <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0003-3096-1470" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
