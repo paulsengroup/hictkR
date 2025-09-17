@@ -36,7 +36,7 @@ trap "cd '$PWD'" EXIT
 
 set +u
 if [ -z "$HICTKR_TMPDIR" ]; then
-  HICTKR_TMPDIR="$wd/scratch/tmp/"
+  HICTKR_TMPDIR="$wd/build/tmp/"
 fi
 set -u
 
@@ -69,10 +69,6 @@ chmod 700 "$cleanup_script"
 mkdir -p "$TMPDIR"
 1>&2 echo "TMPDIR='$TMPDIR'"
 
-1>&2 echo "### BEGIN $(basename "$cleanup_script")"
-1>&2 cat "$cleanup_script"
-1>&2 echo "### END $(basename "$cleanup_script")"
-
 UV_VERSION='0.8.5'
 export UV_INSTALLER_URL="https://astral.sh/uv/$UV_VERSION/install.sh"
 export UV_INSTALLER_SHA256='8e6284da8ff65d4c1d9d978eeb8fc905462eeba7b7e6e55a4c12ecb0412965d9'
@@ -82,6 +78,7 @@ export UV_INSTALL_DIR="$TMPDIR/uv-install"
 export UV_CACHE_DIR="$TMPDIR/uv-cache"
 export UV_PYTHON_INSTALL_DIR="$TMPDIR/python-install"
 export UV_NO_MODIFY_PATH=1
+export UV_PYTHON_VERSION='3.13'
 
 export VIRTUAL_ENV="$TMPDIR/venv/"
 
@@ -119,9 +116,12 @@ sh "$UV_INSTALLER_DEST"
 
 PATH="$UV_INSTALL_DIR:$PATH"
 
+uv python install "$UV_PYTHON_VERSION"
+
 uv venv \
-  --python 3.13 \
+  --python "$UV_PYTHON_VERSION" \
   --link-mode=copy \
+  --managed-python \
   "$VIRTUAL_ENV"
 
 uv pip install 'cmake>=3.25,<4' 'conan>=2.15,<3' ninja
@@ -147,4 +147,23 @@ export CONAN_HOME="$HICTKR_CONAN_HOME"
 which conan
 conan --version
 
-python "$pkg_src_dir/deps/generate_makevars.py" --no-venv --workdir "$pkg_src_dir"
+# shellcheck disable=SC2086
+python "$pkg_src_dir/tools/generate_makevars.py" \
+  --no-venv \
+  --workdir "$pkg_src_dir"
+
+
+1>&2 echo '### BEGIN Makevars'
+1>&2 cat "$pkg_src_dir/src/Makevars"
+1>&2 echo '### END Makevars'
+
+1>&2 echo '### BEGIN cleanup'
+1>&2 cat "$cleanup_script"
+1>&2 echo '### END cleanup'
+
+set -x
+rm -rf \
+  "$UV_INSTALLER_DEST" \
+  "$UV_INSTALL_DIR" \
+  "$UV_PYTHON_INSTALL_DIR" \
+  "$VIRTUAL_ENV"

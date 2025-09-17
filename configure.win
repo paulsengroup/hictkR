@@ -32,7 +32,7 @@ trap "cd '$PWD'" EXIT
 set +u
 if [ -z "$HICTKR_TMPDIR" ]; then
   # HICTKR_TMPDIR="$(Rscript -e 'cat(normalizePath(tempdir(), winslash="/"))' 2> /dev/null)"
-  HICTKR_TMPDIR="$wd/scratch/tmp/"
+  HICTKR_TMPDIR="$wd/build/tmp/"
 fi
 set -u
 
@@ -115,3 +115,13 @@ HICTKR_TMPDIR="$(cygpath -a -w "$HICTKR_TMPDIR")"
 export HICTKR_TMPDIR
 
 "$pkg_src_dir/configure"
+
+set -x
+rm -rf \
+  "$B2_TAR_DEST" \
+  "$B2_INSTALL_DIR"
+set +x
+
+if command -v dos2unix >/dev/null 2>&1; then
+  find "$HICTKR_TMPDIR" -type f -exec dos2unix -k {} + || true
+fi

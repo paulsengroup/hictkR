@@ -44,12 +44,6 @@ def make_cli() -> argparse.ArgumentParser:
     )
 
     cli.add_argument(
-        "--force",
-        action="store_true",
-        default=False,
-        help="Run the script even if Makevars already exists (default: %(default)s).",
-    )
-    cli.add_argument(
         "--workdir",
         type=pathlib.Path,
         default=pathlib.Path().cwd(),
@@ -78,26 +72,42 @@ def find_conan() -> pathlib.Path:
     return conan
 
 
+def run_rscript(
+    args: str,
+    env: EnvDict | None = None,
+    strip_warnings: bool = True,
+) -> str:
+    data = sp.check_output(["Rscript", "-e", args], stderr=sp.DEVNULL, env=env).decode("utf-8")
+
+    if not strip_warnings:
+        return data
+
+    pattern = re.compile(r"^\s*WARNING", re.IGNORECASE)
+    lines = data.splitlines(keepends=True)
+
+    return "".join(line for line in lines if not pattern.match(line))
+
+
+def guess_rtools_home(major_version: str) -> pathlib.Path:
+    paths = list(pathlib.Path("C:\\").glob(f"rtools{major_version}*"))
+    if len(paths) == 0:
+        raise RuntimeError(f"Unable to find Rtools for R {major_version}.x.x under C:\\")
+
+    return max(paths)
+
+
 @functools.cache
 def get_rtools_home() -> pathlib.Path:
-    res = sp.check_output(["Rscript", "-e", "package_version(R.version)"], stderr=sp.DEVNULL).decode("utf-8")
-    matches = re.search(r"(\d+\.\d+).\d+", res)
-    if not matches:
-        raise RuntimeError("Unable to infer R version")
+    major = run_rscript("suppressWarnings(cat(getRversion()$major))")
+    minor = run_rscript("suppressWarnings(cat(getRversion()$minor))")
 
-    r_version = matches.group(1).replace(".", "")
-    rtools_string = f"rtools{r_version}"
-
-    rtools_home = pathlib.Path("C:\\") / rtools_string
-    for p in get_path_as_r(add_rtools=False).split(";"):
-        if rtools_string in p:
-            matches = re.search(rf"^(.*{rtools_string})", p)
-            if matches:
-                rtools_home = pathlib.Path(matches.group(1))
-                break
+    rtools_home = pathlib.Path("C:\\") / f"rtools{major}{minor}"
 
     if not rtools_home.exists():
-        raise RuntimeError(f"Unable to find RTOOLS_HOME at: {rtools_home}")
+        logging.warning("Unable to find RTOOLS_HOME at: %s (major=%s, minor=%s)", rtools_home, major, minor)
+        rtools_home = guess_rtools_home(major)
+
+    assert rtools_home.exists()
 
     logging.info('Found Rtools at "%s"', rtools_home)
 
@@ -105,34 +115,52 @@ def get_rtools_home() -> pathlib.Path:
 
 
 @functools.cache
-def get_path_as_r(add_rtools: bool = True) -> str:
-    res = sp.check_output(["Rscript", "-e", "Sys.getenv('PATH')"], stderr=sp.DEVNULL).decode("utf-8")
-    matches = re.search(r"\"(.*)\"", res, re.MULTILINE)
-    if not matches:
-        return ""
+def get_path_as_r(try_add_rtools: bool = True) -> str:
+    res = run_rscript("suppressWarnings(cat(Sys.getenv('PATH')))")
 
-    path = [pathlib.Path(p).resolve() for p in matches.group(1).split(";")]
+    if res == "":
+        raise RuntimeError("Failed to find the PATH environment variable")
 
-    if add_rtools:
+    if not try_add_rtools:
+        return res
+
+    try:
         rtools_home = get_rtools_home()
 
-        path = [
-            rtools_home / "usr" / "bin",
-            rtools_home / "mingw64" / "bin",
-        ] + path
+        path = [pathlib.Path(p).resolve() for p in res.split(";")]
 
-    return ";".join(str(p) for p in path)
+        def add_dir_to_path(directory: pathlib.Path):
+            try:
+                path.insert(0, directory.resolve(strict=True))
+            except OSError as e:
+                logging.warning(f"{e}: continuing anyway...")
+
+        add_dir_to_path(rtools_home / "mingw64" / "bin")
+        add_dir_to_path(rtools_home / "usr" / "bin")
+
+        return ";".join(str(p) for p in path)
+    except RuntimeError as e:
+        if str(e).startswith("Unable to find Rtools"):
+            logging.warning(f"{e}: continuing anyway...")
+            return res
+
+        raise
 
 
 @functools.cache
-def r_which(program: str, resolve: bool = True) -> pathlib.Path | None:
-    res = sp.check_output(["Rscript", "-e", f'Sys.which("{program}")'], stderr=sp.DEVNULL).decode("utf-8")
+def r_which(
+    program: str,
+    resolve: bool = True,
+    raise_if_not_found: bool = True,
+) -> pathlib.Path | None:
+    res = run_rscript(f'suppressWarnings(cat(Sys.which("{program}")))')
 
-    matches = re.search(r"\n\"(.*)\"", res, re.MULTILINE)
-    if not matches:
+    if res == "":
+        if raise_if_not_found:
+            raise RuntimeError(f'Unable to find "{program}" in PATH')
         return None
 
-    exe = pathlib.Path(matches.group(1))
+    exe = pathlib.Path(res)
     if resolve:
         exe = exe.resolve()
 
@@ -142,7 +170,7 @@ def r_which(program: str, resolve: bool = True) -> pathlib.Path | None:
 @functools.cache
 def find_cc() -> pathlib.Path:
     for name in (os.getenv("CC", "clang"), "clang", "gcc", "cc"):
-        cc = r_which(name, resolve=False)
+        cc = r_which(name, resolve=False, raise_if_not_found=False)
         if cc is not None:
             return cc
 
@@ -152,7 +180,7 @@ def find_cc() -> pathlib.Path:
 @functools.cache
 def find_cxx() -> pathlib.Path:
     for name in (os.getenv("CXX", "clang++"), "clang++", "g++", "c++"):
-        cxx = r_which(name, resolve=False)
+        cxx = r_which(name, resolve=False, raise_if_not_found=False)
         if cxx is not None:
             return cxx
 
@@ -161,7 +189,7 @@ def find_cxx() -> pathlib.Path:
 
 @functools.cache
 def cxx_flags_rcpp() -> str:
-    return sp.check_output(["Rscript", "-e", "Rcpp:::CxxFlags()"], stderr=sp.DEVNULL).decode("utf-8")
+    return run_rscript("suppressWarnings(Rcpp:::CxxFlags())")
 
 
 @functools.cache
@@ -472,12 +500,12 @@ def generate_makevars(
         CXX_STD = CXX17
 
         PKG_CPPFLAGS += $(addprefix -isystem ,$(CONAN_INCLUDE_DIRS))
-        PKG_CPPFLAGS += $(addprefix -D ,$(CONAN_DEFINES))
+        PKG_CPPFLAGS += $(addprefix -D,$(CONAN_DEFINES))
         PKG_CPPFLAGS += {cxx_flags}
 
         PKG_LIBS += $(addprefix -L ,$(CONAN_LIB_DIRS))
-        PKG_LIBS += $(addprefix -l ,$(CONAN_LIBS))
-        PKG_LIBS += $(addprefix -l ,$(CONAN_SYSTEM_LIBS))
+        PKG_LIBS += $(addprefix -l,$(CONAN_LIBS))
+        PKG_LIBS += $(addprefix -l,$(CONAN_SYSTEM_LIBS))
         """
     )
 
@@ -552,14 +580,7 @@ def main():
     workdir = args.workdir
 
     makevars_file = workdir / "src" / "Makevars"
-
-    if args.force:
-        makevars_file.unlink(missing_ok=True)
-
-    if makevars_file.exists():
-        logging.debug("\n%s", makevars_file.read_text())
-        logging.info('found existing Makevars file at "%s"!', makevars_file.resolve())
-        return
+    makevars_file.unlink(missing_ok=True)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         logging.info("Using %s as tmpdir", tmpdir)
@@ -577,7 +598,7 @@ def main():
         env["TMPDIR"] = str(tmpdir.absolute())
 
         run_conan_profile_detect(tmpdir, env)
-        conandeps_mk = run_conan_install(workdir / "deps" / "conanfile.py", tmpdir, env)
+        conandeps_mk = run_conan_install(workdir / "tools" / "conanfile.py", tmpdir, env)
 
         generate_makevars(makevars_file, tmpdir, conandeps_mk)
 

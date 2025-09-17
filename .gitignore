@@ -22,10 +22,12 @@
 .run/
 .vscode/
 __pycache__/
+build/
 cmake-build*/
 conan-staging/
 docs/
 hictkR.Rcheck/
+scratch/
 staging/
 venv/
 
@@ -35,6 +37,7 @@ venv/
 *.html
 *.tar.*
 Makevars
+cleanup
 gmon.out
 perf.*
 *.o
