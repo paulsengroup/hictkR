@@ -140,7 +140,7 @@ jobs:
           Rscript -e 'devtools::document()'
           git diff --exit-code man/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: package
           path: hictkR_*.*.*.tar.gz
