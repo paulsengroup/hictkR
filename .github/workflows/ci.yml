@@ -139,7 +139,7 @@ jobs:
         uses: actions/cache@v4
         id: restore-conan-cache
         with:
-          key: conan-cache-ci-${{ matrix.os }}-${{ hashFiles( 'configure', 'deps/conanfile.py', 'deps/generate_makevars.py') }}
+          key: conan-cache-ci-${{ matrix.os }}-${{ hashFiles( 'configure', 'tools/conanfile.py', 'tools/generate_makevars.py') }}
           path: ${{ env.HICTKR_CONAN_HOME }}/p
 
       - name: Build and test package
