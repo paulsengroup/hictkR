@@ -37,7 +37,7 @@ required_conan_version = ">=2.0"
 
 class HictkConan(ConanFile):
     name = "hictk"
-    version = "2.1.4"
+    version = "2.2.0"
     description = "Blazing fast toolkit to work with .hic and .cool files"
     license = "MIT"
     url = "https://github.com/paulsengroup/hictkR"
@@ -52,17 +52,8 @@ class HictkConan(ConanFile):
             "sources": {
                 HictkConan.version: {
                     "url": f"https://github.com/paulsengroup/hictk/archive/refs/tags/v{HictkConan.version}.tar.gz",
-                    "sha256": "3a0030425176dacc25c20afc6fedb5dfbbc3c1a67f773be11ac77d7fa6b7efde",
+                    "sha256": "989b6e84b967309d9822ee3274abf98daba66d3d6e6ae8c9abffcede07b24761",
                 },
-            },
-            "patches": {
-                "2.1.4": [
-                    {
-                        "patch_file": "patches/hictk_v2.1.4_eigen_include.patch",
-                        "patch_type": "portability",
-                        "patch_description": "Support including Eigen headers located under eigen3/",
-                    }
-                ]
             },
         }
 
