@@ -25,8 +25,8 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/r-build.yml"
-      - "deps/conanfile.py"
-      - "deps/generate_makevars.py"
+      - "tools/conanfile.py"
+      - "tools/generate_makevars.py"
       - "R/**"
       - "inst/extdata/**"
       - "man/**"
@@ -43,8 +43,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/r-build.yml"
-      - "deps/conanfile.py"
-      - "deps/generate_makevars.py"
+      - "tools/conanfile.py"
+      - "tools/generate_makevars.py"
       - "R/**"
       - "inst/extdata/**"
       - "man/**"
