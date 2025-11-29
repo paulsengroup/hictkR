@@ -141,6 +141,9 @@ class HictkConan(ConanFile):
 
         self.cpp_info.defines.append("HICTK_WITH_ARROW")
         self.cpp_info.defines.append("HICTK_WITH_EIGEN")
+        # TODO These should've been defined by the Arrow Conan recipe
+        self.cpp_info.defines.append("ARROW_STATIC")
+        self.cpp_info.defines.append("ARROW_COMPUTE_STATIC")
 
     def configure(self):
         self.options["arrow"].compute = True
