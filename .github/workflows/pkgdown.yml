@@ -25,8 +25,8 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/pkgdown.yml"
-      - "deps/conanfile.py"
-      - "deps/generate_makevars.py"
+      - "tools/conanfile.py"
+      - "tools/generate_makevars.py"
       - "R/**"
       - "inst/extdata/**"
       - "man/**"
@@ -44,8 +44,8 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/pkgdown.yml"
-      - "deps/conanfile.py"
-      - "deps/generate_makevars.py"
+      - "tools/conanfile.py"
+      - "tools/generate_makevars.py"
       - "R/**"
       - "inst/extdata/**"
       - "man/**"
@@ -99,7 +99,7 @@ jobs:
         uses: actions/cache@v4
         id: restore-conan-cache
         with:
-          key: conan-cache-pkgdown-${{ hashFiles( 'configure', 'deps/conanfile.py', 'deps/generate_makevars.py') }}
+          key: conan-cache-pkgdown-${{ hashFiles( 'configure', 'tools/conanfile.py', 'tools/generate_makevars.py') }}
           path: ${{ env.HICTKR_CONAN_HOME }}/p
 
       - name: Add requirements
