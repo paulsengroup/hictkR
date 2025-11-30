@@ -389,6 +389,8 @@ def run_conan_install(
         "--settings=build_type=Release",
         "--settings=compiler.cppstd=17",
         "--conf=tools.cmake.cmaketoolchain:generator=Ninja",
+        "--options",
+        "*/*:shared=False",
     ]
 
     if platform.system() != "Darwin":

@@ -62,6 +62,8 @@ class HictkConan(ConanFile):
 
     def build_requirements(self):
         self.requires("cmake/[>=3.25]")
+
+    def requirements(self):
         # re2
         self.requires("abseil/20250814.0#4e0fdd34a888b97aca482e648fc27a3b", force=True)
         # arrow
@@ -69,7 +71,6 @@ class HictkConan(ConanFile):
         # hdf5
         self.requires("zlib/1.3.1#b8bc2603263cf7eccbd6e17e66b0ed76", force=True)
 
-    def requirements(self):
         self.requires("arrow/22.0.0#e46b173ba20adc478f7926495aeed142")
         self.requires("bshoshany-thread-pool/5.0.0#d94da300363f0c35b8f41b2c5490c94d")
         self.requires("concurrentqueue/1.0.4#1e48e1c712bcfd892087c9c622a51502")
