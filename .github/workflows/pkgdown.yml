@@ -96,7 +96,7 @@ jobs:
           Ncpus: ${{ env.NPROC }}
 
       - name: Restore Conan cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: restore-conan-cache
         with:
           key: conan-cache-pkgdown-${{ hashFiles( 'configure', 'deps/conanfile.py', 'deps/generate_makevars.py') }}
