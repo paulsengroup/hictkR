@@ -260,8 +260,7 @@ def compile_and_check_output(source: str, tmpdir: pathlib.Path) -> str:
 
 def detect_hdf5_version(tmpdir: pathlib.Path) -> str:
     res = compile_and_check_output(
-        source=textwrap.dedent(
-            """
+        source=textwrap.dedent("""
             #include <H5public.h>
             #include <cstdio>
             #include <cstdlib>
@@ -270,8 +269,7 @@ def detect_hdf5_version(tmpdir: pathlib.Path) -> str:
               printf("%d.%d.%d\\n", int{H5_VERS_MAJOR}, int{H5_VERS_MINOR}, int{H5_VERS_RELEASE});
               return EXIT_SUCCESS;
             }
-            """
-        ),
+            """),
         tmpdir=tmpdir,
     )
 
@@ -281,8 +279,7 @@ def detect_hdf5_version(tmpdir: pathlib.Path) -> str:
 
 def detect_zlib_version(tmpdir: pathlib.Path) -> str:
     res = compile_and_check_output(
-        source=textwrap.dedent(
-            """
+        source=textwrap.dedent("""
             #include <cstdio>
             #include <cstdlib>
             #include <zlib.h>
@@ -291,8 +288,7 @@ def detect_zlib_version(tmpdir: pathlib.Path) -> str:
             printf("%d.%d.%d\\n", int{ZLIB_VER_MAJOR}, int{ZLIB_VER_MINOR}, int{ZLIB_VER_REVISION});
             return EXIT_SUCCESS;
             }
-            """
-        ),
+            """),
         tmpdir=tmpdir,
     )
     assert res != ""
@@ -434,17 +430,13 @@ def detect_filesystem_link_flag(tmpdir: pathlib.Path) -> str | None:
     src_file = tmpdir / "filesystem_test.cpp"
     test_program = tmpdir / "test.bin"
 
-    src_file.write_text(
-        textwrap.dedent(
-            """
+    src_file.write_text(textwrap.dedent("""
             #include <filesystem>
 
             int main() {
                 return std::filesystem::path{}.empty() == false;
             }
-            """
-        )
-    )
+            """))
 
     def try_compile(*args) -> bool:
         cxx = find_cxx()
@@ -487,8 +479,7 @@ def generate_makevars(
     cxx = find_cxx()
     cxx_flags = cxx_flags_rcpp()
 
-    makevars = textwrap.dedent(
-        f"""
+    makevars = textwrap.dedent(f"""
         export CC := {cc}
         export CXX := {cxx}
         export CXX17 := {cxx}
@@ -506,8 +497,7 @@ def generate_makevars(
         PKG_LIBS += $(addprefix -L ,$(CONAN_LIB_DIRS))
         PKG_LIBS += $(addprefix -l,$(CONAN_LIBS))
         PKG_LIBS += $(addprefix -l,$(CONAN_SYSTEM_LIBS))
-        """
-    )
+        """)
 
     filesystem_link_flags = detect_filesystem_link_flag(tmpdir)
     if filesystem_link_flags is not None:
